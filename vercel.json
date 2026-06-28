@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/recipe-extractor.js": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  }
+}

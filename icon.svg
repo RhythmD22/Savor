@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="90" fill="#1C1714"/>
+  <!-- Recipe book -->
+  <rect x="106" y="96" width="300" height="320" rx="30" fill="#FFF6F0" stroke="#D35A1C" stroke-width="12"/>
+  <line x1="146" y1="190" x2="366" y2="190" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
+  <line x1="146" y1="240" x2="366" y2="240" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
+  <line x1="146" y1="290" x2="320" y2="290" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
+  <line x1="146" y1="340" x2="280" y2="340" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
+  <!-- Plus badge -->
+  <circle cx="380" cy="96" r="60" fill="#D35A1C" stroke="#1C1714" stroke-width="10"/>
+  <path d="M380 64v64M348 96h64" stroke="#FFF6F0" stroke-width="12" stroke-linecap="round"/>
+</svg>
