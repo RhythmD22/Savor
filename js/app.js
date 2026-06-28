@@ -115,4 +115,8 @@ import { initHealth } from './health.js';
   } else {
     init();
   }
+
+  if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+    navigator.serviceWorker.register('/Savor/service-worker.js').catch(() => {});
+  }
 })();

@@ -812,7 +812,7 @@
           }
         });
       }
-    } catch {}
+    } catch { }
 
     try {
       const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=6&fields=product_name,brands,nutriments,code`;
@@ -839,17 +839,17 @@
           });
         }
       }
-    } catch {}
+    } catch { }
 
     try {
       const usda = await searchUsda(query);
       results.push(...usda);
-    } catch {}
+    } catch { }
 
     try {
       const spoon = await searchSpoonacular(query);
       results.push(...spoon);
-    } catch {}
+    } catch { }
 
     return results.slice(0, 20);
   }
@@ -2321,5 +2321,9 @@
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+
+  if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+    navigator.serviceWorker.register('/Savor/service-worker.js').catch(() => {});
   }
 })();
