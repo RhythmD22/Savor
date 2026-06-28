@@ -329,7 +329,7 @@ async function searchFood(query) {
         }
       });
     }
-  } catch {}
+  } catch { }
 
   try {
     const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=6&fields=product_name,brands,nutriments,code`;
@@ -356,17 +356,17 @@ async function searchFood(query) {
         });
       }
     }
-  } catch {}
+  } catch { }
 
   try {
     const usda = await searchUsda(query);
     results.push(...usda);
-  } catch {}
+  } catch { }
 
   try {
     const spoon = await searchSpoonacular(query);
     results.push(...spoon);
-  } catch {}
+  } catch { }
 
   return results.slice(0, 20);
 }

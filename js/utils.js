@@ -31,12 +31,12 @@ function showDialog({ title, content, actions } = {}) {
     actionsHTML = `
       <div class="dialog-actions">
         ${actions
-          .map(
-            (a) =>
-              `<button class="btn ${a.primary ? 'btn-primary' : 'btn-secondary'}"
+        .map(
+          (a) =>
+            `<button class="btn ${a.primary ? 'btn-primary' : 'btn-secondary'}"
                 data-action="${a.id || ''}">${a.label}</button>`
-          )
-          .join('')}
+        )
+        .join('')}
       </div>`;
   }
 

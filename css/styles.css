@@ -330,26 +330,22 @@
   .bg-ruled {
     position: absolute;
     inset: 0;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 27px,
-      rgba(184, 69, 13, 0.10) 27px,
-      rgba(184, 69, 13, 0.10) 28px
-    );
+    background-image: repeating-linear-gradient(to bottom,
+        transparent,
+        transparent 27px,
+        rgba(184, 69, 13, 0.10) 27px,
+        rgba(184, 69, 13, 0.10) 28px);
   }
 
   /* Red margin line — dark mode */
   .bg-margin {
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(
-      to right,
-      transparent 36px,
-      rgba(220, 38, 38, 0.18) 36px,
-      rgba(220, 38, 38, 0.18) 37px,
-      transparent 37px
-    );
+    background-image: linear-gradient(to right,
+        transparent 36px,
+        rgba(220, 38, 38, 0.18) 36px,
+        rgba(220, 38, 38, 0.18) 37px,
+        transparent 37px);
   }
 
   /* Paper grain */
@@ -425,23 +421,19 @@
   }
 
   [data-theme="light"] .bg-ruled {
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 27px,
-      rgba(184, 69, 13, 0.08) 27px,
-      rgba(184, 69, 13, 0.08) 28px
-    );
+    background-image: repeating-linear-gradient(to bottom,
+        transparent,
+        transparent 27px,
+        rgba(184, 69, 13, 0.08) 27px,
+        rgba(184, 69, 13, 0.08) 28px);
   }
 
   [data-theme="light"] .bg-margin {
-    background-image: linear-gradient(
-      to right,
-      transparent 36px,
-      rgba(220, 38, 38, 0.12) 36px,
-      rgba(220, 38, 38, 0.12) 37px,
-      transparent 37px
-    );
+    background-image: linear-gradient(to right,
+        transparent 36px,
+        rgba(220, 38, 38, 0.12) 36px,
+        rgba(220, 38, 38, 0.12) 37px,
+        transparent 37px);
   }
 
   [data-theme="light"] .bg-noise {
@@ -1241,8 +1233,8 @@
     line-height: 1.5;
   }
 
-  [class*="-grid"] > .empty-state,
-  .card-grid > .empty-state {
+  [class*="-grid"]>.empty-state,
+  .card-grid>.empty-state {
     grid-column: 1 / -1;
   }
 }
@@ -1307,7 +1299,7 @@
       height: 100dvh;
       flex-direction: column;
       justify-content: flex-start;
-    gap: var(--space-xs);
+      gap: var(--space-xs);
       margin: 0;
       padding: var(--space-xl) 0;
       padding-top: calc(var(--space-2xl) + env(safe-area-inset-top, 0px));
@@ -1436,6 +1428,7 @@
 /* ── REDUCED MOTION ────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
