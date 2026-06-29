@@ -5,8 +5,8 @@
   "start_url": "/Savor/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#1C1714",
-  "theme_color": "#1C1714",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
   "icons": [
     {
       "src": "/Savor/icon.svg",
