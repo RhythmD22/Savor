@@ -107,27 +107,20 @@ Savor/
 ├── bundle.js                   # Concatenated production bundle (all JS modules)
 ├── icon.svg                    # Vector PWA icon (source — used as favicon, apple-touch-icon, and maskable)
 ├── icon-maskable.svg                       # Maskable icon variant with safe-zone padding
-├── android-chrome-192x192.png              # PWA icon 192x192 (light)
-├── dark-android-chrome-192x192.png         # PWA icon 192x192 (dark)
-├── android-chrome-512x512.png              # PWA icon 512x512 (light)
-├── dark-android-chrome-512x512.png         # PWA icon 512x512 (dark)
+├── android-chrome-192x192.png              # PWA icon 192x192
+├── android-chrome-512x512.png              # PWA icon 512x512
 ├── android-chrome-maskable-192x192.png     # Android adaptive icon 192x192
 ├── android-chrome-maskable-512x512.png     # Android adaptive icon 512x512
-├── apple-touch-icon.png                    # iOS home screen 180x180 (light)
-├── apple-touch-icon-dark.png               # iOS home screen 180x180 (dark)
-├── apple-touch-icon-120x120.png            # iOS home screen 120x120 (light)
-├── apple-touch-icon-120x120-dark.png       # iOS home screen 120x120 (dark)
-├── apple-touch-icon-152x152.png            # iOS home screen 152x152 (light)
-├── apple-touch-icon-152x152-dark.png       # iOS home screen 152x152 (dark)
-├── apple-touch-icon-167x167.png            # iOS home screen 167x167 (light)
-├── apple-touch-icon-167x167-dark.png       # iOS home screen 167x167 (dark)
+├── apple-touch-icon.png                    # iOS home screen 180x180
+├── apple-touch-icon-120x120.png            # iOS home screen 120x120
+├── apple-touch-icon-152x152.png            # iOS home screen 152x152
+├── apple-touch-icon-167x167.png            # iOS home screen 167x167
 ├── favicon.ico                             # Multi-resolution favicon (16+32+48)
-├── manifest-light.json         # PWA Web App Manifest (light theme)
-├── manifest-dark.json          # PWA Web App Manifest (dark theme)
+├── manifest.json               # PWA Web App Manifest
 ├── service-worker.js           # Offline caching and install flow
 ├── vercel.json                 # Vercel deployment config (SPA rewrites + serverless function)
+├── .gitignore
 ├── LICENSE
-└── .gitignore
 ```
 
 The app is a single-page application. All views live as `<template>` elements inside `index.html`. The router in `app.js` clones templates into `#app-root` on navigation. Data flows through `localStorage` via `data.js` and is consumed by page-specific init functions. There is no build step or bundler; `bundle.js` is a simple concatenation for production.
