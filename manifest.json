@@ -12,7 +12,13 @@
       "src": "/Savor/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/Savor/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     },
     {
       "src": "/Savor/android-chrome-192x192.png",

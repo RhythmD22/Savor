@@ -101,10 +101,10 @@ Savor/
 │   ├── recipe-detail.js        # Recipe detail: nutrition, ingredients, instructions, log/delete actions
 │   ├── import.js               # Import page: URL extraction, manual create, API key management
 │   ├── meal-log.js             # Food diary: date navigation, food search, meal entries, macro bars
-│   └── health.js               # Health page: weight chart (Chart.js), profile, TDEE calculation
+│   ├── health.js               # Health page: weight chart (Chart.js), profile, TDEE calculation
+│   └── bundle.js               # Concatenated production bundle (all JS modules)
 ├── api/
 │   └── recipe-extractor.js     # Vercel serverless function — extracts recipe data from URLs
-├── bundle.js                   # Concatenated production bundle (all JS modules)
 ├── icon.svg                    # Vector PWA icon (source — used as favicon, apple-touch-icon, and maskable)
 ├── icon-maskable.svg                       # Maskable icon variant with safe-zone padding
 ├── android-chrome-192x192.png              # PWA icon 192x192
