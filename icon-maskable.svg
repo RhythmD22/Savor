@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" fill="none">
-  <rect width="640" height="640" rx="112" fill="#1C1714"/>
+  <rect width="640" height="640" fill="#1C1714"/>
   <!-- Recipe book — scaled to fit safe zone (80% = 512x512 centered) -->
-  <rect x="170" y="160" width="300" height="320" rx="30" fill="#FFF6F0" stroke="#D35A1C" stroke-width="12"/>
+  <rect x="170" y="160" width="300" height="320" fill="#FFF6F0" stroke="#D35A1C" stroke-width="12"/>
   <line x1="210" y1="254" x2="430" y2="254" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
   <line x1="210" y1="304" x2="430" y2="304" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
   <line x1="210" y1="354" x2="384" y2="354" stroke="#B8450D" stroke-width="12" stroke-linecap="round"/>
