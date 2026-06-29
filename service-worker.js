@@ -16,9 +16,13 @@ const urlsToCache = [
   '/Savor/icon-maskable.svg',
   '/Savor/favicon.ico',
   '/Savor/apple-touch-icon.png',
+  '/Savor/apple-touch-icon-dark.png',
   '/Savor/apple-touch-icon-120x120.png',
+  '/Savor/apple-touch-icon-120x120-dark.png',
   '/Savor/apple-touch-icon-152x152.png',
+  '/Savor/apple-touch-icon-152x152-dark.png',
   '/Savor/apple-touch-icon-167x167.png',
+  '/Savor/apple-touch-icon-167x167-dark.png',
   '/Savor/android-chrome-192x192.png',
   '/Savor/android-chrome-512x512.png',
   '/Savor/android-chrome-maskable-192x192.png',
@@ -29,7 +33,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.allSettled(
-        urlsToCache.map(url => cache.add(url).catch(() => {}))
+        urlsToCache.map(url => cache.add(url).catch(() => { }))
       );
     }).then(() => self.skipWaiting())
   );
