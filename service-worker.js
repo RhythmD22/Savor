@@ -11,7 +11,8 @@ const urlsToCache = [
   '/Savor/css/meal-log.css',
   '/Savor/css/health.css',
   '/Savor/js/bundle.js',
-  '/Savor/manifest.json',
+  '/Savor/manifest-light.json',
+  '/Savor/manifest-dark.json',
   '/Savor/icon.svg',
   '/Savor/icon-maskable.svg',
   '/Savor/favicon.ico',
@@ -25,6 +26,8 @@ const urlsToCache = [
   '/Savor/apple-touch-icon-167x167-dark.png',
   '/Savor/android-chrome-192x192.png',
   '/Savor/android-chrome-512x512.png',
+  '/Savor/dark-android-chrome-192x192.png',
+  '/Savor/dark-android-chrome-512x512.png',
   '/Savor/android-chrome-maskable-192x192.png',
   '/Savor/android-chrome-maskable-512x512.png',
 ];

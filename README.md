@@ -107,8 +107,10 @@ Savor/
 ├── bundle.js                   # Concatenated production bundle (all JS modules)
 ├── icon.svg                    # Vector PWA icon (source — used as favicon, apple-touch-icon, and maskable)
 ├── icon-maskable.svg                       # Maskable icon variant with safe-zone padding
-├── android-chrome-192x192.png              # PWA icon 192x192
-├── android-chrome-512x512.png              # PWA icon 512x512
+├── android-chrome-192x192.png              # PWA icon 192x192 (light)
+├── dark-android-chrome-192x192.png         # PWA icon 192x192 (dark)
+├── android-chrome-512x512.png              # PWA icon 512x512 (light)
+├── dark-android-chrome-512x512.png         # PWA icon 512x512 (dark)
 ├── android-chrome-maskable-192x192.png     # Android adaptive icon 192x192
 ├── android-chrome-maskable-512x512.png     # Android adaptive icon 512x512
 ├── apple-touch-icon.png                    # iOS home screen 180x180 (light)
@@ -120,7 +122,8 @@ Savor/
 ├── apple-touch-icon-167x167.png            # iOS home screen 167x167 (light)
 ├── apple-touch-icon-167x167-dark.png       # iOS home screen 167x167 (dark)
 ├── favicon.ico                             # Multi-resolution favicon (16+32+48)
-├── manifest.json               # PWA Web App Manifest
+├── manifest-light.json         # PWA Web App Manifest (light theme)
+├── manifest-dark.json          # PWA Web App Manifest (dark theme)
 ├── service-worker.js           # Offline caching and install flow
 ├── vercel.json                 # Vercel deployment config (SPA rewrites + serverless function)
 ├── LICENSE
