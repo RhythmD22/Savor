@@ -2338,9 +2338,23 @@
     root.focus({ preventScroll: true });
   }
 
+  function initKeyboardFix() {
+    const nav = document.querySelector('.bottom-nav');
+    if (!nav || !window.visualViewport) return;
+
+    const reposition = () => {
+      const offset = window.visualViewport.offsetTop;
+      nav.style.transform = offset > 0 ? `translateY(${offset}px)` : '';
+    };
+
+    window.visualViewport.addEventListener('resize', reposition);
+    window.visualViewport.addEventListener('scroll', reposition);
+  }
+
   function init() {
     try {
       initTheme();
+      initKeyboardFix();
 
       document.querySelectorAll('.nav-item').forEach((btn) => {
         btn.addEventListener('click', () => {
