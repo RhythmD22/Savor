@@ -2339,16 +2339,33 @@
   }
 
   function initKeyboardFix() {
-    const nav = document.querySelector('.bottom-nav');
-    if (!nav || !window.visualViewport) return;
+    let savedScrollY = 0;
 
-    const reposition = () => {
-      const offset = window.visualViewport.offsetTop;
-      nav.style.transform = offset > 0 ? `translateY(${offset}px)` : '';
-    };
+    document.addEventListener('focusin', (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
+        savedScrollY = window.scrollY;
+        document.documentElement.style.position = 'fixed';
+        document.documentElement.style.top = `-${savedScrollY}px`;
+        document.documentElement.style.width = '100%';
+        document.documentElement.style.overflow = 'hidden';
+      }
+    });
 
-    window.visualViewport.addEventListener('resize', reposition);
-    window.visualViewport.addEventListener('scroll', reposition);
+    document.addEventListener('focusout', (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
+        requestAnimationFrame(() => {
+          if (document.querySelector('input:focus, textarea:focus, [contenteditable]:focus')) return;
+          document.documentElement.style.position = '';
+          document.documentElement.style.top = '';
+          document.documentElement.style.width = '';
+          document.documentElement.style.overflow = '';
+          window.scrollTo(0, savedScrollY);
+          savedScrollY = 0;
+        });
+      }
+    });
   }
 
   function init() {
