@@ -85,39 +85,8 @@ import { initHealth } from './health.js';
     root.focus({ preventScroll: true });
   }
 
-  function initKeyboardFix() {
-    let savedScrollY = 0;
-
-    document.addEventListener('focusin', (e) => {
-      const tag = e.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
-        savedScrollY = window.scrollY;
-        document.documentElement.style.position = 'fixed';
-        document.documentElement.style.top = `-${savedScrollY}px`;
-        document.documentElement.style.width = '100%';
-        document.documentElement.style.overflow = 'hidden';
-      }
-    });
-
-    document.addEventListener('focusout', (e) => {
-      const tag = e.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) {
-        requestAnimationFrame(() => {
-          if (document.querySelector('input:focus, textarea:focus, [contenteditable]:focus')) return;
-          document.documentElement.style.position = '';
-          document.documentElement.style.top = '';
-          document.documentElement.style.width = '';
-          document.documentElement.style.overflow = '';
-          window.scrollTo(0, savedScrollY);
-          savedScrollY = 0;
-        });
-      }
-    });
-  }
-
   function init() {
     initTheme();
-    initKeyboardFix();
 
     document.querySelectorAll('.nav-item').forEach((btn) => {
       btn.addEventListener('click', () => {
