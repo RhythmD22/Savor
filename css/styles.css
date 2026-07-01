@@ -497,13 +497,14 @@
 
 @layer layout {
   .bottom-nav {
-    position: sticky;
+    position: fixed;
+    right: var(--space-md);
     bottom: var(--space-sm);
+    left: var(--space-md);
     z-index: 50;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin: 0 var(--space-md);
     padding: var(--space-xs) var(--space-sm);
     padding-bottom: calc(var(--space-xs) + env(safe-area-inset-bottom, 0px));
     min-height: var(--bottom-nav-height);
@@ -592,7 +593,7 @@
   #app-root {
     flex: 1;
     padding: var(--space-lg);
-    padding-bottom: var(--space-2xl);
+    padding-bottom: calc(var(--bottom-nav-height) + var(--space-md) + env(safe-area-inset-bottom, 0px));
     animation: page-enter 0.4s var(--ease-out-expo);
   }
 
@@ -1182,6 +1183,15 @@
     background: var(--text-muted);
     border-radius: var(--radius-full);
     margin: 0 auto var(--space-lg);
+    position: relative;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .dialog-handle::after {
+    content: '';
+    position: absolute;
+    inset: -12px -16px;
   }
 
   .dialog-title {

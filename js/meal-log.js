@@ -196,9 +196,9 @@ function openFoodSearch(mealType) {
   overlay.setAttribute('aria-label', 'Search foods');
 
   overlay.innerHTML = `
-    <div class="dialog-sheet">
+    <div class="dialog-sheet food-search-dialog">
       <div class="dialog-handle"></div>
-      <input type="text" class="glass-input" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
+      <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
       <div class="food-search-results" id="food-search-results">
         <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
       </div>
@@ -210,6 +210,61 @@ function openFoodSearch(mealType) {
 
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
+
+  const sheet = overlay.querySelector('.dialog-sheet');
+  const handle = overlay.querySelector('.dialog-handle');
+  const resultsEl = document.getElementById('food-search-results');
+
+  let startY = 0;
+  let currentTranslate = 0;
+  let dragging = false;
+
+  const removeOverlay = () => {
+    overlay.remove();
+    document.body.style.overflow = '';
+  };
+
+  const onTouchStart = (e) => {
+    startY = e.touches[0].clientY;
+    currentTranslate = 0;
+    dragging = true;
+    sheet.style.transition = 'none';
+  };
+
+  const onTouchMove = (e) => {
+    if (!dragging) return;
+    const deltaY = e.touches[0].clientY - startY;
+
+    if (deltaY > 0) {
+      currentTranslate = deltaY;
+      sheet.style.transform = `translateY(${deltaY}px)`;
+      const opacity = Math.max(0, 1 - deltaY / 300);
+      overlay.style.background = `rgba(0, 0, 0, ${0.55 * opacity})`;
+      e.preventDefault();
+    } else if (deltaY < -10 && resultsEl) {
+      resultsEl.scrollTop += Math.abs(deltaY);
+      startY = e.touches[0].clientY;
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+
+    if (currentTranslate > 100) {
+      sheet.style.transform = 'translateY(100%)';
+      overlay.style.background = 'rgba(0, 0, 0, 0)';
+      setTimeout(removeOverlay, 250);
+    } else {
+      sheet.style.transform = '';
+      overlay.style.background = '';
+    }
+  };
+
+  handle.addEventListener('touchstart', onTouchStart, { passive: false });
+  handle.addEventListener('touchmove', onTouchMove, { passive: false });
+  handle.addEventListener('touchend', onTouchEnd);
 
   const searchInput = document.getElementById('food-search-input');
   if (searchInput) {
@@ -223,11 +278,6 @@ function openFoodSearch(mealType) {
       }, 250)
     );
   }
-
-  const removeOverlay = () => {
-    overlay.remove();
-    document.body.style.overflow = '';
-  };
 }
 
 function renderFoodResults(results, overlay, mealType) {
