@@ -204,12 +204,17 @@ function openFoodSearch(mealType) {
       </div>
     </div>`;
 
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
-
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
+
+  const removeOverlay = () => {
+    overlay.remove();
+    document.body.style.overflow = '';
+  };
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) removeOverlay();
+  });
 
   const sheet = overlay.querySelector('.dialog-sheet');
   const handle = overlay.querySelector('.dialog-handle');
@@ -218,11 +223,6 @@ function openFoodSearch(mealType) {
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
-
-  const removeOverlay = () => {
-    overlay.remove();
-    document.body.style.overflow = '';
-  };
 
   const onTouchStart = (e) => {
     startY = e.touches[0].clientY;

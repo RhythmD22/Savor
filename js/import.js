@@ -102,9 +102,10 @@ async function handleUrlExtract() {
   showStatus('Extracting recipe...', 'loading');
 
   let result;
-  if (url.includes('allrecipes.com') || url.includes('foodnetwork.com') || url.includes('epicurious.com')) {
-    result = await fetchRecipeFromUrl(url);
-  } else {
+
+  result = await fetchRecipeFromUrl(url);
+
+  if (!result.success) {
     result = await extractRecipeLocally(url);
   }
 

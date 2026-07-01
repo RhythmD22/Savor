@@ -502,10 +502,34 @@
   }
 
   async function extractRecipeLocally(url) {
+    const proxies = [
+      (fetchUrl) => fetch(fetchUrl),
+      (fetchUrl) => fetch(`https://proxy.cors.sh/${fetchUrl}`),
+      (fetchUrl) => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fetchUrl)}`),
+      (fetchUrl) => fetch(`https://corsproxy.io/?${encodeURIComponent(fetchUrl)}`),
+      (fetchUrl) => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`),
+    ];
+
+    let html;
+
+    for (const fetcher of proxies) {
+      try {
+        const response = await fetcher(url);
+        if (response.ok) {
+          const text = await response.text();
+          if (text && text.length > 500) {
+            html = text;
+            break;
+          }
+        }
+      } catch { }
+    }
+
+    if (!html) {
+      return { success: false, error: 'Could not reach the website. Check the URL and try again.' };
+    }
+
     try {
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-      const response = await fetch(proxyUrl);
-      const html = await response.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
@@ -1362,9 +1386,10 @@
     showStatus('Extracting recipe...', 'loading');
 
     let result;
-    if (url.includes('allrecipes.com') || url.includes('foodnetwork.com') || url.includes('epicurious.com')) {
-      result = await fetchRecipeFromUrl(url);
-    } else {
+
+    result = await fetchRecipeFromUrl(url);
+
+    if (!result.success) {
       result = await extractRecipeLocally(url);
     }
 
@@ -1831,12 +1856,17 @@
         </div>
       </div>`;
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.remove();
-    });
-
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
+
+    const removeOverlay = () => {
+      overlay.remove();
+      document.body.style.overflow = '';
+    };
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) removeOverlay();
+    });
 
     const sheet = overlay.querySelector('.dialog-sheet');
     const handle = overlay.querySelector('.dialog-handle');
@@ -1845,11 +1875,6 @@
     let startY = 0;
     let currentTranslate = 0;
     let dragging = false;
-
-    const removeOverlay = () => {
-      overlay.remove();
-      document.body.style.overflow = '';
-    };
 
     const onTouchStart = (e) => {
       startY = e.touches[0].clientY;

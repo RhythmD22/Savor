@@ -19,10 +19,34 @@ async function fetchRecipeFromUrl(url) {
 }
 
 async function extractRecipeLocally(url) {
+  const proxies = [
+    (fetchUrl) => fetch(fetchUrl),
+    (fetchUrl) => fetch(`https://proxy.cors.sh/${fetchUrl}`),
+    (fetchUrl) => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fetchUrl)}`),
+    (fetchUrl) => fetch(`https://corsproxy.io/?${encodeURIComponent(fetchUrl)}`),
+    (fetchUrl) => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`),
+  ];
+
+  let html;
+
+  for (const fetcher of proxies) {
+    try {
+      const response = await fetcher(url);
+      if (response.ok) {
+        const text = await response.text();
+        if (text && text.length > 500) {
+          html = text;
+          break;
+        }
+      }
+    } catch { }
+  }
+
+  if (!html) {
+    return { success: false, error: 'Could not reach the website. Check the URL and try again.' };
+  }
+
   try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    const response = await fetch(proxyUrl);
-    const html = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
@@ -51,7 +75,7 @@ async function extractRecipeLocally(url) {
       },
     };
   } catch (err) {
-    return { success: false, error: 'Could not reach the website. Check the URL and try again.' };
+    return { success: false, error: 'Could not parse recipe from this page.' };
   }
 }
 
