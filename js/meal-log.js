@@ -1,6 +1,6 @@
 import { getMealLog, getMealTypeTotals, getDailyTotals, addMealEntry, removeMealEntry, getRecipes, getProfile } from './data.js';
 import { searchFood } from './api.js';
-import { formatNumber, formatDate, showToast, debounce } from './utils.js';
+import { formatNumber, formatDate, showToast, debounce, escapeHTML } from './utils.js';
 
 let currentDate = new Date();
 
@@ -343,12 +343,6 @@ function renderFoodResults(results, overlay, mealType) {
       renderMealLog();
     });
   });
-}
-
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 export { initMealLog };

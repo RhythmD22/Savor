@@ -1,5 +1,5 @@
 import { getRecipe, toggleFavorite, deleteRecipe, addMealEntry } from './data.js';
-import { formatNumber, formatTime, formatDecimal, showToast, showConfirm } from './utils.js';
+import { formatNumber, formatTime, formatDecimal, showToast, showConfirm, escapeHTML } from './utils.js';
 
 let currentRecipeId = null;
 
@@ -25,11 +25,6 @@ function initRecipeDetail(data) {
 }
 
 function renderRecipeDetail(recipe) {
-  const placeholders = {
-    'recipe-hero': `<div class="recipe-hero-placeholder">${recipe.title.charAt(0).toUpperCase()}</div>`,
-    'recipe-title': escapeHTML(recipe.title),
-  };
-
   if (recipe.image) {
     const hero = document.getElementById('recipe-hero');
     if (hero) hero.innerHTML = `<img class="recipe-hero-image" src="${escapeHTML(recipe.image)}" alt="${escapeHTML(recipe.title)}">`;
@@ -188,12 +183,6 @@ function bindActions(recipe) {
       });
     });
   }
-}
-
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 export { initRecipeDetail };

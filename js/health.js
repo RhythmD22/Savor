@@ -123,11 +123,6 @@ function calcBMI(profile) {
   return profile.weight / (heightM * heightM);
 }
 
-function calculateBMI(profile) {
-  const bmi = calcBMI(profile);
-  return bmi !== null ? formatDecimal(bmi) : '\u2014';
-}
-
 function getBMICategory(bmi) {
   if (bmi < 18.5) return { label: 'Underweight', class: 'neutral' };
   if (bmi < 25) return { label: 'Normal', class: 'positive' };

@@ -1,12 +1,11 @@
 import { getDailyTotals, getMealTypeTotals, getRecipes, getProfile } from './data.js';
-import { formatNumber } from './utils.js';
+import { formatNumber, escapeHTML } from './utils.js';
 
 function initHome() {
   const today = new Date();
   const totals = getDailyTotals(today);
   const profile = getProfile();
   const recipes = getRecipes();
-  const mealTypes = getMealTypeTotals(today);
 
   const calorieGoal = profile.calorieGoal || 2000;
   const percent = Math.min((totals.calories / calorieGoal) * 100, 100);
@@ -102,12 +101,6 @@ function initHome() {
       mealBreakdown.innerHTML = sections.join('');
     }
   }
-}
-
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 export { initHome };

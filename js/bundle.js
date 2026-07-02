@@ -11,25 +11,25 @@
     if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
     return 'dark';
   }
-
+  
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('savor_theme', theme);
-
+  
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
       meta.setAttribute('content', theme === 'light' ? '#FFFBF8' : '#1C1714');
     }
-
+  
     const btn = document.getElementById('btn-theme');
     if (btn) {
       btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
     }
   }
-
+  
   function initTheme() {
     applyTheme(getPreferredTheme());
-
+  
     const btn = document.getElementById('btn-theme');
     if (btn) {
       btn.addEventListener('click', () => {
@@ -37,13 +37,14 @@
         applyTheme(current === 'light' ? 'dark' : 'light');
       });
     }
-
+  
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
       if (!localStorage.getItem('savor_theme')) {
         applyTheme(e.matches ? 'light' : 'dark');
       }
     });
   }
+  
 
   // ============================================================
   // utils.js
@@ -52,32 +53,32 @@
   function showToast(message, type = '') {
     const container = document.getElementById('toast-container');
     if (!container) return;
-
+  
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`.trimEnd();
     toast.textContent = message;
     toast.setAttribute('role', 'status');
     toast.setAttribute('aria-live', 'polite');
-
+  
     container.appendChild(toast);
-
+  
     setTimeout(() => {
       if (toast.parentNode) toast.remove();
     }, 2800);
   }
-
+  
   function showDialog({ title, content, actions } = {}) {
     const existing = document.querySelector('.dialog-overlay');
     if (existing) existing.remove();
     const previousFocus = document.activeElement;
-  const scrollY = window.scrollY;
-
+    const scrollY = window.scrollY;
+  
     const overlay = document.createElement('div');
     overlay.className = 'dialog-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', title || 'Dialog');
-
+  
     let actionsHTML = '';
     if (actions && actions.length) {
       actionsHTML = `
@@ -91,7 +92,7 @@
           .join('')}
         </div>`;
     }
-
+  
     overlay.innerHTML = `
       <div class="dialog-sheet">
         <div class="dialog-handle"></div>
@@ -102,7 +103,7 @@
         ${content ? `<div class="dialog-content">${content}</div>` : ''}
         ${actionsHTML}
       </div>`;
-
+  
     const closeDialog = () => {
       overlay.remove();
       document.body.style.overflow = '';
@@ -111,14 +112,14 @@
         previousFocus.focus({ preventScroll: true });
       }
     };
-
+  
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeDialog();
     });
-
+  
     const closeBtn = overlay.querySelector('.dialog-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', closeDialog);
-
+  
     overlay.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
@@ -138,13 +139,13 @@
         }
       }
     });
-
+  
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
-
+  
     const firstBtn = overlay.querySelector('button');
     if (firstBtn) firstBtn.focus();
-
+  
     if (actions && actions.length) {
       actions.forEach((a) => {
         const btn = overlay.querySelector(`[data-action="${a.id}"]`);
@@ -156,10 +157,10 @@
         }
       });
     }
-
+  
     return { close: closeDialog };
   }
-
+  
   function showConfirm(message, onConfirm) {
     return showDialog({
       title: message,
@@ -169,23 +170,23 @@
       ],
     });
   }
-
+  
   function formatNumber(n) {
-    if (n === null || n === undefined) return '\u2014';
+    if (n === null || n === undefined) return '—';
     return Math.round(n).toLocaleString();
   }
-
+  
   function formatDecimal(n, decimals = 1) {
-    if (n === null || n === undefined) return '\u2014';
+    if (n === null || n === undefined) return '—';
     return parseFloat(n).toFixed(decimals);
   }
-
+  
   function getRelativeDate(dateStr) {
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
+  
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays}d ago`;
@@ -193,7 +194,7 @@
     if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
     return `${Math.floor(diffDays / 365)}y ago`;
   }
-
+  
   function debounce(fn, delay = 300) {
     let timer;
     return function (...args) {
@@ -201,15 +202,15 @@
       timer = setTimeout(() => fn.apply(this, args), delay);
     };
   }
-
+  
   function formatTime(minutes) {
-    if (!minutes || minutes <= 0) return '\u2014';
+    if (!minutes || minutes <= 0) return '—';
     if (minutes < 60) return `${minutes}m`;
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
-
+  
   function getMealTypeEmoji(type) {
     const map = {
       breakfast: '🌅',
@@ -219,7 +220,7 @@
     };
     return map[type] || '🍽️';
   }
-
+  
   function getMacroColor(type) {
     const map = {
       protein: 'var(--macro-protein)',
@@ -228,19 +229,31 @@
     };
     return map[type] || 'var(--text-secondary)';
   }
-
+  
   function escapeHTML(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
-
+  
+    showToast,
+    showDialog,
+    showConfirm,
+    formatNumber,
+    formatDecimal,
+    getRelativeDate,
+    debounce,
+    formatTime,
+    getMealTypeEmoji,
+    getMacroColor,
+    escapeHTML,
+  };
   // ============================================================
   // data.js
   // ============================================================
 
   const STORAGE_KEY = 'savor_data';
-
+  
   const defaults = {
     recipes: [],
     mealLog: {},
@@ -255,11 +268,10 @@
       proteinGoal: 150,
       carbsGoal: 200,
       fatGoal: 65,
-      weightGoal: null,
     },
     version: 1,
   };
-
+  
   function load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -271,33 +283,33 @@
       return structuredClone(defaults);
     }
   }
-
+  
   function save(data) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
-
+  
   let _data = load();
-
+  
   function getData() {
     return _data;
   }
-
+  
   function saveData() {
     save(_data);
   }
-
+  
   function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
-
+  
   function getRecipes() {
     return _data.recipes;
   }
-
+  
   function getRecipe(id) {
     return _data.recipes.find((r) => r.id === id) || null;
   }
-
+  
   function addRecipe(recipe) {
     const newRecipe = {
       id: generateId(),
@@ -333,7 +345,7 @@
     saveData();
     return newRecipe;
   }
-
+  
   function updateRecipe(id, updates) {
     const idx = _data.recipes.findIndex((r) => r.id === id);
     if (idx === -1) return null;
@@ -345,22 +357,22 @@
     saveData();
     return _data.recipes[idx];
   }
-
+  
   function deleteRecipe(id) {
     _data.recipes = _data.recipes.filter((r) => r.id !== id);
-
+  
     Object.keys(_data.mealLog).forEach((date) => {
       _data.mealLog[date] = _data.mealLog[date].filter((e) => e.recipeId !== id);
     });
     saveData();
   }
-
+  
   function toggleFavorite(id) {
     const recipe = getRecipe(id);
     if (!recipe) return;
     updateRecipe(id, { isFavorite: !recipe.isFavorite });
   }
-
+  
   function getRecipeStats() {
     const recipes = _data.recipes;
     return {
@@ -370,17 +382,17 @@
       tags: [...new Set(recipes.flatMap((r) => r.tags))],
     };
   }
-
+  
   function formatDate(date) {
     const d = date instanceof Date ? date : new Date(date);
     return d.toISOString().split('T')[0];
   }
-
+  
   function getMealLog(date) {
     const key = formatDate(date);
     return _data.mealLog[key] || [];
   }
-
+  
   function addMealEntry(date, entry) {
     const key = formatDate(date);
     if (!_data.mealLog[key]) _data.mealLog[key] = [];
@@ -399,14 +411,14 @@
     saveData();
     return _data.mealLog[key];
   }
-
+  
   function removeMealEntry(date, entryId) {
     const key = formatDate(date);
     if (!_data.mealLog[key]) return;
     _data.mealLog[key] = _data.mealLog[key].filter((e) => e.id !== entryId);
     saveData();
   }
-
+  
   function getDailyTotals(date) {
     const entries = getMealLog(date);
     return {
@@ -417,7 +429,7 @@
       entryCount: entries.length,
     };
   }
-
+  
   function getMealTypeTotals(date) {
     const entries = getMealLog(date);
     const types = { breakfast: [], lunch: [], dinner: [], snack: [] };
@@ -431,20 +443,20 @@
     });
     return types;
   }
-
+  
   function getProfile() {
     return _data.profile;
   }
-
+  
   function updateProfile(updates) {
     _data.profile = { ..._data.profile, ...updates };
     saveData();
   }
-
+  
   function getWeightLog() {
     return [..._data.weightLog].sort((a, b) => new Date(a.date) - new Date(b.date));
   }
-
+  
   function addWeightEntry(weight) {
     _data.weightLog.push({
       id: generateId(),
@@ -453,23 +465,23 @@
     });
     saveData();
   }
-
+  
   function deleteWeightEntry(id) {
     _data.weightLog = _data.weightLog.filter((e) => e.id !== id);
     saveData();
   }
-
+  
   function calculateTDEE() {
     const p = _data.profile;
     if (!p.weight || !p.height || !p.age || !p.gender) return null;
-
+  
     let bmr;
     if (p.gender === 'male') {
       bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age + 5;
     } else {
       bmr = 10 * p.weight + 6.25 * p.height - 5 * p.age - 161;
     }
-
+  
     const multipliers = {
       sedentary: 1.2,
       light: 1.375,
@@ -477,35 +489,35 @@
       active: 1.725,
       veryActive: 1.9,
     };
-
+  
     return Math.round(bmr * (multipliers[p.activityLevel] || 1.55));
   }
-
+  
   function getWeightTrend() {
     const log = getWeightLog();
     if (log.length < 2) return null;
-
+  
     const first = log[0];
     const last = log[log.length - 1];
     const daysDiff = (new Date(last.date) - new Date(first.date)) / (1000 * 60 * 60 * 24);
     const weightDiff = last.weight - first.weight;
-
+  
     return {
       totalChange: Math.round(weightDiff * 100) / 100,
       daysDiff: Math.round(daysDiff),
       weeklyRate: daysDiff >= 7 ? Math.round((weightDiff / (daysDiff / 7)) * 100) / 100 : null,
     };
   }
-
+  
   function resetAll() {
     localStorage.removeItem(STORAGE_KEY);
     _data = load();
   }
-
+  
   function exportData() {
     return JSON.stringify(getData(), null, 2);
   }
-
+  
   function importData(jsonString) {
     let parsed;
     try {
@@ -523,7 +535,34 @@
     _data = merged;
     saveData();
   }
-
+  
+    getData,
+    saveData,
+    generateId,
+    getRecipes,
+    getRecipe,
+    addRecipe,
+    updateRecipe,
+    deleteRecipe,
+    toggleFavorite,
+    getRecipeStats,
+    getMealLog,
+    addMealEntry,
+    removeMealEntry,
+    getDailyTotals,
+    getMealTypeTotals,
+    getProfile,
+    updateProfile,
+    getWeightLog,
+    addWeightEntry,
+    deleteWeightEntry,
+    calculateTDEE,
+    getWeightTrend,
+    formatDate,
+    resetAll,
+    exportData,
+    importData,
+  };
   // ============================================================
   // api.js
   // ============================================================
@@ -535,20 +574,19 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.error || `Server responded with ${response.status}`);
       }
-
+  
       return { success: true, recipe: data };
     } catch (err) {
-      console.error('Recipe extraction failed:', err);
       return { success: false, error: err.message };
     }
   }
-
+  
   async function extractRecipeLocally(url) {
     const proxies = [
       (fetchUrl) => fetch(fetchUrl),
@@ -556,11 +594,10 @@
       (fetchUrl) => fetch(`https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(fetchUrl)}`),
       (fetchUrl) => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fetchUrl)}`),
       (fetchUrl) => fetch(`https://corsproxy.io/?${encodeURIComponent(fetchUrl)}`),
-      (fetchUrl) => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`),
     ];
-
+  
     let html;
-
+  
     for (const fetcher of proxies) {
       try {
         const response = await fetcher(url);
@@ -573,15 +610,15 @@
         }
       } catch { }
     }
-
+  
     if (!html) {
       return { success: false, error: 'Could not reach the website. Check the URL and try again.' };
     }
-
+  
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-
+  
       const jsonLdScripts = doc.querySelectorAll('script[type="application/ld+json"]');
       for (const script of jsonLdScripts) {
         try {
@@ -590,10 +627,10 @@
           if (recipe) return { success: true, recipe };
         } catch { }
       }
-
+  
       const microdata = extractMicrodata(doc);
       if (microdata) return { success: true, recipe: microdata };
-
+  
       return {
         success: true,
         recipe: {
@@ -611,10 +648,10 @@
         },
       };
     } catch (err) {
-      return { success: false, error: 'Could not reach the website. Check the URL and try again.' };
+      return { success: false, error: 'Could not parse recipe from this page.' };
     }
   }
-
+  
   function findRecipeInJsonLd(data) {
     const items = Array.isArray(data) ? data : [data];
     for (const item of items) {
@@ -629,7 +666,7 @@
     }
     return null;
   }
-
+  
   function parseJsonLdRecipe(r) {
     const getText = (v) => {
       if (!v) return '';
@@ -637,11 +674,11 @@
       if (Array.isArray(v)) return v.map(getText).filter(Boolean).join('\n');
       return '';
     };
-
+  
     const ingredients = (r.recipeIngredient || [])
       .map(getText)
       .filter(Boolean);
-
+  
     const instructions = [];
     const rawInstructions = r.recipeInstructions || [];
     if (typeof rawInstructions === 'string') {
@@ -662,7 +699,7 @@
       };
       collectSteps(rawInstructions);
     }
-
+  
     const nutrition = {};
     if (r.nutrition) {
       const nc = r.nutrition;
@@ -674,7 +711,7 @@
       nutrition.sugar = parseNumber(nc.sugarContent);
       nutrition.sodium = parseNumber(nc.sodiumContent);
     }
-
+  
     return {
       title: r.name || '',
       description: r.description || '',
@@ -693,30 +730,30 @@
       mealType: r.recipeCategory || '',
     };
   }
-
+  
   function extractMicrodata(doc) {
     const recipeEl = doc.querySelector('[itemtype*="schema.org/Recipe"]');
     if (!recipeEl) return null;
-
+  
     const prop = (sel, attr = 'content') => {
       const el = recipeEl.querySelector(`[itemprop="${sel}"]`);
       if (!el) return '';
       if (attr === 'content') return el.getAttribute('content') || el.textContent?.trim() || '';
       return el.getAttribute(attr) || '';
     };
-
+  
     const ingredients = [];
     recipeEl.querySelectorAll('[itemprop="recipeIngredient"]').forEach((el) => {
       const text = el.textContent?.trim();
       if (text) ingredients.push({ text });
     });
-
+  
     const instructions = [];
     recipeEl.querySelectorAll('[itemprop="recipeInstructions"]').forEach((el) => {
       const text = el.textContent?.trim();
       if (text) instructions.push(text);
     });
-
+  
     return {
       title: prop('name'),
       description: prop('description', 'text'),
@@ -735,11 +772,11 @@
       },
     };
   }
-
+  
   function extractIngredients(doc) {
     const ingredients = [];
     const excludeKeywords = /\b(calories|kcal|protein|carbs|carbohydrate|fat|fiber|fibre|sugar|sodium|cholesterol|saturated|trans fat|serving|yield|min|mins|minute|minutes|hour|hours|cook time|prep time|preparation time|total time|ingredients|grain)\b/i;
-
+  
     const isIngredient = (text) => {
       if (excludeKeywords.test(text)) return false;
       const patterns = [
@@ -748,7 +785,7 @@
       ];
       return patterns.some((p) => p.test(text));
     };
-
+  
     // Try <li> elements first
     const lists = doc.querySelectorAll('ul li, ol li');
     lists.forEach((li) => {
@@ -758,7 +795,7 @@
         ingredients.push({ text });
       }
     });
-
+  
     // Fallback: scan <p> tags for ingredient patterns
     if (ingredients.length === 0) {
       const paragraphs = doc.querySelectorAll('p');
@@ -767,10 +804,10 @@
       for (const p of paragraphs) {
         const text = p.textContent?.trim();
         if (!text || text.length < 2 || text.length > 400) continue;
-
+  
         const isHeading = text === text.toUpperCase() && text.length >= 5 && text.length <= 50
           && !/\b(ingredients|instructions|method|notes|tips|nutrition)\b/i.test(text);
-
+  
         if (isIngredient(text)) {
           if (pendingHeading) {
             ingredients.push(pendingHeading);
@@ -792,27 +829,28 @@
         }
       }
     }
-
+  
     return ingredients.slice(0, 30);
   }
-
+  
   function extractInstructions(doc) {
     const instructions = [];
     const ingredientPattern = /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|pound|ounce|gram|teaspoon|tablespoon)/i;
     const cookingVerbs = /\b(heat|bake|mix|add|stir|cook|beat|pour|combine|preheat|melt|chop|dice|slice|grate|drain|boil|simmer|fry|grill|roast|blend|whisk|fold|roll|cut|place|transfer|remove|cool|let|bring|spread|sprinkle|top|drizzle|season|serve|garnish|drop|scrape|line|scoop|freeze|refrigerate|chill|toast|mash|dissolve|grease|flour|whip|cream|knead|shape|cover|steep|strain|marinate|broil|poach|steam|reduce|caramelize|deglaze|braise|saute|plunge|temper|separate|sift|toss|crush)\b/i;
-
+  
     const looksLikeInstructionList = (items) => {
       const viable = items.filter((t) => t.length > 10 && !ingredientPattern.test(t));
       if (viable.length < 3) return false;
       const verbCount = viable.filter((t) => cookingVerbs.test(t.slice(0, 30))).length;
       return verbCount >= Math.ceil(viable.length * 0.4);
     };
-
+  
     const isNavElement = (el) => {
       const classId = (el.className || '') + ' ' + (el.id || '');
       return /\b(nav|menu|dropdown|footer)\b/i.test(classId) || el.closest('nav, footer, header');
     };
-
+  
+    // Try ordered lists first
     const orderedLists = doc.querySelectorAll('ol');
     for (const ol of orderedLists) {
       const items = Array.from(ol.querySelectorAll('li'))
@@ -823,7 +861,8 @@
         break;
       }
     }
-
+  
+    // Try unordered lists that look like instructions (not nav, not ingredients)
     if (instructions.length === 0) {
       const lists = doc.querySelectorAll('ul');
       for (const ul of lists) {
@@ -837,16 +876,16 @@
         }
       }
     }
-
+  
     return instructions.slice(0, 25).map(capitalizeFirst);
   }
-
+  
   function extractServings(doc) {
     const text = doc.body.textContent;
     const match = text.match(/(\d+)\s*(serving|servings|serves|yield|makes|bars|cookies|pieces)/i);
     return match ? parseInt(match[1]) : 0;
   }
-
+  
   function extractTime(doc, type) {
     const text = doc.body.textContent.replace(/\s+/g, ' ');
     const keywords = type === 'prep' ? '\\bprep\\b|\\bpreparation\\b'
@@ -869,10 +908,11 @@
     const revMatch = text.match(revPattern);
     return revMatch ? parseInt(revMatch[1]) : 0;
   }
-
+  
   function extractNutrition(doc) {
     const result = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
-
+  
+    // Find nutrition section via heading
     const headings = doc.querySelectorAll('h2, h3, h4, strong, b, .nutrition, [id*="nutrition"], [class*="nutrition"]');
     let sectionEl = null;
     for (const h of headings) {
@@ -882,14 +922,15 @@
       }
     }
     if (!sectionEl) sectionEl = doc.body;
-
+  
+    // Try <strong>/<b> values from a table/list layout
     const strongs = sectionEl.querySelectorAll('strong, b');
     const values = [];
     for (const s of strongs) {
       const num = parseInt(s.textContent);
       if (num > 0) values.push(num);
     }
-
+  
     if (values.length >= 9) {
       result.calories = values[0];
       result.fat = values[1];
@@ -900,14 +941,15 @@
       result.protein = values[8];
       return result;
     }
-
+  
+    // Generic fallback
     const text = sectionEl.textContent.replace(/\s+/g, ' ');
     const extract = (label) => {
       const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const m = text.match(new RegExp(esc + '[^\\d]*?(\\d+)', 'i'));
       return m ? parseInt(m[1]) : 0;
     };
-
+  
     result.calories = extract('calories');
     result.protein = extract('protein');
     result.carbs = extract('carbohydrate') || extract('carbs');
@@ -915,10 +957,10 @@
     result.sugar = extract('sugar') || extract('sugars');
     result.sodium = extract('sodium');
     result.fat = extract('total fat') || extract('fat');
-
+  
     return result;
   }
-
+  
   function capitalizeFirst(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -929,16 +971,16 @@
     const num = parseFloat(String(val).replace(/[^0-9.]/g, ''));
     return isNaN(num) ? 0 : num;
   }
-
+  
   function parseIsoDuration(duration) {
     if (!duration) return 0;
     if (typeof duration === 'number') return duration;
-
+  
     const match = String(duration).match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
     if (!match) return 0;
     return (parseInt(match[1]) || 0) * 60 + (parseInt(match[2]) || 0);
   }
-
+  
   function extractImageUrl(image) {
     if (!image) return '';
     if (typeof image === 'string') return image;
@@ -947,7 +989,7 @@
     if (image['@id']) return image['@id'];
     return '';
   }
-
+  
   async function searchRemoteFood(query) {
     try {
       const response = await fetch('/api/food-search', {
@@ -962,7 +1004,7 @@
       return [];
     }
   }
-
+  
   function looksLikeRecipePage(html) {
     const lower = html.toLowerCase();
     return (
@@ -972,12 +1014,14 @@
       !lower.includes('cf-browser-verification')
     );
   }
-
+  
+  
+  
   async function searchFood(query) {
     if (!query || query.length < 2) return [];
     const lower = query.toLowerCase();
     const results = [];
-
+  
     try {
       const data = JSON.parse(localStorage.getItem('savor_data'));
       if (data?.recipes) {
@@ -997,30 +1041,192 @@
         });
       }
     } catch { }
-
+  
     try {
       const remote = await searchRemoteFood(query);
       results.push(...remote);
     } catch { }
-
+  
     return results.slice(0, 20);
   }
+  
+
+  // ============================================================
+  // conversions.js
+  // ============================================================
+
+  function initConversions() {
+    bindOvenToAirFryer();
+    bindVolumeConverter();
+    bindWeightConverter();
+    bindTemperatureConverter();
+  }
+  
+  const ROUND = (n, d = 1) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
+  
+  function parseFraction(val) {
+    if (!val) return NaN;
+    const s = val.trim();
+    if (/^-?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+    const m = s.match(/^(\d+)?\s*(\d+)\/(\d+)$/);
+    if (m) {
+      const whole = m[1] ? parseInt(m[1]) : 0;
+      const num = parseInt(m[2]);
+      const den = parseInt(m[3]);
+      if (den === 0) return NaN;
+      return whole >= 0 ? whole + num / den : whole - num / den;
+    }
+    return NaN;
+  }
+  
+  /* ── Oven → Air Fryer ─────────────────────────────────── */
+  
+  function bindOvenToAirFryer() {
+    const tempInput = document.getElementById('conv-oven-temp');
+    const timeInput = document.getElementById('conv-oven-time');
+  
+    if (!tempInput || !timeInput) return;
+  
+    const update = () => {
+      const temp = parseFloat(tempInput.value);
+      const time = parseFloat(timeInput.value);
+  
+      document.getElementById('conv-af-temp').textContent =
+        !isNaN(temp) && temp > 0 ? Math.round(temp - 25) + '\u00B0F / ' + Math.round((temp - 25 - 32) * 5 / 9) + '\u00B0C' : '\u2014';
+  
+      document.getElementById('conv-af-time').textContent =
+        !isNaN(time) && time > 0 ? Math.round(time * 0.8) + ' min' : '\u2014';
+  
+      document.getElementById('conv-af-note').hidden = isNaN(temp) || temp <= 0;
+    };
+  
+    tempInput.addEventListener('input', update);
+    timeInput.addEventListener('input', update);
+  }
+  
+  /* ── Volume Converter ──────────────────────────────────── */
+  
+  const VOLUME_UNITS = {
+    cup:    { name: 'Cups',      ml: 236.588 },
+    tbsp:   { name: 'Tbsp',       ml: 14.787 },
+    tsp:    { name: 'Tsp',        ml: 4.929 },
+    'fl-oz':{ name: 'Fl oz',     ml: 29.574 },
+    ml:     { name: 'ml',         ml: 1 },
+    liter:  { name: 'Liters',     ml: 1000 },
+  };
+  
+  function bindVolumeConverter() {
+    const input = document.getElementById('conv-vol-input');
+    const unitSelect = document.getElementById('conv-vol-unit');
+    const resultEl = document.getElementById('conv-vol-result');
+  
+    if (!input || !unitSelect || !resultEl) return;
+  
+    const update = () => {
+      const value = parseFraction(input.value);
+      const unit = unitSelect.value;
+      if (isNaN(value) || value <= 0) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const ml = value * VOLUME_UNITS[unit].ml;
+      const rows = Object.entries(VOLUME_UNITS)
+        .filter(([key]) => key !== unit)
+        .map(([, u]) => {
+          const converted = ROUND(ml / u.ml, u.ml < 10 ? 1 : u.ml < 100 ? 2 : 3);
+          return `<div class="converter-result-row"><span>${u.name}</span><span class="converter-result-value">${converted}</span></div>`;
+        });
+      resultEl.innerHTML = rows.join('');
+    };
+  
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
+  }
+  
+  /* ── Weight Converter ──────────────────────────────────── */
+  
+  const WEIGHT_UNITS = {
+    lb: { name: 'Pounds (lbs)', g: 453.592 },
+    oz: { name: 'Ounces (oz)',  g: 28.35 },
+    g:  { name: 'Grams (g)',     g: 1 },
+    kg: { name: 'Kilograms',     g: 1000 },
+  };
+  
+  function bindWeightConverter() {
+    const input = document.getElementById('conv-wt-input');
+    const unitSelect = document.getElementById('conv-wt-unit');
+    const resultEl = document.getElementById('conv-wt-result');
+  
+    if (!input || !unitSelect || !resultEl) return;
+  
+    const update = () => {
+      const value = parseFraction(input.value);
+      const unit = unitSelect.value;
+      if (isNaN(value) || value <= 0) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const grams = value * WEIGHT_UNITS[unit].g;
+      const rows = Object.entries(WEIGHT_UNITS)
+        .filter(([key]) => key !== unit)
+        .map(([, u]) => {
+          const converted = ROUND(grams / u.g, u.g < 10 ? 1 : u.g < 100 ? 2 : 3);
+          return `<div class="converter-result-row"><span>${u.name}</span><span class="converter-result-value">${converted}</span></div>`;
+        });
+      resultEl.innerHTML = rows.join('');
+    };
+  
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
+  }
+  
+  /* ── Temperature Converter ──────────────────────────────── */
+  
+  function bindTemperatureConverter() {
+    const input = document.getElementById('conv-temp-input');
+    const unitSelect = document.getElementById('conv-temp-unit');
+    const resultEl = document.getElementById('conv-temp-result');
+  
+    if (!input || !unitSelect || !resultEl) return;
+  
+    const update = () => {
+      const value = parseFraction(input.value);
+      if (isNaN(value)) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const unit = unitSelect.value;
+      let converted, label;
+      if (unit === 'F') {
+        converted = ROUND((value - 32) * 5 / 9);
+        label = '\u00B0C (Celsius)';
+      } else {
+        converted = ROUND(value * 9 / 5 + 32);
+        label = '\u00B0F (Fahrenheit)';
+      }
+      resultEl.innerHTML = `<div class="converter-result-row"><span>${label}</span><span class="converter-result-value">${converted}</span></div>`;
+    };
+  
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
+  }
+  
 
   // ============================================================
   // index.js
   // ============================================================
 
+  
   function initHome() {
     const today = new Date();
     const totals = getDailyTotals(today);
     const profile = getProfile();
     const recipes = getRecipes();
-    const mealTypes = getMealTypeTotals(today);
-
+  
     const calorieGoal = profile.calorieGoal || 2000;
     const percent = Math.min((totals.calories / calorieGoal) * 100, 100);
     const remaining = calorieGoal - totals.calories;
-
+  
     const ringEl = document.getElementById('calorie-ring-fill');
     if (ringEl) {
       const circumference = 2 * Math.PI * 80;
@@ -1028,30 +1234,30 @@
       ringEl.style.strokeDasharray = circumference;
       ringEl.style.strokeDashoffset = offset;
     }
-
+  
     const calValue = document.getElementById('calorie-value');
     if (calValue) calValue.textContent = formatNumber(totals.calories);
-
+  
     const calRemaining = document.getElementById('calorie-remaining');
     if (calRemaining) {
       calRemaining.textContent = remaining > 0 ? `${formatNumber(remaining)} left` : `${formatNumber(Math.abs(remaining))} over`;
       calRemaining.classList.toggle('over', remaining < 0);
     }
-
+  
     const macroProtein = document.getElementById('macro-protein-value');
     const macroCarbs = document.getElementById('macro-carbs-value');
     const macroFat = document.getElementById('macro-fat-value');
     if (macroProtein) macroProtein.textContent = `${formatNumber(totals.protein)}g`;
     if (macroCarbs) macroCarbs.textContent = `${formatNumber(totals.carbs)}g`;
     if (macroFat) macroFat.textContent = `${formatNumber(totals.fat)}g`;
-
+  
     const macroProteinGoal = document.getElementById('macro-protein-goal');
     const macroCarbsGoal = document.getElementById('macro-carbs-goal');
     const macroFatGoal = document.getElementById('macro-fat-goal');
     if (macroProteinGoal) macroProteinGoal.textContent = `goal ${formatNumber(profile.proteinGoal)}`;
     if (macroCarbsGoal) macroCarbsGoal.textContent = `goal ${formatNumber(profile.carbsGoal)}`;
     if (macroFatGoal) macroFatGoal.textContent = `goal ${formatNumber(profile.fatGoal)}`;
-
+  
     const recentRecipesContainer = document.getElementById('recent-recipes');
     if (recentRecipesContainer) {
       const recent = recipes.slice(0, 4);
@@ -1075,9 +1281,10 @@
           .join('');
       }
     }
-
+  
     const mealBreakdown = document.getElementById('meal-breakdown');
     if (mealBreakdown) {
+      const mealTypes = getMealTypeTotals(today);
       const sections = [];
       const order = ['breakfast', 'lunch', 'dinner', 'snack'];
       order.forEach((type) => {
@@ -1095,12 +1302,12 @@
             .join('');
           sections.push(`
             <div class="meal-group">
-              <div class="meal-group-title">${type.charAt(0).toUpperCase() + type.slice(1)} \u00B7 ${formatNumber(typeCal)} cal</div>
+              <div class="meal-group-title">${type.charAt(0).toUpperCase() + type.slice(1)} · ${formatNumber(typeCal)} cal</div>
               ${entriesHTML}
             </div>`);
         }
       });
-
+  
       if (sections.length === 0) {
         mealBreakdown.innerHTML = `
           <div class="empty-state">
@@ -1111,18 +1318,20 @@
       }
     }
   }
+  
 
   // ============================================================
   // recipes.js
   // ============================================================
 
+  
   let currentFilter = 'all';
   let currentSort = 'newest';
   let searchQuery = '';
-
+  
   function initRecipes() {
     renderRecipes();
-
+  
     const searchInput = document.getElementById('recipe-search-input');
     if (searchInput) {
       searchInput.addEventListener(
@@ -1133,7 +1342,7 @@
         }, 200)
       );
     }
-
+  
     const filterChips = document.querySelectorAll('.filter-chip');
     filterChips.forEach((chip) => {
       chip.addEventListener('click', () => {
@@ -1144,10 +1353,10 @@
       });
     });
   }
-
+  
   function renderRecipes() {
     let recipes = getRecipes();
-
+  
     if (searchQuery) {
       recipes = recipes.filter(
         (r) =>
@@ -1156,13 +1365,13 @@
           (r.cuisine && r.cuisine.toLowerCase().includes(searchQuery))
       );
     }
-
+  
     if (currentFilter === 'favorites') {
       recipes = recipes.filter((r) => r.isFavorite);
     } else if (currentFilter !== 'all') {
       recipes = recipes.filter((r) => r.mealType === currentFilter || r.tags.includes(currentFilter));
     }
-
+  
     if (currentSort === 'newest') {
       recipes.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
     } else if (currentSort === 'oldest') {
@@ -1170,15 +1379,15 @@
     } else if (currentSort === 'name') {
       recipes.sort((a, b) => a.title.localeCompare(b.title));
     }
-
+  
     const container = document.getElementById('recipe-cards');
     const stats = document.getElementById('recipe-stats');
     if (!container) return;
-
+  
     if (stats) {
       stats.textContent = `${recipes.length} recipe${recipes.length !== 1 ? 's' : ''}`;
     }
-
+  
     if (recipes.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -1194,7 +1403,7 @@
         </div>`;
       return;
     }
-
+  
     container.innerHTML = recipes
       .map(
         (r) => `
@@ -1213,64 +1422,61 @@
             .slice(0, 3)
             .map((t) => `<span class="tag tag-brand">${escapeHTML(t)}</span>`)
             .join('')}
-              ${r.isFavorite ? '<span class="tag tag-warning">\u2605 Favorite</span>' : ''}
+              ${r.isFavorite ? '<span class="tag tag-warning">★ Favorite</span>' : ''}
             </div>
           </div>
         </button>`
       )
       .join('');
   }
+  
 
   // ============================================================
   // recipe-detail.js
   // ============================================================
 
+  
   let currentRecipeId = null;
-
+  
   function initRecipeDetail(data) {
     if (!data?.id) {
       window.navigateTo('recipes');
       return;
     }
-
+  
     currentRecipeId = data.id;
     const recipe = getRecipe(data.id);
-
+  
     if (!recipe) {
       window.navigateTo('recipes');
       return;
     }
-
+  
     document.getElementById('page-title').textContent = recipe.title;
-    document.title = `${recipe.title} \u2014 Savor`;
-
+    document.title = `${recipe.title} — Savor`;
+  
     renderRecipeDetail(recipe);
     bindActions(recipe);
   }
-
+  
   function renderRecipeDetail(recipe) {
-    const placeholders = {
-      'recipe-hero': `<div class="recipe-hero-placeholder">${recipe.title.charAt(0).toUpperCase()}</div>`,
-      'recipe-title': escapeHTML(recipe.title),
-    };
-
     if (recipe.image) {
       const hero = document.getElementById('recipe-hero');
       if (hero) hero.innerHTML = `<img class="recipe-hero-image" src="${escapeHTML(recipe.image)}" alt="${escapeHTML(recipe.title)}">`;
     }
-
+  
     const titleEl = document.getElementById('recipe-title');
     if (titleEl) titleEl.textContent = recipe.title;
-
+  
     const prepTimeEl = document.getElementById('info-prep-time');
     const cookTimeEl = document.getElementById('info-cook-time');
     const servingsEl = document.getElementById('info-servings');
     const caloriesEl = document.getElementById('info-calories');
     if (prepTimeEl) prepTimeEl.textContent = formatTime(recipe.prepTime);
     if (cookTimeEl) cookTimeEl.textContent = formatTime(recipe.cookTime);
-    if (servingsEl) servingsEl.textContent = recipe.servings || '\u2014';
-    if (caloriesEl) caloriesEl.textContent = recipe.nutrition?.calories ? formatNumber(recipe.nutrition.calories) : '\u2014';
-
+    if (servingsEl) servingsEl.textContent = recipe.servings || '—';
+    if (caloriesEl) caloriesEl.textContent = recipe.nutrition?.calories ? formatNumber(recipe.nutrition.calories) : '—';
+  
     const sourceLink = document.getElementById('recipe-source-link');
     if (sourceLink) {
       sourceLink.innerHTML = recipe.sourceUrl
@@ -1281,7 +1487,7 @@
       sourceLink.target = '_blank';
       sourceLink.rel = 'noopener noreferrer';
     }
-
+  
     const nutrients = [
       { label: 'Calories', value: formatNumber(recipe.nutrition?.calories) },
       { label: 'Protein', value: `${formatDecimal(recipe.nutrition?.protein)}g` },
@@ -1289,9 +1495,9 @@
       { label: 'Fat', value: `${formatDecimal(recipe.nutrition?.fat)}g` },
       { label: 'Fiber', value: `${formatDecimal(recipe.nutrition?.fiber)}g` },
       { label: 'Sugar', value: `${formatDecimal(recipe.nutrition?.sugar)}g` },
-      { label: 'Sodium', value: recipe.nutrition?.sodium ? `${formatNumber(recipe.nutrition.sodium)}mg` : '\u2014' },
+      { label: 'Sodium', value: recipe.nutrition?.sodium ? `${formatNumber(recipe.nutrition.sodium)}mg` : '—' },
     ];
-
+  
     const nutritionGrid = document.getElementById('nutrition-grid');
     if (nutritionGrid) {
       nutritionGrid.innerHTML = nutrients
@@ -1304,7 +1510,7 @@
         )
         .join('');
     }
-
+  
     const ingredientsList = document.getElementById('ingredients-list');
     if (ingredientsList) {
       if (recipe.ingredients.length === 0) {
@@ -1321,7 +1527,7 @@
           .join('');
       }
     }
-
+  
     const instructionsList = document.getElementById('instructions-list');
     if (instructionsList) {
       if (recipe.instructions.length === 0) {
@@ -1339,7 +1545,7 @@
           .join('');
       }
     }
-
+  
     const tagsContainer = document.getElementById('recipe-tags');
     if (tagsContainer) {
       const tags = [];
@@ -1348,7 +1554,7 @@
       if (recipe.difficulty) tags.push(recipe.difficulty);
       tagsContainer.innerHTML = tags.map((t) => `<span class="tag tag-brand">${escapeHTML(t)}</span>`).join('');
     }
-
+  
     const favBtn = document.getElementById('btn-favorite');
     if (favBtn) {
       favBtn.classList.toggle('active', recipe.isFavorite);
@@ -1357,7 +1563,7 @@
       if (starIcon) starIcon.setAttribute('fill', recipe.isFavorite ? '#fbbf24' : 'none');
     }
   }
-
+  
   function bindActions(recipe) {
     const favBtn = document.getElementById('btn-favorite');
     if (favBtn) {
@@ -1373,19 +1579,19 @@
         }
       });
     }
-
+  
     const cookBtn = document.getElementById('btn-cook-recipe');
     if (cookBtn) {
       cookBtn.addEventListener('click', () => {
         const today = new Date();
-
+  
         const perServing = {
           calories: Math.round(recipe.nutrition?.calories / (recipe.servings || 1)),
           protein: Math.round((recipe.nutrition?.protein / (recipe.servings || 1)) * 10) / 10,
           carbs: Math.round((recipe.nutrition?.carbs / (recipe.servings || 1)) * 10) / 10,
           fat: Math.round((recipe.nutrition?.fat / (recipe.servings || 1)) * 10) / 10,
         };
-
+  
         const entry = {
           recipeId: recipe.id,
           foodName: recipe.title,
@@ -1396,12 +1602,12 @@
           carbs: perServing.carbs,
           fat: perServing.fat,
         };
-
+  
         addMealEntry(today, entry);
         showToast(`Added "${recipe.title}" to today's meal log`);
       });
     }
-
+  
     const deleteBtn = document.getElementById('btn-delete-recipe');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
@@ -1413,28 +1619,30 @@
       });
     }
   }
+  
 
   // ============================================================
   // import.js
   // ============================================================
 
+  
   let previewRecipe = null;
   let manualIngredients = [{ text: '' }];
   let manualInstructions = [''];
   let conversionsInitialized = false;
-
+  
   function initImport() {
     previewRecipe = null;
     manualIngredients = [{ text: '' }];
     manualInstructions = [''];
     conversionsInitialized = false;
-
+  
     switchTab('url');
-    bindImportEvents();
+    bindEvents();
     resetForms();
     refreshApiStatus();
   }
-
+  
   function switchTab(tabId) {
     document.querySelectorAll('.import-tab').forEach((tab) => {
       tab.classList.toggle('active', tab.dataset.tab === tabId);
@@ -1442,30 +1650,30 @@
     document.querySelectorAll('.import-tab-content').forEach((content) => {
       content.classList.toggle('active', content.dataset.tab === tabId);
     });
-
+  
     if (tabId === 'convert' && !conversionsInitialized) {
       conversionsInitialized = true;
       initConversions();
     }
   }
-
-  function bindImportEvents() {
+  
+  function bindEvents() {
     document.querySelectorAll('.import-tab').forEach((tab) => {
       tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
-
+  
     const urlBtn = document.getElementById('btn-extract-url');
     if (urlBtn) {
       urlBtn.addEventListener('click', handleUrlExtract);
     }
-
+  
     const urlInput = document.getElementById('import-url-input');
     if (urlInput) {
       urlInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') handleUrlExtract();
       });
     }
-
+  
     const manualForm = document.getElementById('manual-recipe-form');
     if (manualForm) {
       manualForm.addEventListener('submit', (e) => {
@@ -1473,22 +1681,22 @@
         handleManualSave();
       });
     }
-
+  
     const addIngredientBtn = document.getElementById('btn-add-ingredient');
     if (addIngredientBtn) {
       addIngredientBtn.addEventListener('click', addIngredientRow);
     }
-
+  
     const addInstructionBtn = document.getElementById('btn-add-instruction');
     if (addInstructionBtn) {
       addInstructionBtn.addEventListener('click', addInstructionRow);
     }
-
+  
     const saveBtn = document.getElementById('btn-save-imported');
     if (saveBtn) {
       saveBtn.addEventListener('click', handleSaveImported);
     }
-
+  
     const cancelBtn = document.getElementById('btn-cancel-preview');
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => {
@@ -1498,7 +1706,7 @@
       });
     }
   }
-
+  
   async function refreshApiStatus() {
     try {
       const response = await fetch('/api/food-search-status');
@@ -1508,7 +1716,7 @@
       updateBadge('spoonacular-status', status.spoonacular);
     } catch { }
   }
-
+  
   function updateBadge(id, isConfigured) {
     const badge = document.getElementById(id);
     if (!badge) return;
@@ -1520,42 +1728,42 @@
       badge.classList.remove('import-api-badge--active');
     }
   }
-
+  
   async function handleUrlExtract() {
     const input = document.getElementById('import-url-input');
     const statusEl = document.getElementById('import-status');
     const previewEl = document.getElementById('import-preview');
-
+  
     if (!input || !input.value.trim()) {
       showStatus('Please enter a URL', 'error');
       return;
     }
-
+  
     const url = input.value.trim();
     showStatus('Extracting recipe...', 'loading');
-
+  
     let result;
-
+  
     result = await fetchRecipeFromUrl(url);
-
+  
     if (!result.success) {
       result = await extractRecipeLocally(url);
     }
-
+  
     if (!result.success || !result.recipe) {
       showStatus(result.error || 'Could not extract recipe from this URL', 'error');
       return;
     }
-
+  
     previewRecipe = result.recipe;
     showPreview(previewRecipe);
     showStatus('Recipe extracted! Review and edit below.', 'success');
   }
-
+  
   function showPreview(recipe) {
     const previewEl = document.getElementById('import-preview');
     if (!previewEl) return;
-
+  
     document.getElementById('import-preview-title').textContent = recipe.title || 'Untitled';
     document.getElementById('import-preview-meta').textContent = [
       recipe.servings ? `${recipe.servings} servings` : '',
@@ -1563,8 +1771,8 @@
       recipe.cookTime ? `Cook: ${recipe.cookTime}m` : '',
     ]
       .filter(Boolean)
-      .join(' \u00B7 ');
-
+      .join(' · ');
+  
     const imgEl = document.getElementById('import-preview-image');
     if (imgEl) {
       if (recipe.image) {
@@ -1573,13 +1781,13 @@
         imgEl.innerHTML = `<div class="import-preview-image-placeholder">${(recipe.title || 'R').charAt(0).toUpperCase()}</div>`;
       }
     }
-
+  
     document.getElementById('edit-title').value = recipe.title || '';
     document.getElementById('edit-description').value = recipe.description || '';
     document.getElementById('edit-servings').value = recipe.servings || '';
     document.getElementById('edit-prep-time').value = recipe.prepTime || '';
     document.getElementById('edit-cook-time').value = recipe.cookTime || '';
-
+  
     document.getElementById('edit-calories').value = recipe.nutrition?.calories || '';
     document.getElementById('edit-protein').value = recipe.nutrition?.protein || '';
     document.getElementById('edit-carbs').value = recipe.nutrition?.carbs || '';
@@ -1590,56 +1798,56 @@
     document.getElementById('edit-tags').value = (recipe.tags || []).join(', ');
     document.getElementById('edit-cuisine').value = recipe.cuisine || '';
     document.getElementById('edit-meal-type').value = recipe.mealType || '';
-
+  
     manualIngredients = (recipe.ingredients || []).length > 0
       ? recipe.ingredients
       : [{ text: '' }];
-
+  
     manualInstructions = (recipe.instructions || []).length > 0
       ? recipe.instructions
       : [''];
-
+  
     renderIngredientsEditor();
     renderInstructionsEditor();
-
+  
     previewEl.removeAttribute('hidden');
   }
-
+  
   function hidePreview() {
     const previewEl = document.getElementById('import-preview');
     if (previewEl) previewEl.setAttribute('hidden', '');
     const statusEl = document.getElementById('import-status');
     if (statusEl) statusEl.innerHTML = '';
   }
-
+  
   function showStatus(message, type) {
     const statusEl = document.getElementById('import-status');
     if (!statusEl) return;
-
+  
     const icons = {
       loading: `<span class="spinner spinner-brand"></span>`,
       success: `<svg class="import-status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
       error: `<svg class="import-status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
     };
-
+  
     statusEl.className = `import-status ${type}`;
     statusEl.innerHTML = `${icons[type] || ''} ${message}`;
   }
-
+  
   function addIngredientRow() {
     manualIngredients.push({ text: '' });
     renderIngredientsEditor();
   }
-
+  
   function addInstructionRow() {
     manualInstructions.push('');
     renderInstructionsEditor();
   }
-
+  
   function renderIngredientsEditor() {
     const container = document.getElementById('ingredients-editor');
     if (!container) return;
-
+  
     container.innerHTML = manualIngredients
       .map(
         (ing, i) => {
@@ -1659,14 +1867,14 @@
         }
       )
       .join('');
-
+  
     container.querySelectorAll('[data-ingredient-index]').forEach((input) => {
       input.addEventListener('input', (e) => {
         const idx = parseInt(e.target.dataset.ingredientIndex);
         manualIngredients[idx] = { text: e.target.value };
       });
     });
-
+  
     container.querySelectorAll('[data-remove-ingredient]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.removeIngredient);
@@ -1675,11 +1883,11 @@
       });
     });
   }
-
+  
   function renderInstructionsEditor() {
     const container = document.getElementById('instructions-editor');
     if (!container) return;
-
+  
     container.innerHTML = manualInstructions
       .map(
         (step, i) => `
@@ -1694,14 +1902,14 @@
         </div>`
       )
       .join('');
-
+  
     container.querySelectorAll('[data-instruction-index]').forEach((textarea) => {
       textarea.addEventListener('input', (e) => {
         const idx = parseInt(e.target.dataset.instructionIndex);
         manualInstructions[idx] = e.target.value;
       });
     });
-
+  
     container.querySelectorAll('[data-remove-instruction]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.removeInstruction);
@@ -1710,10 +1918,10 @@
       });
     });
   }
-
+  
   function handleSaveImported() {
     if (!previewRecipe) return;
-
+  
     const recipe = {
       title: document.getElementById('edit-title')?.value || previewRecipe.title,
       description: document.getElementById('edit-description')?.value || previewRecipe.description,
@@ -1743,28 +1951,28 @@
       cuisine: document.getElementById('edit-cuisine')?.value || previewRecipe.cuisine || '',
       mealType: document.getElementById('edit-meal-type')?.value || previewRecipe.mealType || '',
     };
-
+  
     if (!recipe.title.trim()) {
       showStatus('Please enter a recipe title', 'error');
       return;
     }
-
+  
     const saved = addRecipe(recipe);
     showToast('Recipe saved!');
     previewRecipe = null;
     resetForms();
     hidePreview();
-
+  
     window.navigateTo('recipe-detail', { id: saved.id });
   }
-
+  
   function handleManualSave() {
     const title = document.getElementById('manual-title')?.value?.trim();
     if (!title) {
       showToast('Please enter a recipe title', 'error');
       return;
     }
-
+  
     const recipe = {
       title,
       description: document.getElementById('manual-description')?.value || '',
@@ -1785,42 +1993,44 @@
       cuisine: document.getElementById('manual-cuisine')?.value || '',
       mealType: document.getElementById('manual-meal-type')?.value || '',
     };
-
+  
     const saved = addRecipe(recipe);
     showToast('Recipe created!');
     window.navigateTo('recipe-detail', { id: saved.id });
   }
-
+  
   function resetForms() {
     const urlInput = document.getElementById('import-url-input');
     if (urlInput) urlInput.value = '';
-
+  
     const manualForm = document.getElementById('manual-recipe-form');
     if (manualForm) manualForm.reset();
-
+  
     manualIngredients = [{ text: '' }];
     manualInstructions = [''];
     renderIngredientsEditor();
     renderInstructionsEditor();
     hidePreview();
   }
+  
 
   // ============================================================
   // meal-log.js
   // ============================================================
 
+  
   let currentDate = new Date();
-
+  
   function initMealLog() {
     currentDate = new Date();
     updateDateDisplay();
     renderMealLog();
-
+  
     const prevBtn = document.getElementById('btn-date-prev');
     const nextBtn = document.getElementById('btn-date-next');
     if (prevBtn) prevBtn.addEventListener('click', () => changeDate(-1));
     if (nextBtn) nextBtn.addEventListener('click', () => changeDate(1));
-
+  
     const todayBtn = document.getElementById('btn-date-today');
     if (todayBtn) {
       todayBtn.addEventListener('click', () => {
@@ -1832,21 +2042,22 @@
         }
       });
     }
+  
   }
-
+  
   function changeDate(days) {
     currentDate.setDate(currentDate.getDate() + days);
     updateDateDisplay();
     renderMealLog();
   }
-
+  
   function updateDateDisplay() {
     const display = document.getElementById('meal-log-date');
     if (!display) return;
-
+  
     const today = formatDate(new Date());
     const current = formatDate(currentDate);
-
+  
     if (current === today) {
       display.textContent = 'Today';
     } else if (current === formatDate(new Date(Date.now() - 86400000))) {
@@ -1861,43 +2072,43 @@
       });
     }
   }
-
+  
   function renderMealLog() {
     const date = currentDate;
     const totals = getDailyTotals(date);
     const profile = getProfile();
     const mealTypes = getMealTypeTotals(date);
-
+  
     const calGoal = profile.calorieGoal || 2000;
     const calPercent = Math.min((totals.calories / calGoal) * 100, 100);
-
+  
     const elements = {
       'total-calories-value': formatNumber(totals.calories),
       'total-protein-value': formatNumber(totals.protein),
       'total-carbs-value': formatNumber(totals.carbs),
       'total-fat-value': formatNumber(totals.fat),
     };
-
+  
     Object.entries(elements).forEach(([id, value]) => {
       const el = document.getElementById(id);
       if (el) el.textContent = value;
     });
-
+  
     const calBar = document.getElementById('calorie-bar-fill');
     if (calBar) {
       calBar.style.width = `${calPercent}%`;
       calBar.setAttribute('aria-valuenow', Math.round(calPercent));
       calBar.className = `progress-fill ${calPercent >= 100 ? 'progress-fill-warning' : 'progress-fill-brand'}`;
     }
-
+  
     const proteinBar = document.getElementById('protein-bar-fill');
     const carbsBar = document.getElementById('carbs-bar-fill');
     const fatBar = document.getElementById('fat-bar-fill');
-
+  
     const proteinGoal = profile.proteinGoal || 150;
     const carbsGoal = profile.carbsGoal || 200;
     const fatGoal = profile.fatGoal || 65;
-
+  
     if (proteinBar) {
       const pct = Math.min((totals.protein / proteinGoal) * 100, 100);
       proteinBar.style.width = `${pct}%`;
@@ -1913,7 +2124,7 @@
       fatBar.style.width = `${pct}%`;
       fatBar.setAttribute('aria-valuenow', Math.round(pct));
     }
-
+  
     const barValues = {
       'bar-protein-current': formatNumber(totals.protein),
       'bar-protein-goal': profile.proteinGoal,
@@ -1924,21 +2135,21 @@
     };
     Object.entries(barValues).forEach(([id, value]) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = value !== null ? value : '\u2014';
+      if (el) el.textContent = value !== null ? value : '—';
     });
-
+  
     const sections = document.getElementById('meal-log-sections');
     if (!sections) return;
-
+  
     const order = ['breakfast', 'lunch', 'dinner', 'snack'];
     const typeLabels = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', snack: 'Snacks' };
-
+  
     sections.innerHTML = order
       .map(
         (type) => {
           const entries = mealTypes[type] || [];
           const typeCal = entries.reduce((s, e) => s + e.calories, 0);
-
+  
           const entriesHTML = entries
             .map(
               (e) => `
@@ -1949,7 +2160,7 @@
                     <span class="text-secondary">P:${formatNumber(e.protein)}</span>
                     <span class="text-secondary">C:${formatNumber(e.carbs)}</span>
                     <span class="text-secondary">F:${formatNumber(e.fat)}</span>
-                    <span>${e.servingSize > 1 ? '\u00D7' + e.servingSize : ''}</span>
+                    <span>${e.servingSize > 1 ? '×' + e.servingSize : ''}</span>
                   </div>
                 </div>
                 <span class="meal-log-entry-calories">${formatNumber(e.calories)} cal</span>
@@ -1961,7 +2172,7 @@
               </div>`
             )
             .join('');
-
+  
           return `
             <div class="meal-log-section">
               <div class="meal-log-section-header">
@@ -1981,14 +2192,14 @@
         }
       )
       .join('');
-
+  
     sections.querySelectorAll('.add-food-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const mealType = btn.dataset.mealType || 'snack';
         openFoodSearch(mealType);
       });
     });
-
+  
     sections.querySelectorAll('[data-remove-entry]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const entryId = btn.dataset.removeEntry;
@@ -1998,17 +2209,17 @@
       });
     });
   }
-
+  
   function openFoodSearch(mealType) {
     const existing = document.querySelector('.dialog-overlay');
     if (existing) existing.remove();
-
+  
     const overlay = document.createElement('div');
     overlay.className = 'dialog-overlay';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
     overlay.setAttribute('aria-label', 'Search foods');
-
+  
     overlay.innerHTML = `
       <div class="dialog-sheet food-search-dialog">
         <div class="dialog-handle"></div>
@@ -2020,47 +2231,47 @@
           <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
         </div>
       </div>`;
-
+  
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
-
+  
     const removeOverlay = () => {
       overlay.remove();
       document.body.style.overflow = '';
     };
-
+  
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) removeOverlay();
     });
-
+  
     overlay.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         removeOverlay();
       }
     });
-
+  
     const closeBtn = overlay.querySelector('.dialog-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', removeOverlay);
-
+  
     const sheet = overlay.querySelector('.dialog-sheet');
     const handle = overlay.querySelector('.dialog-handle');
     const resultsEl = document.getElementById('food-search-results');
-
+  
     let startY = 0;
     let currentTranslate = 0;
     let dragging = false;
-
+  
     const onTouchStart = (e) => {
       startY = e.touches[0].clientY;
       currentTranslate = 0;
       dragging = true;
       sheet.style.transition = 'none';
     };
-
+  
     const onTouchMove = (e) => {
       if (!dragging) return;
       const deltaY = e.touches[0].clientY - startY;
-
+  
       if (deltaY > 0) {
         currentTranslate = deltaY;
         sheet.style.transform = `translateY(${deltaY}px)`;
@@ -2072,12 +2283,12 @@
         startY = e.touches[0].clientY;
       }
     };
-
+  
     const onTouchEnd = () => {
       if (!dragging) return;
       dragging = false;
       sheet.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
-
+  
       if (currentTranslate > 100) {
         sheet.style.transform = 'translateY(100%)';
         overlay.style.background = 'rgba(0, 0, 0, 0)';
@@ -2087,11 +2298,11 @@
         overlay.style.background = '';
       }
     };
-
+  
     handle.addEventListener('touchstart', onTouchStart, { passive: false });
     handle.addEventListener('touchmove', onTouchMove, { passive: false });
     handle.addEventListener('touchend', onTouchEnd);
-
+  
     const searchInput = document.getElementById('food-search-input');
     if (searchInput) {
       setTimeout(() => searchInput.focus(), 100);
@@ -2105,17 +2316,17 @@
       );
     }
   }
-
+  
   function renderFoodResults(results, overlay, mealType) {
     const container = document.getElementById('food-search-results');
     if (!container) return;
-
+  
     if (!results || results.length === 0) {
       container.innerHTML =
         '<p class="text-tertiary text-sm text-center">No matching foods found</p>';
       return;
     }
-
+  
     container.innerHTML = results
       .map(
         (r) => `
@@ -2129,7 +2340,7 @@
         </button>`
       )
       .join('');
-
+  
     container.querySelectorAll('.food-search-item').forEach((item) => {
       item.addEventListener('click', () => {
         const entry = {
@@ -2141,7 +2352,7 @@
           mealType,
           servingSize: 1,
         };
-
+  
         addMealEntry(currentDate, entry);
         overlay.remove();
         document.body.style.overflow = '';
@@ -2150,55 +2361,69 @@
       });
     });
   }
+  
 
   // ============================================================
   // health.js
   // ============================================================
 
-  let weightChart = null;
-
+    getProfile,
+    updateProfile,
+    getWeightLog,
+    addWeightEntry,
+    deleteWeightEntry,
+    calculateTDEE,
+    getWeightTrend,
+    getDailyTotals,
+    resetAll,
+    exportData,
+    importData,
+  } from './data.js';
+  
   const LBS_PER_KG = 2.20462;
-
+  
   function toLbs(kg) {
     return Math.round(kg * LBS_PER_KG * 10) / 10;
   }
-
+  
   function toKg(lbs) {
     return lbs / LBS_PER_KG;
   }
-
+  
   function inFromCm(cm) {
     return Math.round(cm / 2.54 * 10) / 10;
   }
-
+  
   function cmFromIn(inches) {
     return inches * 2.54;
   }
-
+  
+  let weightChart = null;
+  
   function initHealth() {
     renderHealthProfile();
     renderWeightLog();
-    bindHealthEvents();
+    bindEvents();
   }
-
+  
   function renderHealthProfile() {
     const profile = getProfile();
     const tdee = calculateTDEE();
     const bmiRaw = calcBMI(profile);
     const bmiCategory = bmiRaw !== null ? getBMICategory(bmiRaw) : null;
-
+  
     const elements = {
-      'health-current-weight': profile.weight ? `${formatDecimal(toLbs(profile.weight))} lbs` : '\u2014',
-      'health-height': profile.height ? `${formatDecimal(inFromCm(profile.height))} in` : '\u2014',
-      'health-age': profile.age ? `${profile.age} yrs` : '\u2014',
-      'health-bmi': bmiRaw !== null ? formatDecimal(bmiRaw) : '\u2014',
+      'health-current-weight': profile.weight ? `${formatDecimal(toLbs(profile.weight))} lbs` : '—',
+      'health-height': profile.height ? `${formatDecimal(inFromCm(profile.height))} in` : '—',
+      'health-age': profile.age ? `${profile.age} yrs` : '—',
+      'health-bmi': bmiRaw !== null ? formatDecimal(bmiRaw) : '—',
     };
-
+  
     Object.entries(elements).forEach(([id, value]) => {
       const el = document.getElementById(id);
       if (el) el.textContent = value;
     });
-
+  
     const bmiCatEl = document.getElementById('health-bmi-category');
     if (bmiCatEl) {
       if (bmiCategory) {
@@ -2209,7 +2434,7 @@
         bmiCatEl.className = 'health-metric-category';
       }
     }
-
+  
     const tdeeValue = document.getElementById('health-tdee');
     if (tdeeValue) {
       if (tdee) {
@@ -2218,7 +2443,7 @@
         tdeeValue.textContent = 'Set profile to calculate';
       }
     }
-
+  
     const trend = getWeightTrend();
     const trendEl = document.getElementById('health-weight-trend');
     if (trendEl) {
@@ -2234,23 +2459,23 @@
         trendEl.className = 'health-metric-change neutral';
       }
     }
-
+  
     const heightEl = document.getElementById('profile-height');
     if (heightEl) heightEl.value = profile.height ? formatDecimal(inFromCm(profile.height)) : '';
     const weightEl = document.getElementById('profile-weight');
     if (weightEl) weightEl.value = profile.weight ? formatDecimal(toLbs(profile.weight)) : '';
     const ageEl = document.getElementById('profile-age');
     if (ageEl) ageEl.value = profile.age || '';
-
+  
     const genderSelect = document.getElementById('profile-gender');
     if (genderSelect) genderSelect.value = profile.gender || '';
-
+  
     const activitySelect = document.getElementById('profile-activity');
     if (activitySelect) activitySelect.value = profile.activityLevel || 'moderate';
-
+  
     const calGoal = document.getElementById('profile-calorie-goal');
     if (calGoal) calGoal.value = profile.calorieGoal || 2000;
-
+  
     const proteinGoalEl = document.getElementById('profile-protein-goal');
     if (proteinGoalEl) proteinGoalEl.value = profile.proteinGoal || 150;
     const carbsGoalEl = document.getElementById('profile-carbs-goal');
@@ -2258,30 +2483,25 @@
     const fatGoalEl = document.getElementById('profile-fat-goal');
     if (fatGoalEl) fatGoalEl.value = profile.fatGoal || 65;
   }
-
+  
   function calcBMI(profile) {
     if (!profile.weight || !profile.height) return null;
     const heightM = profile.height / 100;
     return profile.weight / (heightM * heightM);
   }
-
-  function calculateBMI(profile) {
-    const bmi = calcBMI(profile);
-    return bmi !== null ? formatDecimal(bmi) : '\u2014';
-  }
-
+  
   function getBMICategory(bmi) {
     if (bmi < 18.5) return { label: 'Underweight', class: 'neutral' };
     if (bmi < 25) return { label: 'Normal', class: 'positive' };
     if (bmi < 30) return { label: 'Overweight', class: 'negative' };
     return { label: 'Obese', class: 'negative' };
   }
-
+  
   function renderWeightLog() {
     const log = getWeightLog();
     const container = document.getElementById('weight-entries');
     if (!container) return;
-
+  
     if (log.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -2290,7 +2510,7 @@
     } else {
       const latest = log[log.length - 1];
       const entries = [...log].reverse().slice(0, 10);
-
+  
       container.innerHTML = entries
         .map((entry) => {
           const date = new Date(entry.date).toLocaleDateString('en-US', {
@@ -2302,7 +2522,7 @@
           const changeStr = entry === latest
             ? '<span class="health-metric-change neutral">latest</span>'
             : `<span class="health-metric-change ${diff < 0 ? 'positive' : diff > 0 ? 'negative' : 'neutral'}">${sign}${formatDecimal(diff)}</span>`;
-
+  
           return `
             <div class="weight-entry">
               <span class="weight-entry-date">${date}</span>
@@ -2313,18 +2533,18 @@
         })
         .join('');
     }
-
+  
     renderWeightChart(log);
   }
-
+  
   function renderWeightChart(log) {
     const chartContainer = document.getElementById('weight-chart');
     if (!chartContainer) return;
-
+  
     const isLight = document.documentElement.dataset.theme === 'light';
     const tickColor = isLight ? '#7A6C60' : '#9A8E82';
     const gridColor = isLight ? 'rgba(184, 69, 13, 0.10)' : 'rgba(184, 69, 13, 0.12)';
-
+  
     if (log.length < 2) {
       chartContainer.innerHTML = `
         <div class="chart-placeholder">
@@ -2332,9 +2552,9 @@
         </div>`;
       return;
     }
-
+  
     chartContainer.innerHTML = '<canvas id="weightCanvas" role="img" aria-label="Weight trend chart"></canvas>';
-
+  
     if (typeof Chart === 'undefined') {
       setTimeout(() => {
         const canvas = document.getElementById('weightCanvas');
@@ -2345,14 +2565,14 @@
     } else {
       const ctx = document.getElementById('weightCanvas')?.getContext('2d');
       if (!ctx) return;
-
+  
       if (weightChart) weightChart.destroy();
-
+  
       const labels = log.map((e) =>
         new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       );
       const weights = log.map((e) => toLbs(e.weight));
-
+  
       weightChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -2382,28 +2602,28 @@
       });
     }
   }
-
+  
   function renderSimpleChart(canvas, log, tickColor) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
+  
     const width = canvas.offsetWidth || 300;
     const height = canvas.offsetHeight || 200;
-
+  
     canvas.width = width * 2;
     canvas.height = height * 2;
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     ctx.scale(2, 2);
-
+  
     const padding = { top: 20, right: 20, bottom: 30, left: 45 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
-
+  
     const lbsLog = log.map((e) => toLbs(e.weight));
     const minWeight = Math.min(...lbsLog) - 1;
     const maxWeight = Math.max(...lbsLog) + 1;
-
+  
     ctx.strokeStyle = 'rgba(184, 69, 13, 0.12)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -2413,7 +2633,7 @@
       ctx.lineTo(width - padding.right, y);
       ctx.stroke();
     }
-
+  
     ctx.fillStyle = tickColor;
     ctx.font = '10px Inter, sans-serif';
     ctx.textAlign = 'right';
@@ -2422,30 +2642,30 @@
       const y = padding.top + (chartH / 4) * i + 3;
       ctx.fillText(val.toFixed(1), padding.left - 8, y);
     }
-
+  
     const points = lbsLog.map((weight, i) => ({
       x: padding.left + (chartW / (log.length - 1 || 1)) * i,
       y: padding.top + chartH - ((weight - minWeight) / (maxWeight - minWeight)) * chartH,
     }));
-
+  
     ctx.strokeStyle = '#D35A1C';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
-
+  
     for (let i = 1; i < points.length; i++) {
       const cp1x = points[i - 1].x + (points[i].x - points[i - 1].x) / 3;
       ctx.bezierCurveTo(cp1x, points[i - 1].y, points[i].x - (points[i].x - points[i - 1].x) / 3, points[i].y, points[i].x, points[i].y);
     }
-
+  
     ctx.stroke();
-
+  
     ctx.fillStyle = 'rgba(211, 90, 28, 0.08)';
     ctx.lineTo(points[points.length - 1].x, padding.top + chartH);
     ctx.lineTo(points[0].x, padding.top + chartH);
     ctx.closePath();
     ctx.fill();
-
+  
     points.forEach((p) => {
       ctx.fillStyle = '#D35A1C';
       ctx.beginPath();
@@ -2453,13 +2673,13 @@
       ctx.fill();
     });
   }
-
-  function bindHealthEvents() {
+  
+  function bindEvents() {
     const profileForm = document.getElementById('health-profile-form');
     if (profileForm) {
       profileForm.addEventListener('submit', (e) => {
         e.preventDefault();
-
+  
         const weightLbs = parseFloat(document.getElementById('profile-weight')?.value);
         const heightIn = parseFloat(document.getElementById('profile-height')?.value);
         const updates = {
@@ -2473,11 +2693,11 @@
           carbsGoal: parseInt(document.getElementById('profile-carbs-goal')?.value) || null,
           fatGoal: parseInt(document.getElementById('profile-fat-goal')?.value) || null,
         };
-
+  
         updateProfile(updates);
         showToast('Profile updated');
         renderHealthProfile();
-
+  
         const tdee = calculateTDEE();
         if (tdee && !document.getElementById('profile-calorie-goal')?.value) {
           const calGoalEl = document.getElementById('profile-calorie-goal');
@@ -2485,20 +2705,20 @@
         }
       });
     }
-
+  
     const weightForm = document.getElementById('add-weight-form');
     if (weightForm) {
       weightForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const input = document.getElementById('new-weight-input');
         if (!input || !input.value) return;
-
+  
         const weightLbs = parseFloat(input.value);
         if (isNaN(weightLbs) || weightLbs <= 0) {
           showToast('Enter a valid weight', 'error');
           return;
         }
-
+  
         const weightKg = toKg(weightLbs);
         addWeightEntry(weightKg);
         updateProfile({ weight: weightKg });
@@ -2508,7 +2728,7 @@
         renderWeightLog();
       });
     }
-
+  
     const weightEntries = document.getElementById('weight-entries');
     if (weightEntries) {
       weightEntries.addEventListener('click', (e) => {
@@ -2522,7 +2742,7 @@
         renderWeightLog();
       });
     }
-
+  
     const exportBtn = document.getElementById('btn-export-data');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
@@ -2537,7 +2757,7 @@
         showToast('Data exported', 'success');
       });
     }
-
+  
     const importBtn = document.getElementById('btn-import-data');
     if (importBtn) {
       const fileInput = document.createElement('input');
@@ -2545,7 +2765,7 @@
       fileInput.accept = '.json';
       fileInput.hidden = true;
       document.body.appendChild(fileInput);
-
+  
       fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
         if (!file) return;
@@ -2565,10 +2785,10 @@
         };
         reader.readAsText(file);
       });
-
+  
       importBtn.addEventListener('click', () => fileInput.click());
     }
-
+  
     const resetBtn = document.getElementById('btn-reset-data');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
@@ -2581,261 +2801,113 @@
       });
     }
   }
+  
 
   // ============================================================
-  // conversions.js
+  // app.js
   // ============================================================
 
-  function initConversions() {
-    bindOvenToAirFryer();
-    bindVolumeConverter();
-    bindWeightConverter();
-    bindTemperatureConverter();
-  }
-
-  const ROUND = (n, d = 1) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
-
-  function parseFraction(val) {
-    if (!val) return NaN;
-    const s = val.trim();
-    if (/^-?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
-    const m = s.match(/^(\d+)?\s*(\d+)\/(\d+)$/);
-    if (m) {
-      const whole = m[1] ? parseInt(m[1]) : 0;
-      const num = parseInt(m[2]);
-      const den = parseInt(m[3]);
-      if (den === 0) return NaN;
-      return whole >= 0 ? whole + num / den : whole - num / den;
+  
+  (() => {
+    'use strict';
+  
+    const routeMap = {
+      home: { template: 'template-home', heading: 'Dashboard', title: 'Savor — Dashboard' },
+      recipes: { template: 'template-recipes', heading: 'Recipes', title: 'Recipes — Savor' },
+      'recipe-detail': { template: 'template-recipe-detail', heading: 'Recipe', title: 'Recipe — Savor' },
+      import: { template: 'template-import', heading: 'Import Recipe', title: 'Import — Savor' },
+      'meal-log': { template: 'template-meal-log', heading: 'Meal Log', title: 'Meal Log — Savor' },
+      health: { template: 'template-health', heading: 'Health', title: 'Health — Savor' },
+    };
+  
+    const initMap = {
+      home: initHome,
+      recipes: initRecipes,
+      'recipe-detail': initRecipeDetail,
+      import: initImport,
+      'meal-log': initMealLog,
+      health: initHealth,
+    };
+  
+    let currentRoute = 'home';
+    let currentDetailId = null;
+  
+    function navigateTo(route, data) {
+      if (!routeMap[route]) return;
+  
+      if (route === 'recipe-detail' && data?.id === currentDetailId) return;
+      if (route === currentRoute && !data) {
+        const existingPage = document.querySelector(`[data-page="${route}"]`);
+        if (existingPage && route !== 'recipe-detail') return;
+      }
+  
+      const prevRoute = currentRoute;
+      currentRoute = route;
+      currentDetailId = route === 'recipe-detail' ? data?.id : null;
+  
+      const spec = routeMap[route];
+      const template = document.getElementById(spec.template);
+      if (!template) return;
+  
+      const root = document.getElementById('app-root');
+      root.innerHTML = '';
+      root.appendChild(template.content.cloneNode(true));
+  
+      document.getElementById('page-title').textContent = spec.heading;
+      document.title = spec.title;
+  
+      const sidebarHeading = document.getElementById('sidebar-heading');
+      if (sidebarHeading) sidebarHeading.textContent = spec.heading;
+  
+      document.querySelectorAll('.nav-item').forEach((btn) => {
+        const isFAB = btn.classList.contains('nav-fab');
+        const btnRoute = btn.dataset.route;
+  
+        let isActive;
+        if (isFAB) {
+          isActive = route === 'import';
+        } else if (route === 'recipe-detail') {
+          isActive = btnRoute === 'recipes';
+        } else {
+          isActive = btnRoute === route;
+        }
+  
+        btn.classList.toggle('active', isActive);
+        if (isActive) btn.setAttribute('aria-current', 'page');
+        else btn.removeAttribute('aria-current');
+      });
+  
+      const initFn = initMap[route];
+      if (initFn) {
+        initFn(data);
+      }
+  
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      root.setAttribute('tabindex', '-1');
+      root.focus({ preventScroll: true });
+  
+      const announcer = document.getElementById('nav-announcer') || (() => {
+        const el = document.createElement('div');
+        el.id = 'nav-announcer';
+        el.className = 'sr-only';
+        el.setAttribute('aria-live', 'assertive');
+        el.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(el);
+        return el;
+      })();
+      announcer.textContent = spec.heading;
     }
-    return NaN;
-  }
-
-  function bindOvenToAirFryer() {
-    const tempInput = document.getElementById('conv-oven-temp');
-    const timeInput = document.getElementById('conv-oven-time');
-
-    if (!tempInput || !timeInput) return;
-
-    const update = () => {
-      const temp = parseFloat(tempInput.value);
-      const time = parseFloat(timeInput.value);
-
-      document.getElementById('conv-af-temp').textContent =
-        !isNaN(temp) && temp > 0 ? Math.round(temp - 25) + '\u00B0F / ' + Math.round((temp - 25 - 32) * 5 / 9) + '\u00B0C' : '\u2014';
-
-      document.getElementById('conv-af-time').textContent =
-        !isNaN(time) && time > 0 ? Math.round(time * 0.8) + ' min' : '\u2014';
-
-      document.getElementById('conv-af-note').hidden = isNaN(temp) || temp <= 0;
-    };
-
-    tempInput.addEventListener('input', update);
-    timeInput.addEventListener('input', update);
-  }
-
-  const VOLUME_UNITS = {
-    cup:    { name: 'Cups',      ml: 236.588 },
-    tbsp:   { name: 'Tbsp',       ml: 14.787 },
-    tsp:    { name: 'Tsp',        ml: 4.929 },
-    'fl-oz':{ name: 'Fl oz',     ml: 29.574 },
-    ml:     { name: 'ml',         ml: 1 },
-    liter:  { name: 'Liters',     ml: 1000 },
-  };
-
-  function bindVolumeConverter() {
-    const input = document.getElementById('conv-vol-input');
-    const unitSelect = document.getElementById('conv-vol-unit');
-    const resultEl = document.getElementById('conv-vol-result');
-
-    if (!input || !unitSelect || !resultEl) return;
-
-    const update = () => {
-      const value = parseFraction(input.value);
-      const unit = unitSelect.value;
-      if (isNaN(value) || value <= 0) {
-        resultEl.innerHTML = '';
-        return;
-      }
-      const ml = value * VOLUME_UNITS[unit].ml;
-      const rows = Object.entries(VOLUME_UNITS)
-        .filter(([key]) => key !== unit)
-        .map(([, u]) => {
-          const converted = ROUND(ml / u.ml, u.ml < 10 ? 1 : u.ml < 100 ? 2 : 3);
-          return '<div class="converter-result-row"><span>' + u.name + '</span><span class="converter-result-value">' + converted + '</span></div>';
-        });
-      resultEl.innerHTML = rows.join('');
-    };
-
-    input.addEventListener('input', update);
-    unitSelect.addEventListener('change', update);
-  }
-
-  const WEIGHT_UNITS = {
-    lb: { name: 'Pounds (lbs)', g: 453.592 },
-    oz: { name: 'Ounces (oz)',  g: 28.35 },
-    g:  { name: 'Grams (g)',     g: 1 },
-    kg: { name: 'Kilograms',     g: 1000 },
-  };
-
-  function bindWeightConverter() {
-    const input = document.getElementById('conv-wt-input');
-    const unitSelect = document.getElementById('conv-wt-unit');
-    const resultEl = document.getElementById('conv-wt-result');
-
-    if (!input || !unitSelect || !resultEl) return;
-
-    const update = () => {
-      const value = parseFraction(input.value);
-      const unit = unitSelect.value;
-      if (isNaN(value) || value <= 0) {
-        resultEl.innerHTML = '';
-        return;
-      }
-      const grams = value * WEIGHT_UNITS[unit].g;
-      const rows = Object.entries(WEIGHT_UNITS)
-        .filter(([key]) => key !== unit)
-        .map(([, u]) => {
-          const converted = ROUND(grams / u.g, u.g < 10 ? 1 : u.g < 100 ? 2 : 3);
-          return '<div class="converter-result-row"><span>' + u.name + '</span><span class="converter-result-value">' + converted + '</span></div>';
-        });
-      resultEl.innerHTML = rows.join('');
-    };
-
-    input.addEventListener('input', update);
-    unitSelect.addEventListener('change', update);
-  }
-
-  function bindTemperatureConverter() {
-    const input = document.getElementById('conv-temp-input');
-    const unitSelect = document.getElementById('conv-temp-unit');
-    const resultEl = document.getElementById('conv-temp-result');
-
-    if (!input || !unitSelect || !resultEl) return;
-
-    const update = () => {
-      const value = parseFraction(input.value);
-      if (isNaN(value)) {
-        resultEl.innerHTML = '';
-        return;
-      }
-      const unit = unitSelect.value;
-      let converted, label;
-      if (unit === 'F') {
-        converted = ROUND((value - 32) * 5 / 9);
-        label = '\u00B0C (Celsius)';
-      } else {
-        converted = ROUND(value * 9 / 5 + 32);
-        label = '\u00B0F (Fahrenheit)';
-      }
-      resultEl.innerHTML = '<div class="converter-result-row"><span>' + label + '</span><span class="converter-result-value">' + converted + '</span></div>';
-    };
-
-    input.addEventListener('input', update);
-    unitSelect.addEventListener('change', update);
-  }
-
-  // ============================================================
-  // app.js (Router)
-  // ============================================================
-
-  const routeMap = {
-    home: { template: 'template-home', heading: 'Dashboard', title: 'Savor \u2014 Dashboard' },
-    recipes: { template: 'template-recipes', heading: 'Recipes', title: 'Recipes \u2014 Savor' },
-    'recipe-detail': { template: 'template-recipe-detail', heading: 'Recipe', title: 'Recipe \u2014 Savor' },
-    import: { template: 'template-import', heading: 'Import Recipe', title: 'Import \u2014 Savor' },
-    'meal-log': { template: 'template-meal-log', heading: 'Meal Log', title: 'Meal Log \u2014 Savor' },
-    health: { template: 'template-health', heading: 'Health', title: 'Health \u2014 Savor' },
-  };
-
-  const initMap = {
-    home: initHome,
-    recipes: initRecipes,
-    'recipe-detail': initRecipeDetail,
-    import: initImport,
-    'meal-log': initMealLog,
-    health: initHealth,
-  };
-
-  let currentRoute = 'home';
-  let currentDetailId = null;
-
-  function navigateTo(route, data) {
-    if (!routeMap[route]) return;
-
-    if (route === 'recipe-detail' && data?.id === currentDetailId) return;
-    if (route === currentRoute && !data) {
-      const existingPage = document.querySelector(`[data-page="${route}"]`);
-      if (existingPage && route !== 'recipe-detail') return;
-    }
-
-    const prevRoute = currentRoute;
-    currentRoute = route;
-    currentDetailId = route === 'recipe-detail' ? data?.id : null;
-
-    const spec = routeMap[route];
-    const template = document.getElementById(spec.template);
-    if (!template) return;
-
-    const root = document.getElementById('app-root');
-    root.innerHTML = '';
-    root.appendChild(template.content.cloneNode(true));
-
-    document.getElementById('page-title').textContent = spec.heading;
-    document.title = spec.title;
-
-    const sidebarHeading = document.getElementById('sidebar-heading');
-    if (sidebarHeading) sidebarHeading.textContent = spec.heading;
-
-    document.querySelectorAll('.nav-item').forEach((btn) => {
-      const isFAB = btn.classList.contains('nav-fab');
-      const btnRoute = btn.dataset.route;
-
-      let isActive;
-      if (isFAB) {
-        isActive = route === 'import';
-      } else if (route === 'recipe-detail') {
-        isActive = btnRoute === 'recipes';
-      } else {
-        isActive = btnRoute === route;
-      }
-
-      btn.classList.toggle('active', isActive);
-      if (isActive) btn.setAttribute('aria-current', 'page');
-      else btn.removeAttribute('aria-current');
-    });
-
-    const initFn = initMap[route];
-    if (initFn) {
-      initFn(data);
-    }
-
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    root.setAttribute('tabindex', '-1');
-    root.focus({ preventScroll: true });
-
-    const announcer = document.getElementById('nav-announcer') || (() => {
-      const el = document.createElement('div');
-      el.id = 'nav-announcer';
-      el.className = 'sr-only';
-      el.setAttribute('aria-live', 'assertive');
-      el.setAttribute('aria-atomic', 'true');
-      document.body.appendChild(el);
-      return el;
-    })();
-    announcer.textContent = spec.heading;
-  }
-
-  function init() {
-    try {
+  
+    function init() {
       initTheme();
-
+  
       document.querySelectorAll('.nav-item').forEach((btn) => {
         btn.addEventListener('click', () => {
           const route = btn.dataset.route;
           if (route) navigateTo(route);
         });
       });
-
+  
       document.body.addEventListener('click', (e) => {
         const link = e.target.closest('[data-route]');
         if (link) {
@@ -2845,22 +2917,20 @@
           navigateTo(route, id ? { id } : undefined);
         }
       });
-
+  
       navigateTo('home');
-    } catch (e) {
-      document.getElementById('app-root').innerHTML = '<div class="empty-state"><p class="empty-state-text">Something went wrong loading the app. Check the console for details.</p></div>';
     }
-  }
-
-  window.navigateTo = navigateTo;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-    navigator.serviceWorker.register('/Savor/service-worker.js').catch(() => { });
-  }
+  
+    window.navigateTo = navigateTo;
+  
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  
+    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+      navigator.serviceWorker.register('/Savor/service-worker.js').catch(() => {});
+    }
+  })();
 })();

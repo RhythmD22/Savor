@@ -178,6 +178,12 @@ function getMacroColor(type) {
   return map[type] || 'var(--text-secondary)';
 }
 
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 export {
   showToast,
   showDialog,
@@ -189,4 +195,5 @@ export {
   formatTime,
   getMealTypeEmoji,
   getMacroColor,
+  escapeHTML,
 };

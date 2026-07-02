@@ -14,7 +14,6 @@ const defaults = {
     proteinGoal: 150,
     carbsGoal: 200,
     fatGoal: 65,
-    weightGoal: null,
   },
   version: 1,
 };

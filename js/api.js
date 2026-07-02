@@ -14,7 +14,6 @@ async function fetchRecipeFromUrl(url) {
 
     return { success: true, recipe: data };
   } catch (err) {
-    console.error('Recipe extraction failed:', err);
     return { success: false, error: err.message };
   }
 }
@@ -26,7 +25,6 @@ async function extractRecipeLocally(url) {
     (fetchUrl) => fetch(`https://translate.google.com/translate?sl=auto&tl=en&u=${encodeURIComponent(fetchUrl)}`),
     (fetchUrl) => fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(fetchUrl)}`),
     (fetchUrl) => fetch(`https://corsproxy.io/?${encodeURIComponent(fetchUrl)}`),
-    (fetchUrl) => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(fetchUrl)}`),
   ];
 
   let html;

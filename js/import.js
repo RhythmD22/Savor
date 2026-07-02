@@ -1,6 +1,6 @@
 import { addRecipe, getRecipes } from './data.js';
 import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
-import { showToast } from './utils.js';
+import { showToast, escapeHTML } from './utils.js';
 import { initConversions } from './conversions.js';
 
 let previewRecipe = null;
@@ -388,12 +388,6 @@ function resetForms() {
   renderIngredientsEditor();
   renderInstructionsEditor();
   hidePreview();
-}
-
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 export { initImport };

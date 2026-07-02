@@ -1,5 +1,5 @@
 import { getRecipes, getRecipeStats, toggleFavorite, deleteRecipe } from './data.js';
-import { formatNumber, formatTime, showToast, showConfirm, debounce } from './utils.js';
+import { formatNumber, formatTime, showToast, showConfirm, debounce, escapeHTML } from './utils.js';
 
 let currentFilter = 'all';
 let currentSort = 'newest';
@@ -104,12 +104,6 @@ function renderRecipes() {
       </button>`
     )
     .join('');
-}
-
-function escapeHTML(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 export { initRecipes };
