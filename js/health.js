@@ -9,6 +9,24 @@ import {
 } from './data.js';
 import { formatNumber, formatDecimal, showToast } from './utils.js';
 
+const LBS_PER_KG = 2.20462;
+
+function toLbs(kg) {
+  return Math.round(kg * LBS_PER_KG * 10) / 10;
+}
+
+function toKg(lbs) {
+  return lbs / LBS_PER_KG;
+}
+
+function inFromCm(cm) {
+  return Math.round(cm / 2.54 * 10) / 10;
+}
+
+function cmFromIn(inches) {
+  return inches * 2.54;
+}
+
 let weightChart = null;
 
 function initHealth() {
@@ -22,8 +40,8 @@ function renderHealthProfile() {
   const tdee = calculateTDEE();
 
   const elements = {
-    'health-current-weight': profile.weight ? `${formatDecimal(profile.weight)} kg` : '—',
-    'health-height': profile.height ? `${formatNumber(profile.height)} cm` : '—',
+    'health-current-weight': profile.weight ? `${formatDecimal(toLbs(profile.weight))} lbs` : '—',
+    'health-height': profile.height ? `${formatDecimal(inFromCm(profile.height))} in` : '—',
     'health-age': profile.age ? `${profile.age} yrs` : '—',
     'health-bmi': calculateBMI(profile),
   };
@@ -47,7 +65,7 @@ function renderHealthProfile() {
   if (trendEl) {
     if (trend) {
       const sign = trend.totalChange > 0 ? '+' : '';
-      trendEl.textContent = `${sign}${trend.totalChange} kg over ${trend.daysDiff} days`;
+      trendEl.textContent = `${sign}${formatDecimal(toLbs(trend.totalChange))} lbs over ${trend.daysDiff} days`;
       trendEl.className = 'health-metric-change';
       if (Math.abs(trend.totalChange) < 0.5) trendEl.classList.add('neutral');
       else if (trend.totalChange < 0) trendEl.classList.add('positive');
@@ -58,8 +76,8 @@ function renderHealthProfile() {
     }
   }
 
-  document.getElementById('profile-height')?.setAttribute('value', profile.height || '');
-  document.getElementById('profile-weight')?.setAttribute('value', profile.weight || '');
+  document.getElementById('profile-height')?.setAttribute('value', profile.height ? formatDecimal(inFromCm(profile.height)) : '');
+  document.getElementById('profile-weight')?.setAttribute('value', profile.weight ? formatDecimal(toLbs(profile.weight)) : '');
   document.getElementById('profile-age')?.setAttribute('value', profile.age || '');
 
   const genderSelect = document.getElementById('profile-gender');
@@ -103,7 +121,7 @@ function renderWeightLog() {
           month: 'short',
           day: 'numeric',
         });
-        const diff = latest && entry !== latest ? entry.weight - latest.weight : 0;
+        const diff = latest && entry !== latest ? toLbs(entry.weight) - toLbs(latest.weight) : 0;
         const sign = diff > 0 ? '+' : '';
         const changeStr = entry === latest
           ? '<span class="health-metric-change neutral">latest</span>'
@@ -112,7 +130,7 @@ function renderWeightLog() {
         return `
           <div class="weight-entry">
             <span class="weight-entry-date">${date}</span>
-            <span class="weight-entry-value">${formatDecimal(entry.weight)} kg</span>
+            <span class="weight-entry-value">${formatDecimal(toLbs(entry.weight))} lbs</span>
             ${changeStr}
           </div>`;
       })
@@ -156,7 +174,7 @@ function renderWeightChart(log) {
     const labels = log.map((e) =>
       new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     );
-    const weights = log.map((e) => e.weight);
+    const weights = log.map((e) => toLbs(e.weight));
 
     weightChart = new Chart(ctx, {
       type: 'line',
@@ -164,7 +182,7 @@ function renderWeightChart(log) {
         labels,
         datasets: [
           {
-            label: 'Weight (kg)',
+            label: 'Weight (lbs)',
             data: weights,
             borderColor: '#D35A1C',
             backgroundColor: 'rgba(211, 90, 28, 0.1)',
@@ -205,8 +223,9 @@ function renderSimpleChart(canvas, log, tickColor) {
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
 
-  const minWeight = Math.min(...log.map((e) => e.weight)) - 1;
-  const maxWeight = Math.max(...log.map((e) => e.weight)) + 1;
+  const lbsLog = log.map((e) => toLbs(e.weight));
+  const minWeight = Math.min(...lbsLog) - 1;
+  const maxWeight = Math.max(...lbsLog) + 1;
 
   ctx.strokeStyle = 'rgba(184, 69, 13, 0.12)';
   ctx.lineWidth = 1;
@@ -227,9 +246,9 @@ function renderSimpleChart(canvas, log, tickColor) {
     ctx.fillText(val.toFixed(1), padding.left - 8, y);
   }
 
-  const points = log.map((e, i) => ({
+  const points = lbsLog.map((weight, i) => ({
     x: padding.left + (chartW / (log.length - 1 || 1)) * i,
-    y: padding.top + chartH - ((e.weight - minWeight) / (maxWeight - minWeight)) * chartH,
+    y: padding.top + chartH - ((weight - minWeight) / (maxWeight - minWeight)) * chartH,
   }));
 
   ctx.strokeStyle = '#D35A1C';
@@ -264,9 +283,11 @@ function bindEvents() {
     profileForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      const weightLbs = parseFloat(document.getElementById('profile-weight')?.value);
+      const heightIn = parseFloat(document.getElementById('profile-height')?.value);
       const updates = {
-        height: parseFloat(document.getElementById('profile-height')?.value) || null,
-        weight: parseFloat(document.getElementById('profile-weight')?.value) || null,
+        height: heightIn ? cmFromIn(heightIn) : null,
+        weight: weightLbs ? toKg(weightLbs) : null,
         age: parseInt(document.getElementById('profile-age')?.value) || null,
         gender: document.getElementById('profile-gender')?.value || null,
         activityLevel: document.getElementById('profile-activity')?.value || 'moderate',
@@ -295,14 +316,15 @@ function bindEvents() {
       const input = document.getElementById('new-weight-input');
       if (!input || !input.value) return;
 
-      const weight = parseFloat(input.value);
-      if (isNaN(weight) || weight <= 0) {
+      const weightLbs = parseFloat(input.value);
+      if (isNaN(weightLbs) || weightLbs <= 0) {
         showToast('Enter a valid weight', 'error');
         return;
       }
 
-      addWeightEntry(weight);
-      updateProfile({ weight });
+      const weightKg = toKg(weightLbs);
+      addWeightEntry(weightKg);
+      updateProfile({ weight: weightKg });
       input.value = '';
       showToast('Weight logged');
       renderHealthProfile();

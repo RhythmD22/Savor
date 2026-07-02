@@ -532,7 +532,7 @@
       <!-- API -->
       <div class="import-tab-content" data-tab="api">
         <div class="import-api-select">
-          <p class="text-sm text-secondary">When you search for a food in the meal log, results come from all enabled sources at once. Keys are stored only in your browser.</p>
+          <p class="text-sm text-secondary">Food search results come from Open Food Facts, USDA FoodData Central, and Spoonacular — all proxied through the server to keep API keys secure.</p>
 
           <div class="import-api-option glass glass-card">
             <div class="import-api-info" style="flex:1">
@@ -545,22 +545,20 @@
           <div class="import-api-option glass glass-card">
             <div class="import-api-info" style="flex:1">
               <div class="import-api-name">USDA FoodData Central</div>
-              <div class="import-api-desc">Government nutrition database — raw ingredients, branded foods, lab data. 1,000 req/hr free. <br>Uses DEMO_KEY by default for testing (limited).</div>
+              <div class="import-api-desc">Government nutrition database — raw ingredients, branded foods, lab data.</div>
             </div>
-            <input type="password" class="glass-input" id="api-key-usda" placeholder="Enter key" style="width:140px;flex-shrink:0">
+            <span class="import-api-badge" id="usda-status">Not configured</span>
           </div>
 
           <div class="import-api-option glass glass-card">
             <div class="import-api-info" style="flex:1">
               <div class="import-api-name">Spoonacular</div>
-              <div class="import-api-desc">Recipe extraction, meal planning, ingredient parsing. 50 pts/day free, no credit card.</div>
+              <div class="import-api-desc">Recipe extraction, meal planning, ingredient parsing.</div>
             </div>
-            <input type="password" class="glass-input" id="api-key-spoonacular" placeholder="Enter key" style="width:140px;flex-shrink:0">
+            <span class="import-api-badge" id="spoonacular-status">Not configured</span>
           </div>
 
-          <button class="btn btn-primary btn-block" id="btn-save-api-key">Save Keys</button>
-
-          <p class="text-xs text-tertiary">USDA: fdc.nal.usda.gov/api-key-signup · Spoonacular: spoonacular.com/food-api/console</p>
+          <p class="text-xs text-tertiary">API keys must be set as environment variables (USDA_API_KEY, SPOONACULAR_API_KEY) on your Vercel deployment. They are never exposed to the browser.</p>
         </div>
       </div>
 
@@ -715,7 +713,7 @@
       <div class="page-section">
         <h2 class="section-title">Weight Log</h2>
         <div class="add-weight-form" id="add-weight-form">
-          <input type="number" class="glass-input" id="new-weight-input" placeholder="Enter weight (kg)" step="0.1"
+          <input type="number" class="glass-input" id="new-weight-input" placeholder="Enter weight (lbs)" step="0.1"
             min="10" max="300">
           <button type="submit" class="btn btn-primary weight-add-btn">Log</button>
         </div>
@@ -728,11 +726,11 @@
         <form class="profile-form" id="health-profile-form">
           <div class="profile-input-group">
             <div class="profile-field flex-1">
-              <label class="profile-label">Height (cm)</label>
-              <input type="number" class="glass-input" id="profile-height" min="50" max="250" step="0.1">
+              <label class="profile-label">Height (in)</label>
+              <input type="number" class="glass-input" id="profile-height" min="20" max="100" step="0.1">
             </div>
             <div class="profile-field flex-1">
-              <label class="profile-label">Weight (kg)</label>
+              <label class="profile-label">Weight (lbs)</label>
               <input type="number" class="glass-input" id="profile-weight" min="10" max="300" step="0.1">
             </div>
           </div>

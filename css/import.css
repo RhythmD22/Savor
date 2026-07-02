@@ -168,6 +168,15 @@
   color: var(--danger);
 }
 
+.ingredient-heading {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  padding: var(--space-md) 0 var(--space-xs);
+}
+
 .import-add-btn {
   display: flex;
   align-items: center;
@@ -245,6 +254,11 @@
   color: var(--brand-600);
   font-size: var(--text-xs);
   font-weight: 600;
+}
+
+.import-api-badge--active {
+  background: var(--success-bg, #e6f7ed);
+  color: var(--success, #1a7d36);
 }
 
 .spinner {

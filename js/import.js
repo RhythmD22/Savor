@@ -1,5 +1,5 @@
 import { addRecipe, getRecipes } from './data.js';
-import { extractRecipeLocally, fetchRecipeFromUrl, saveApiKey } from './api.js';
+import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
 import { showToast } from './utils.js';
 
 let previewRecipe = null;
@@ -14,6 +14,7 @@ function initImport() {
   switchTab('url');
   bindEvents();
   resetForms();
+  refreshApiStatus();
 }
 
 function switchTab(tabId) {
@@ -73,18 +74,27 @@ function bindEvents() {
       hidePreview();
     });
   }
+}
 
-  const saveApiBtn = document.getElementById('btn-save-api-key');
-  if (saveApiBtn) {
-    saveApiBtn.addEventListener('click', () => {
-      const usdaKey = document.getElementById('api-key-usda')?.value.trim();
-      const spoonKey = document.getElementById('api-key-spoonacular')?.value.trim();
-      if (usdaKey) saveApiKey('usda', usdaKey);
-      if (spoonKey) saveApiKey('spoonacular', spoonKey);
-      if (usdaKey || spoonKey) showToast('API keys saved');
-      document.getElementById('api-key-usda').value = '';
-      document.getElementById('api-key-spoonacular').value = '';
-    });
+async function refreshApiStatus() {
+  try {
+    const response = await fetch('/api/food-search-status');
+    if (!response.ok) return;
+    const status = await response.json();
+    updateBadge('usda-status', status.usda);
+    updateBadge('spoonacular-status', status.spoonacular);
+  } catch { }
+}
+
+function updateBadge(id, isConfigured) {
+  const badge = document.getElementById(id);
+  if (!badge) return;
+  if (isConfigured) {
+    badge.textContent = 'Active';
+    badge.classList.add('import-api-badge--active');
+  } else {
+    badge.textContent = 'Not configured';
+    badge.classList.remove('import-api-badge--active');
   }
 }
 
@@ -209,7 +219,11 @@ function renderIngredientsEditor() {
 
   container.innerHTML = manualIngredients
     .map(
-      (ing, i) => `
+      (ing, i) => {
+        if (ing.heading) {
+          return `<div class="ingredient-heading">${escapeHTML(ing.text)}</div>`;
+        }
+        return `
       <div class="import-ingredient-row">
         <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
           data-ingredient-index="${i}" placeholder="e.g. 2 cups flour">
@@ -219,6 +233,7 @@ function renderIngredientsEditor() {
           </svg>
         </button>
       </div>`
+      }
     )
     .join('');
 
