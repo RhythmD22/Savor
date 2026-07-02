@@ -107,7 +107,7 @@ Savor/
 │   ├── app.js                  # SPA router, navigation, page initialization
 │   ├── theme.js                # Light/dark theme persistence and toggle
 │   ├── data.js                 # localStorage CRUD (recipes, meal logs, weight entries, profile) + export/import/reset
-  │ │   ├── utils.js               # Shared utilities: toast, dialog, debounce, formatting, escapeHTML
+│   ├── utils.js               # Shared utilities: toast, dialog, debounce, formatting, escapeHTML
 │   ├── api.js                  # Client-side API: recipe extraction, food search (via serverless proxy)
 │   ├── index.js                # Dashboard: calorie ring, macro breakdown, recent recipes, meal log summary
 │   ├── recipes.js              # Recipe list: search, filter, sort, favorites
