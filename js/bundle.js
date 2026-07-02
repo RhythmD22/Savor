@@ -184,20 +184,6 @@
     return parseFloat(n).toFixed(decimals);
   }
   
-  function getRelativeDate(dateStr) {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
-    return `${Math.floor(diffDays / 365)}y ago`;
-  }
-  
   function debounce(fn, delay = DEBOUNCE_DELAY) {
     let timer;
     return function (...args) {
@@ -511,9 +497,49 @@
     saveData();
   }
   // ============================================================
+  // recipe-parsers.js
+  // ============================================================
+
+  function capitalizeFirst(str) {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
+  function parseNumber(val) {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    const num = parseFloat(String(val).replace(/[^0-9.]/g, ''));
+    return isNaN(num) ? 0 : num;
+  }
+  
+  function parseDuration(val) {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    const str = String(val);
+  
+    const isoMatch = str.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    if (isoMatch) {
+      return (parseInt(isoMatch[1]) || 0) * 60 + (parseInt(isoMatch[2]) || 0);
+    }
+  
+    const num = parseInt(str.match(/\d+/)?.[0]);
+    return isNaN(num) ? 0 : num;
+  }
+  
+  function extractImageUrl(image) {
+    if (!image) return '';
+    if (typeof image === 'string') return image;
+    if (Array.isArray(image) && image.length > 0) return extractImageUrl(image[0]);
+    if (image.url) return image.url;
+    if (image['@id']) return image['@id'];
+    return '';
+  }
+
+  // ============================================================
   // api.js
   // ============================================================
 
+  
   async function fetchRecipeFromUrl(url) {
     try {
       const response = await fetch('/api/recipe-extractor', {
@@ -651,17 +677,17 @@
       collectSteps(rawInstructions);
     }
   
-    const nutrition = {};
-    if (r.nutrition) {
-      const nc = r.nutrition;
-      nutrition.calories = parseNumber(nc.calories);
-      nutrition.protein = parseNumber(nc.proteinContent);
-      nutrition.carbs = parseNumber(nc.carbohydrateContent);
-      nutrition.fat = parseNumber(nc.fatContent);
-      nutrition.fiber = parseNumber(nc.fiberContent);
-      nutrition.sugar = parseNumber(nc.sugarContent);
-      nutrition.sodium = parseNumber(nc.sodiumContent);
-    }
+    const nutrition = r.nutrition
+      ? {
+          calories: parseNumber(r.nutrition.calories),
+          protein: parseNumber(r.nutrition.proteinContent),
+          carbs: parseNumber(r.nutrition.carbohydrateContent),
+          fat: parseNumber(r.nutrition.fatContent),
+          fiber: parseNumber(r.nutrition.fiberContent),
+          sugar: parseNumber(r.nutrition.sugarContent),
+          sodium: parseNumber(r.nutrition.sodiumContent),
+        }
+      : {};
   
     return {
       title: r.name || '',
@@ -670,9 +696,9 @@
       sourceUrl: r.url || '',
       sourceName: r.author?.name || r.publisher?.name || '',
       servings: parseInt(r.recipeYield) || 0,
-      prepTime: parseIsoDuration(r.prepTime),
-      cookTime: parseIsoDuration(r.cookTime),
-      totalTime: parseIsoDuration(r.totalTime),
+      prepTime: parseDuration(r.prepTime),
+      cookTime: parseDuration(r.cookTime),
+      totalTime: parseDuration(r.totalTime),
       ingredients: ingredients.map((i) => ({ text: i })),
       instructions: instructions.map(capitalizeFirst),
       nutrition,
@@ -711,8 +737,8 @@
       image: prop('image', 'src') || prop('image'),
       sourceUrl: doc.querySelector('link[rel="canonical"]')?.href || '',
       servings: parseInt(prop('recipeYield')) || 0,
-      prepTime: parseIsoDuration(prop('prepTime')),
-      cookTime: parseIsoDuration(prop('cookTime')),
+      prepTime: parseDuration(prop('prepTime')),
+      cookTime: parseDuration(prop('cookTime')),
       ingredients,
       instructions,
       nutrition: {
@@ -910,35 +936,6 @@
     result.fat = extract('total fat') || extract('fat');
   
     return result;
-  }
-  
-  function capitalizeFirst(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-  function parseNumber(val) {
-    if (!val) return 0;
-    if (typeof val === 'number') return val;
-    const num = parseFloat(String(val).replace(/[^0-9.]/g, ''));
-    return isNaN(num) ? 0 : num;
-  }
-  
-  function parseIsoDuration(duration) {
-    if (!duration) return 0;
-    if (typeof duration === 'number') return duration;
-  
-    const match = String(duration).match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
-    if (!match) return 0;
-    return (parseInt(match[1]) || 0) * 60 + (parseInt(match[2]) || 0);
-  }
-  
-  function extractImageUrl(image) {
-    if (!image) return '';
-    if (typeof image === 'string') return image;
-    if (Array.isArray(image)) return image[0] || '';
-    if (image.url) return image.url;
-    if (image['@id']) return image['@id'];
-    return '';
   }
   
   async function searchRemoteFood(query) {
@@ -1465,7 +1462,7 @@
             (ing, i) => `
           <label class="ingredient-item">
             <input type="checkbox" class="ingredient-checkbox">
-            <span class="ingredient-name">${escapeHTML(typeof ing === 'string' ? ing : ing.text || ing.quantity + ' ' + ing.unit + ' ' + ing.name)}</span>
+            <span class="ingredient-name">${escapeHTML(typeof ing === 'string' ? ing : ing.text || [ing.quantity, ing.unit, ing.name].filter(Boolean).join(' '))}</span>
           </label>`
           )
           .join('');
@@ -3060,7 +3057,7 @@
     }
   
     if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-      navigator.serviceWorker.register('/Savor/service-worker.js').catch((err) => {
+      navigator.serviceWorker.register('/service-worker.js').catch((err) => {
         console.warn('Service worker registration failed:', err);
       });
     }
