@@ -1,8 +1,9 @@
 # Savor
 
-> Recipe book & health tracker — import recipes from any URL, track daily calories and macros, and monitor weight goals, all from the browser with no sign-up and no server.
+> Recipe book & health tracker — import recipes from any URL, track daily calories and macros, and monitor weight goals, all from the browser with no sign-up.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Deploy](https://img.shields.io/badge/deploy-Vercel-black?logo=vercel)](https://savor.vercel.app)
 [![PWA Ready](https://img.shields.io/badge/PWA-ready-brightgreen)](#progressive-web-app-pwa-support)
 
 ---
@@ -16,7 +17,9 @@
 - [Design System](#design-system)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
-- [API Integrations](#api-integrations)
+- [Scripts](#scripts)
+- [API](#api)
+- [Environment Variables](#environment-variables)
 - [PWA Support](#progressive-web-app-pwa-support)
 - [License](#license)
 
@@ -29,10 +32,11 @@
 | Recipe Import | Paste any recipe URL — ingredients, instructions, and nutrition are extracted automatically via a Vercel serverless function |
 | Manual Creation | Build recipes from scratch with custom ingredients, step-by-step instructions, and full nutrition data |
 | Recipe Library | Browse, search, favorite, and filter recipes by meal type (breakfast, lunch, dinner, snacks) |
+| Cooking Conversions | Built-in measurement converters — volume (cups, tbsp, tsp, ml, liters), weight (lbs, oz, g, kg), temperature (F ↔ C), and oven-to-air-fryer (temp/time adjustments) — with fraction input support ("1 1/2") and a quick-reference cheat sheet |
 | Calorie Ring | Animated SVG calorie tracker on the dashboard — fill the ring throughout the day with color-coded macro breakdown |
 | Meal Logging | Log recipes or individual foods to your daily diary with per-meal grouping and visual macro bars |
 | Nutrition Goals | Set custom daily targets for calories, protein, carbs, and fat — progress bars update in real time |
-| Food Search | Search across Open Food Facts, USDA FoodData Central, and Spoonacular simultaneously — no key required for Open Food Facts |
+| Food Search | Search across Open Food Facts, USDA FoodData Central, and Spoonacular — proxied through a Vercel serverless function to keep API keys secure |
 | Health Dashboard | Weight logging with Chart.js trend visualization, BMI calculation, and TDEE estimation based on your profile |
 | Light / Dark Theme | System-aware `prefers-color-scheme` with floating manual toggle (sun/moon), persisted to `localStorage` |
 | Notebook Aesthetic | Ruled paper background with red margin line, paper grain texture, and warm gradient washes — like a Moleskine journal |
@@ -48,15 +52,22 @@
 
 ## Demo
 
-To run locally:
+To run locally with all features:
 
 ```bash
 git clone https://github.com/rhythmd22/Savor.git
 cd Savor
+cp .env.example .env    # add API keys (optional)
+npx vercel dev
+```
+
+For a quick preview without API features, serve statically:
+
+```bash
 python3 -m http.server 8080
 ```
 
-Open `http://localhost:8080/` in your browser. For recipe URL extraction, run with `vercel dev` instead.
+Open `http://localhost:3000/` (vercel dev) or `http://localhost:8080/` in your browser.
 
 ---
 
@@ -83,28 +94,32 @@ Open `http://localhost:8000/` in your browser.
 Savor/
 ├── index.html                  # SPA shell with 6 <template> elements
 ├── css/
-│   ├── styles.css              # Design tokens, reset, layout, components, theme overrides (1,556 lines)
+│   ├── styles.css              # Design tokens, reset, layout, components, theme overrides
 │   ├── index.css               # Dashboard page (calorie ring, macros, meal entries)
 │   ├── recipes.css             # Recipe list, search, filter chips, card grid
 │   ├── recipe-detail.css       # Recipe detail (hero, nutrition grid, ingredients, instructions)
 │   ├── import.css              # Recipe import (URL/manual/API tabs, form, spinner)
 │   ├── meal-log.css            # Daily food diary (date selector, summary bars, search, entries)
-│   └── health.css              # Health tracking (metrics, weight log, chart, profile form)
+│   ├── health.css              # Health tracking (metrics, weight log, chart, profile form)
+│   └── conversions.css         # Cooking conversions (grid, cards, inputs, results)
 ├── js/
 │   ├── app.js                  # SPA router, navigation, page initialization
 │   ├── theme.js                # Light/dark theme persistence and toggle
 │   ├── data.js                 # localStorage CRUD (recipes, meal logs, weight entries, profile)
 │   ├── utils.js                # Shared utilities: toast, dialog, debounce, formatting
-│   ├── api.js                  # Recipe extraction, food search (Open Food Facts, USDA, Spoonacular)
+│   ├── api.js                  # Client-side API: recipe extraction, food search (via serverless proxy)
 │   ├── index.js                # Dashboard: calorie ring, macro breakdown, recent recipes, meal log summary
 │   ├── recipes.js              # Recipe list: search, filter, sort, favorites
 │   ├── recipe-detail.js        # Recipe detail: nutrition, ingredients, instructions, log/delete actions
-│   ├── import.js               # Import page: URL extraction, manual create, API key management
+│   ├── import.js               # Import page: URL extraction, manual create, API source status, cooking conversions tab
 │   ├── meal-log.js             # Food diary: date navigation, food search, meal entries, macro bars
 │   ├── health.js               # Health page: weight chart (Chart.js), profile, TDEE calculation
+│   ├── conversions.js          # Cooking unit converters (volume, weight, temperature, oven → air fryer)
 │   └── bundle.js               # Concatenated production bundle (all JS modules)
 ├── api/
-│   └── recipe-extractor.js     # Vercel serverless function — extracts recipe data from URLs
+│   ├── recipe-extractor.js     # Vercel serverless — extracts recipe data from URLs
+│   ├── food-search.js          # Vercel serverless — proxies USDA, Spoonacular, Open Food Facts searches
+│   └── food-search-status.js   # Vercel serverless — reports which API sources are configured
 ├── icon.svg                    # Vector PWA icon (source — used as favicon and apple-touch-icon)
 ├── icon-maskable.svg                       # Maskable icon variant with safe-zone padding
 ├── android-chrome-192x192.png              # PWA icon 192x192
@@ -120,6 +135,7 @@ Savor/
 ├── service-worker.js           # Offline caching and install flow
 ├── vercel.json                 # Vercel deployment config (SPA rewrites + serverless function)
 ├── .gitignore
+├── .env.example                # Environment variable template
 ├── LICENSE
 ```
 
@@ -260,58 +276,87 @@ No npm packages, no build steps, no framework. All visual effects (glassmorphism
 
 No dependencies to install, no environment variables to configure. The app works fully offline using `localStorage` for all data.
 
-### Recipe URL Extraction (Optional)
+### Recipe URL Extraction and Food Search (Optional)
 
-To enable automatic recipe extraction from URLs:
+To enable recipe extraction from URLs and food search with USDA/Spoonacular:
 
 ```bash
+cp .env.example .env      # add API keys (optional)
 npx vercel dev
 ```
 
-This starts the Vercel development environment with the `/api/recipe-extractor` serverless function. Without it, you can still create recipes manually.
-
-### Food Search API Keys (Optional)
-
-Food search works with Open Food Facts out of the box (no key). To enable additional sources:
-
-1. Get a free key at [USDA FoodData Central](https://fdc.nal.usda.gov/api-key-signup) or [Spoonacular](https://spoonacular.com/food-api/console)
-2. Go to Import → API tab
-3. Paste your key and tap Save
-
-Keys are stored in `localStorage` on your device only and are never sent anywhere except directly to the respective APIs.
+This starts the Vercel development environment with all serverless functions. Set `USDA_API_KEY` and/or `SPOONACULAR_API_KEY` in `.env` (both are optional — Open Food Facts always works). Without `vercel dev`, you can still create recipes manually and search local recipes.
 
 ---
 
-## API Integrations
+## Scripts
 
-### Recipe Extractor (Vercel Serverless)
+| Command | Description |
+|---------|------------|
+| `npx vercel dev` | Start local dev server with all API functions |
+| `python3 -m http.server 8080` | Quick static preview (no API features) |
 
-- **Purpose:** Extract structured recipe data (title, ingredients, instructions, nutrition, image, cook time, servings) from any recipe URL
-- **Endpoint:** `/api/recipe-extractor`
-- **Key required:** No
-- **Deployment:** Runs on Vercel; falls back to manual recipe creation when unavailable
+No npm dependencies, no build step, no framework. The project is vanilla HTML, CSS, and JavaScript.
 
-### Open Food Facts
+---
 
-- **Purpose:** Product and ingredient lookup — nutrition facts, serving sizes, barcode search
-- **Endpoint:** `https://world.openfoodfacts.org/`
-- **Key required:** No
-- **Use case:** Search for "chicken breast" or scan a barcode to get nutrition data per 100g
+## API
 
-### USDA FoodData Central
+All third-party API calls are proxied through Vercel serverless functions. API keys are injected server-side and never exposed to the browser.
 
-- **Purpose:** Government nutrition database — raw ingredients, branded foods, lab-analyzed data
-- **Endpoint:** `https://api.nal.usda.gov/fdc/v1/foods/search`
-- **Key required:** Yes (free — [sign up](https://fdc.nal.usda.gov/api-key-signup))
-- **Default:** Uses `DEMO_KEY` for testing (limited rate). Replace with your own key for production use.
-- **Rate limit:** 1,000 requests/hour on free tier
+### Recipe Extractor
 
-### Spoonacular
+```
+POST /api/recipe-extractor
+Content-Type: application/json
 
-- **Purpose:** Recipe extraction, ingredient parsing, meal planning, nutrition analysis
-- **Endpoint:** `https://api.spoonacular.com/`
-- **Key required:** Yes (free — [sign up](https://spoonacular.com/food-api/console))
-- **Rate limit:** 50 points/day on free tier (no credit card required)
+{ "url": "https://example.com/recipe" }
+```
+
+Fetches a recipe URL server-side and extracts structured data (title, ingredients, instructions, nutrition, image, cook time, servings) from JSON-LD, HTML Microdata, or generic page parsing. No API key required.
+
+### Food Search
+
+```
+POST /api/food-search
+Content-Type: application/json
+
+{ "query": "chicken breast" }
+```
+
+Proxies searches to Open Food Facts, USDA FoodData Central, and Spoonacular in parallel. Returns combined results from all enabled sources:
+
+```json
+{
+  "results": [ { "id": "usda-...", "name": "...", "calories": 165, ... } ],
+  "sources": { "usda": true, "spoonacular": true, "openFoodFacts": true }
+}
+```
+
+### Food Search Status
+
+```
+GET /api/food-search-status
+```
+
+Returns which API sources are configured:
+
+```json
+{ "usda": true, "spoonacular": false, "openFoodFacts": true }
+```
+
+Used by the Import → API tab to display source status.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|------------|
+| `USDA_API_KEY` | No | USDA FoodData Central key from [fdc.nal.usda.gov/api-key-signup](https://fdc.nal.usda.gov/api-key-signup) |
+| `SPOONACULAR_API_KEY` | No | Spoonacular key from [spoonacular.com/food-api/console](https://spoonacular.com/food-api/console) |
+
+Copy `.env.example` to `.env` for local development. Set these in Vercel's project dashboard for production.
 
 ---
 

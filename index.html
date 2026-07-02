@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="css/import.css">
   <link rel="stylesheet" href="css/meal-log.css">
   <link rel="stylesheet" href="css/health.css">
+  <link rel="stylesheet" href="css/conversions.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" defer></script>
 
@@ -349,6 +350,7 @@
         <button class="import-tab active" data-tab="url" role="tab" aria-selected="true">From URL</button>
         <button class="import-tab" data-tab="manual" role="tab" aria-selected="false">Create Manually</button>
         <button class="import-tab" data-tab="api" role="tab" aria-selected="false">API</button>
+        <button class="import-tab" data-tab="convert" role="tab" aria-selected="false">Convert</button>
       </div>
 
       <!-- URL Import -->
@@ -562,6 +564,140 @@
         </div>
       </div>
 
+      <!-- Convert -->
+      <div class="import-tab-content" data-tab="convert">
+        <div class="conversions-grid">
+
+          <!-- Volume Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2h12l4 6-4 14H6L2 8z"/>
+              </svg>
+              <span class="converter-card-title">Volume</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-vol-input" placeholder="e.g. 1 1/2">
+              <select class="glass-input" id="conv-vol-unit">
+                <option value="cup">Cups</option>
+                <option value="tbsp">Tbsp</option>
+                <option value="tsp">Tsp</option>
+                <option value="fl-oz">Fl oz</option>
+                <option value="ml">ml</option>
+                <option value="liter">Liters</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-vol-result"></div>
+          </div>
+
+          <!-- Weight Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="3" x2="12" y2="13"/><line x1="3" y1="13" x2="21" y2="13"/><polyline points="6 13 3 19 9 19"/><polyline points="18 13 21 19 15 19"/>
+              </svg>
+              <span class="converter-card-title">Weight</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-wt-input" placeholder="e.g. 1.5">
+              <select class="glass-input" id="conv-wt-unit">
+                <option value="lb">Pounds</option>
+                <option value="oz">Ounces</option>
+                <option value="g">Grams</option>
+                <option value="kg">Kilograms</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-wt-result"></div>
+          </div>
+
+          <!-- Temperature Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="6" x2="12.01" y2="6"/>
+              </svg>
+              <span class="converter-card-title">Temperature</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-temp-input" placeholder="350">
+              <select class="glass-input" id="conv-temp-unit">
+                <option value="F">&deg;F</option>
+                <option value="C">&deg;C</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-temp-result"></div>
+          </div>
+
+          <!-- Common Equivalents -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              <span class="converter-card-title">Quick Reference</span>
+            </div>
+            <div class="converter-result">
+              <div class="converter-result-row"><span>1 tbsp</span><span class="converter-result-value">3 tsp</span></div>
+              <div class="converter-result-row"><span>1/4 cup</span><span class="converter-result-value">4 tbsp</span></div>
+              <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">16 tbsp</span></div>
+              <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">8 fl oz</span></div>
+              <div class="converter-result-row"><span>1 pint</span><span class="converter-result-value">2 cups</span></div>
+              <div class="converter-result-row"><span>1 quart</span><span class="converter-result-value">4 cups</span></div>
+              <div class="converter-result-row"><span>1 gallon</span><span class="converter-result-value">16 cups</span></div>
+              <div class="converter-result-row"><span>1 stick butter</span><span class="converter-result-value">1/2 cup</span></div>
+              <div class="converter-result-row"><span>1 oz</span><span class="converter-result-value">28 g</span></div>
+              <div class="converter-result-row"><span>1 lb</span><span class="converter-result-value">454 g</span></div>
+            </div>
+          </div>
+
+          <!-- Oven → Air Fryer -->
+          <div class="converter-card glass glass-card wide">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="16" rx="2"/><rect x="8" y="10" width="8" height="6" rx="1"/><line x1="8" y1="17" x2="16" y2="17"/><path d="M5 3v3M12 3v3M19 3v3"/>
+              </svg>
+              <span class="converter-card-title">Oven &rarr; Air Fryer</span>
+            </div>
+            <div class="airfryer-dual-input">
+              <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <label>Oven Temp (&deg;F)</label>
+                <input type="number" class="glass-input" id="conv-oven-temp" placeholder="350" min="0" max="550">
+              </div>
+              <div class="airfryer-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </div>
+              <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <label>Air Fryer Temp</label>
+                <div class="converter-result" style="min-height:42px;display:flex;align-items:center">
+                  <strong id="conv-af-temp">&mdash;</strong>
+                </div>
+              </div>
+            </div>
+            <div class="airfryer-dual-input">
+              <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <label>Oven Time (min)</label>
+                <input type="number" class="glass-input" id="conv-oven-time" placeholder="30" min="1" max="600">
+              </div>
+              <div class="airfryer-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </div>
+              <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <label>Air Fryer Time</label>
+                <div class="converter-result" style="min-height:42px;display:flex;align-items:center">
+                  <strong id="conv-af-time">&mdash;</strong>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-tertiary" id="conv-af-note" hidden>Temp reduced by 25&deg;F, time reduced by ~20%. Start checking a few minutes early.</p>
+          </div>
+
+        </div>
+      </div>
+
       </div>
 
     </div>
@@ -692,6 +828,7 @@
             </svg>
             <div class="health-metric-value" id="health-bmi">—</div>
             <div class="health-metric-label">BMI</div>
+            <div class="health-metric-category" id="health-bmi-category"></div>
           </div>
           <div class="health-metric-card glass glass-card">
             <svg class="health-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -712,11 +849,11 @@
 
       <div class="page-section">
         <h2 class="section-title">Weight Log</h2>
-        <div class="add-weight-form" id="add-weight-form">
+        <form class="add-weight-form" id="add-weight-form">
           <input type="number" class="glass-input" id="new-weight-input" placeholder="Enter weight (lbs)" step="0.1"
             min="10" max="300">
           <button type="submit" class="btn btn-primary weight-add-btn">Log</button>
-        </div>
+        </form>
         <div class="weight-chart-container" id="weight-chart"></div>
         <div class="weight-log" id="weight-entries"></div>
       </div>

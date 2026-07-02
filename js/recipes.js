@@ -84,7 +84,7 @@ function renderRecipes() {
     .map(
       (r) => `
       <button class="recipe-card glass glass-card" data-route="recipe-detail" data-id="${r.id}" aria-label="View recipe: ${escapeHTML(r.title)}">
-        <div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>
+        ${r.image ? `<img class="recipe-card-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
         <div class="recipe-card-content">
           <div class="recipe-card-title truncate">${escapeHTML(r.title)}</div>
           ${r.sourceName ? `<div class="recipe-card-source">${escapeHTML(r.sourceName)}</div>` : ''}

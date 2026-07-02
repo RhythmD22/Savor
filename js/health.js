@@ -3,6 +3,7 @@ import {
   updateProfile,
   getWeightLog,
   addWeightEntry,
+  deleteWeightEntry,
   calculateTDEE,
   getWeightTrend,
   getDailyTotals,
@@ -38,18 +39,31 @@ function initHealth() {
 function renderHealthProfile() {
   const profile = getProfile();
   const tdee = calculateTDEE();
+  const bmiRaw = calcBMI(profile);
+  const bmiCategory = bmiRaw !== null ? getBMICategory(bmiRaw) : null;
 
   const elements = {
     'health-current-weight': profile.weight ? `${formatDecimal(toLbs(profile.weight))} lbs` : '—',
     'health-height': profile.height ? `${formatDecimal(inFromCm(profile.height))} in` : '—',
     'health-age': profile.age ? `${profile.age} yrs` : '—',
-    'health-bmi': calculateBMI(profile),
+    'health-bmi': bmiRaw !== null ? formatDecimal(bmiRaw) : '—',
   };
 
   Object.entries(elements).forEach(([id, value]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
   });
+
+  const bmiCatEl = document.getElementById('health-bmi-category');
+  if (bmiCatEl) {
+    if (bmiCategory) {
+      bmiCatEl.textContent = bmiCategory.label;
+      bmiCatEl.className = `health-metric-category ${bmiCategory.class}`;
+    } else {
+      bmiCatEl.textContent = '';
+      bmiCatEl.className = 'health-metric-category';
+    }
+  }
 
   const tdeeValue = document.getElementById('health-tdee');
   if (tdeeValue) {
@@ -94,11 +108,22 @@ function renderHealthProfile() {
   document.getElementById('profile-fat-goal')?.setAttribute('value', profile.fatGoal || 65);
 }
 
-function calculateBMI(profile) {
-  if (!profile.weight || !profile.height) return '—';
+function calcBMI(profile) {
+  if (!profile.weight || !profile.height) return null;
   const heightM = profile.height / 100;
-  const bmi = profile.weight / (heightM * heightM);
-  return formatDecimal(bmi);
+  return profile.weight / (heightM * heightM);
+}
+
+function calculateBMI(profile) {
+  const bmi = calcBMI(profile);
+  return bmi !== null ? formatDecimal(bmi) : '\u2014';
+}
+
+function getBMICategory(bmi) {
+  if (bmi < 18.5) return { label: 'Underweight', class: 'neutral' };
+  if (bmi < 25) return { label: 'Normal', class: 'positive' };
+  if (bmi < 30) return { label: 'Overweight', class: 'negative' };
+  return { label: 'Obese', class: 'negative' };
 }
 
 function renderWeightLog() {
@@ -132,6 +157,7 @@ function renderWeightLog() {
             <span class="weight-entry-date">${date}</span>
             <span class="weight-entry-value">${formatDecimal(toLbs(entry.weight))} lbs</span>
             ${changeStr}
+            <button class="weight-entry-delete" data-delete-weight="${entry.id}" aria-label="Delete entry">&times;</button>
           </div>`;
       })
       .join('');
@@ -327,6 +353,20 @@ function bindEvents() {
       updateProfile({ weight: weightKg });
       input.value = '';
       showToast('Weight logged');
+      renderHealthProfile();
+      renderWeightLog();
+    });
+  }
+
+  const weightEntries = document.getElementById('weight-entries');
+  if (weightEntries) {
+    weightEntries.addEventListener('click', (e) => {
+      const btn = e.target.closest('.weight-entry-delete');
+      if (!btn) return;
+      const id = btn.dataset.deleteWeight;
+      if (!id) return;
+      deleteWeightEntry(id);
+      showToast('Entry deleted');
       renderHealthProfile();
       renderWeightLog();
     });

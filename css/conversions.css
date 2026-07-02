@@ -1,0 +1,123 @@
+/* ── CONVERSIONS ──────────────────────────────────────── */
+
+.conversions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+}
+
+.converter-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
+.converter-card.wide {
+  grid-column: span 2;
+}
+
+.converter-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.converter-card-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--brand-600);
+  flex-shrink: 0;
+}
+
+.converter-card-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.converter-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.converter-input-group .glass-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.converter-input-group select.glass-input {
+  width: auto;
+  flex: 0 0 auto;
+  min-width: 80px;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+.converter-result {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.converter-result strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.converter-result-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.converter-result-row:last-child {
+  border-bottom: none;
+}
+
+.converter-result-value {
+  font-weight: 600;
+  color: var(--brand-text);
+}
+
+.airfryer-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-600);
+  padding: 0 var(--space-xs);
+  flex-shrink: 0;
+}
+
+.airfryer-dual-input {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.airfryer-dual-input .converter-input-group {
+  flex: 1;
+}
+
+.airfryer-dual-input label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 640px) {
+  .conversions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .converter-card.wide {
+    grid-column: span 1;
+  }
+}

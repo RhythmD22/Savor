@@ -213,6 +213,11 @@ function addWeightEntry(weight) {
   saveData();
 }
 
+function deleteWeightEntry(id) {
+  _data.weightLog = _data.weightLog.filter((e) => e.id !== id);
+  saveData();
+}
+
 function calculateTDEE() {
   const p = _data.profile;
   if (!p.weight || !p.height || !p.age || !p.gender) return null;
@@ -271,6 +276,7 @@ export {
   updateProfile,
   getWeightLog,
   addWeightEntry,
+  deleteWeightEntry,
   calculateTDEE,
   getWeightTrend,
   formatDate,

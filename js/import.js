@@ -1,15 +1,18 @@
 import { addRecipe, getRecipes } from './data.js';
 import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
 import { showToast } from './utils.js';
+import { initConversions } from './conversions.js';
 
 let previewRecipe = null;
 let manualIngredients = [{ text: '' }];
 let manualInstructions = [''];
+let conversionsInitialized = false;
 
 function initImport() {
   previewRecipe = null;
   manualIngredients = [{ text: '' }];
   manualInstructions = [''];
+  conversionsInitialized = false;
 
   switchTab('url');
   bindEvents();
@@ -24,6 +27,11 @@ function switchTab(tabId) {
   document.querySelectorAll('.import-tab-content').forEach((content) => {
     content.classList.toggle('active', content.dataset.tab === tabId);
   });
+
+  if (tabId === 'convert' && !conversionsInitialized) {
+    conversionsInitialized = true;
+    initConversions();
+  }
 }
 
 function bindEvents() {

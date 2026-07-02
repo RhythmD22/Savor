@@ -439,6 +439,11 @@
     saveData();
   }
 
+  function deleteWeightEntry(id) {
+    _data.weightLog = _data.weightLog.filter((e) => e.id !== id);
+    saveData();
+  }
+
   function calculateTDEE() {
     const p = _data.profile;
     if (!p.weight || !p.height || !p.age || !p.gender) return null;
@@ -1152,7 +1157,7 @@
       .map(
         (r) => `
         <button class="recipe-card glass glass-card" data-route="recipe-detail" data-id="${r.id}" aria-label="View recipe: ${escapeHTML(r.title)}">
-          <div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>
+          ${r.image ? `<img class="recipe-card-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
           <div class="recipe-card-content">
             <div class="recipe-card-title truncate">${escapeHTML(r.title)}</div>
             ${r.sourceName ? `<div class="recipe-card-source">${escapeHTML(r.sourceName)}</div>` : ''}
@@ -1306,6 +1311,8 @@
     if (favBtn) {
       favBtn.classList.toggle('active', recipe.isFavorite);
       favBtn.setAttribute('aria-label', recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites');
+      const starIcon = favBtn.querySelector('svg');
+      if (starIcon) starIcon.setAttribute('fill', recipe.isFavorite ? '#fbbf24' : 'none');
     }
   }
 
@@ -1318,6 +1325,8 @@
         if (updated) {
           favBtn.classList.toggle('active', updated.isFavorite);
           favBtn.setAttribute('aria-label', updated.isFavorite ? 'Remove from favorites' : 'Add to favorites');
+          const starIcon = favBtn.querySelector('svg');
+          if (starIcon) starIcon.setAttribute('fill', updated.isFavorite ? '#fbbf24' : 'none');
           showToast(updated.isFavorite ? 'Added to favorites' : 'Removed from favorites');
         }
       });
@@ -1370,11 +1379,13 @@
   let previewRecipe = null;
   let manualIngredients = [{ text: '' }];
   let manualInstructions = [''];
+  let conversionsInitialized = false;
 
   function initImport() {
     previewRecipe = null;
     manualIngredients = [{ text: '' }];
     manualInstructions = [''];
+    conversionsInitialized = false;
 
     switchTab('url');
     bindImportEvents();
@@ -1389,6 +1400,11 @@
     document.querySelectorAll('.import-tab-content').forEach((content) => {
       content.classList.toggle('active', content.dataset.tab === tabId);
     });
+
+    if (tabId === 'convert' && !conversionsInitialized) {
+      conversionsInitialized = true;
+      initConversions();
+    }
   }
 
   function bindImportEvents() {
@@ -2106,18 +2122,31 @@
   function renderHealthProfile() {
     const profile = getProfile();
     const tdee = calculateTDEE();
+    const bmiRaw = calcBMI(profile);
+    const bmiCategory = bmiRaw !== null ? getBMICategory(bmiRaw) : null;
 
     const elements = {
       'health-current-weight': profile.weight ? `${formatDecimal(toLbs(profile.weight))} lbs` : '\u2014',
       'health-height': profile.height ? `${formatDecimal(inFromCm(profile.height))} in` : '\u2014',
       'health-age': profile.age ? `${profile.age} yrs` : '\u2014',
-      'health-bmi': calculateBMI(profile),
+      'health-bmi': bmiRaw !== null ? formatDecimal(bmiRaw) : '\u2014',
     };
 
     Object.entries(elements).forEach(([id, value]) => {
       const el = document.getElementById(id);
       if (el) el.textContent = value;
     });
+
+    const bmiCatEl = document.getElementById('health-bmi-category');
+    if (bmiCatEl) {
+      if (bmiCategory) {
+        bmiCatEl.textContent = bmiCategory.label;
+        bmiCatEl.className = `health-metric-category ${bmiCategory.class}`;
+      } else {
+        bmiCatEl.textContent = '';
+        bmiCatEl.className = 'health-metric-category';
+      }
+    }
 
     const tdeeValue = document.getElementById('health-tdee');
     if (tdeeValue) {
@@ -2162,11 +2191,22 @@
     document.getElementById('profile-fat-goal')?.setAttribute('value', profile.fatGoal || 65);
   }
 
-  function calculateBMI(profile) {
-    if (!profile.weight || !profile.height) return '\u2014';
+  function calcBMI(profile) {
+    if (!profile.weight || !profile.height) return null;
     const heightM = profile.height / 100;
-    const bmi = profile.weight / (heightM * heightM);
-    return formatDecimal(bmi);
+    return profile.weight / (heightM * heightM);
+  }
+
+  function calculateBMI(profile) {
+    const bmi = calcBMI(profile);
+    return bmi !== null ? formatDecimal(bmi) : '\u2014';
+  }
+
+  function getBMICategory(bmi) {
+    if (bmi < 18.5) return { label: 'Underweight', class: 'neutral' };
+    if (bmi < 25) return { label: 'Normal', class: 'positive' };
+    if (bmi < 30) return { label: 'Overweight', class: 'negative' };
+    return { label: 'Obese', class: 'negative' };
   }
 
   function renderWeightLog() {
@@ -2200,6 +2240,7 @@
               <span class="weight-entry-date">${date}</span>
               <span class="weight-entry-value">${formatDecimal(toLbs(entry.weight))} lbs</span>
               ${changeStr}
+              <button class="weight-entry-delete" data-delete-weight="${entry.id}" aria-label="Delete entry">&times;</button>
             </div>`;
         })
         .join('');
@@ -2399,6 +2440,172 @@
         renderWeightLog();
       });
     }
+
+    const weightEntries = document.getElementById('weight-entries');
+    if (weightEntries) {
+      weightEntries.addEventListener('click', (e) => {
+        const btn = e.target.closest('.weight-entry-delete');
+        if (!btn) return;
+        const id = btn.dataset.deleteWeight;
+        if (!id) return;
+        deleteWeightEntry(id);
+        showToast('Entry deleted');
+        renderHealthProfile();
+        renderWeightLog();
+      });
+    }
+  }
+
+  // ============================================================
+  // conversions.js
+  // ============================================================
+
+  function initConversions() {
+    bindOvenToAirFryer();
+    bindVolumeConverter();
+    bindWeightConverter();
+    bindTemperatureConverter();
+  }
+
+  const ROUND = (n, d = 1) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
+
+  function parseFraction(val) {
+    if (!val) return NaN;
+    const s = val.trim();
+    if (/^-?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+    const m = s.match(/^(\d+)?\s*(\d+)\/(\d+)$/);
+    if (m) {
+      const whole = m[1] ? parseInt(m[1]) : 0;
+      const num = parseInt(m[2]);
+      const den = parseInt(m[3]);
+      if (den === 0) return NaN;
+      return whole >= 0 ? whole + num / den : whole - num / den;
+    }
+    return NaN;
+  }
+
+  function bindOvenToAirFryer() {
+    const tempInput = document.getElementById('conv-oven-temp');
+    const timeInput = document.getElementById('conv-oven-time');
+
+    if (!tempInput || !timeInput) return;
+
+    const update = () => {
+      const temp = parseFloat(tempInput.value);
+      const time = parseFloat(timeInput.value);
+
+      document.getElementById('conv-af-temp').textContent =
+        !isNaN(temp) && temp > 0 ? Math.round(temp - 25) + '\u00B0F / ' + Math.round((temp - 25 - 32) * 5 / 9) + '\u00B0C' : '\u2014';
+
+      document.getElementById('conv-af-time').textContent =
+        !isNaN(time) && time > 0 ? Math.round(time * 0.8) + ' min' : '\u2014';
+
+      document.getElementById('conv-af-note').hidden = isNaN(temp) || temp <= 0;
+    };
+
+    tempInput.addEventListener('input', update);
+    timeInput.addEventListener('input', update);
+  }
+
+  const VOLUME_UNITS = {
+    cup:    { name: 'Cups',      ml: 236.588 },
+    tbsp:   { name: 'Tbsp',       ml: 14.787 },
+    tsp:    { name: 'Tsp',        ml: 4.929 },
+    'fl-oz':{ name: 'Fl oz',     ml: 29.574 },
+    ml:     { name: 'ml',         ml: 1 },
+    liter:  { name: 'Liters',     ml: 1000 },
+  };
+
+  function bindVolumeConverter() {
+    const input = document.getElementById('conv-vol-input');
+    const unitSelect = document.getElementById('conv-vol-unit');
+    const resultEl = document.getElementById('conv-vol-result');
+
+    if (!input || !unitSelect || !resultEl) return;
+
+    const update = () => {
+      const value = parseFraction(input.value);
+      const unit = unitSelect.value;
+      if (isNaN(value) || value <= 0) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const ml = value * VOLUME_UNITS[unit].ml;
+      const rows = Object.entries(VOLUME_UNITS)
+        .filter(([key]) => key !== unit)
+        .map(([, u]) => {
+          const converted = ROUND(ml / u.ml, u.ml < 10 ? 1 : u.ml < 100 ? 2 : 3);
+          return '<div class="converter-result-row"><span>' + u.name + '</span><span class="converter-result-value">' + converted + '</span></div>';
+        });
+      resultEl.innerHTML = rows.join('');
+    };
+
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
+  }
+
+  const WEIGHT_UNITS = {
+    lb: { name: 'Pounds (lbs)', g: 453.592 },
+    oz: { name: 'Ounces (oz)',  g: 28.35 },
+    g:  { name: 'Grams (g)',     g: 1 },
+    kg: { name: 'Kilograms',     g: 1000 },
+  };
+
+  function bindWeightConverter() {
+    const input = document.getElementById('conv-wt-input');
+    const unitSelect = document.getElementById('conv-wt-unit');
+    const resultEl = document.getElementById('conv-wt-result');
+
+    if (!input || !unitSelect || !resultEl) return;
+
+    const update = () => {
+      const value = parseFraction(input.value);
+      const unit = unitSelect.value;
+      if (isNaN(value) || value <= 0) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const grams = value * WEIGHT_UNITS[unit].g;
+      const rows = Object.entries(WEIGHT_UNITS)
+        .filter(([key]) => key !== unit)
+        .map(([, u]) => {
+          const converted = ROUND(grams / u.g, u.g < 10 ? 1 : u.g < 100 ? 2 : 3);
+          return '<div class="converter-result-row"><span>' + u.name + '</span><span class="converter-result-value">' + converted + '</span></div>';
+        });
+      resultEl.innerHTML = rows.join('');
+    };
+
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
+  }
+
+  function bindTemperatureConverter() {
+    const input = document.getElementById('conv-temp-input');
+    const unitSelect = document.getElementById('conv-temp-unit');
+    const resultEl = document.getElementById('conv-temp-result');
+
+    if (!input || !unitSelect || !resultEl) return;
+
+    const update = () => {
+      const value = parseFraction(input.value);
+      if (isNaN(value)) {
+        resultEl.innerHTML = '';
+        return;
+      }
+      const unit = unitSelect.value;
+      let converted, label;
+      if (unit === 'F') {
+        converted = ROUND((value - 32) * 5 / 9);
+        label = '\u00B0C (Celsius)';
+      } else {
+        converted = ROUND(value * 9 / 5 + 32);
+        label = '\u00B0F (Fahrenheit)';
+      }
+      resultEl.innerHTML = '<div class="converter-result-row"><span>' + label + '</span><span class="converter-result-value">' + converted + '</span></div>';
+    };
+
+    input.addEventListener('input', update);
+    unitSelect.addEventListener('change', update);
   }
 
   // ============================================================
