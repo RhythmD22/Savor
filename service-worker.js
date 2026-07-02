@@ -1,4 +1,4 @@
-const CACHE_NAME = 'savor-v1.1';
+const CACHE_NAME = 'savor-v1.0';
 
 const urlsToCache = [
   '/',
