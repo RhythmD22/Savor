@@ -1,4 +1,8 @@
 const STORAGE_KEY = 'savor_data';
+export const DEFAULT_CALORIE_GOAL = 2000;
+export const DEFAULT_PROTEIN_GOAL = 150;
+export const DEFAULT_CARBS_GOAL = 200;
+export const DEFAULT_FAT_GOAL = 65;
 
 const defaults = {
   recipes: [],
@@ -10,10 +14,10 @@ const defaults = {
     age: null,
     gender: null,
     activityLevel: 'moderate',
-    calorieGoal: 2000,
-    proteinGoal: 150,
-    carbsGoal: 200,
-    fatGoal: 65,
+    calorieGoal: DEFAULT_CALORIE_GOAL,
+    proteinGoal: DEFAULT_PROTEIN_GOAL,
+    carbsGoal: DEFAULT_CARBS_GOAL,
+    fatGoal: DEFAULT_FAT_GOAL,
   },
   version: 1,
 };
@@ -36,27 +40,27 @@ function save(data) {
 
 let _data = load();
 
-function getData() {
+export function getData() {
   return _data;
 }
 
-function saveData() {
+export function saveData() {
   save(_data);
 }
 
-function generateId() {
+export function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-function getRecipes() {
+export function getRecipes() {
   return _data.recipes;
 }
 
-function getRecipe(id) {
+export function getRecipe(id) {
   return _data.recipes.find((r) => r.id === id) || null;
 }
 
-function addRecipe(recipe) {
+export function addRecipe(recipe) {
   const newRecipe = {
     id: generateId(),
     title: recipe.title || 'Untitled Recipe',
@@ -92,7 +96,7 @@ function addRecipe(recipe) {
   return newRecipe;
 }
 
-function updateRecipe(id, updates) {
+export function updateRecipe(id, updates) {
   const idx = _data.recipes.findIndex((r) => r.id === id);
   if (idx === -1) return null;
   _data.recipes[idx] = {
@@ -104,7 +108,7 @@ function updateRecipe(id, updates) {
   return _data.recipes[idx];
 }
 
-function deleteRecipe(id) {
+export function deleteRecipe(id) {
   _data.recipes = _data.recipes.filter((r) => r.id !== id);
 
   Object.keys(_data.mealLog).forEach((date) => {
@@ -113,13 +117,13 @@ function deleteRecipe(id) {
   saveData();
 }
 
-function toggleFavorite(id) {
+export function toggleFavorite(id) {
   const recipe = getRecipe(id);
   if (!recipe) return;
   updateRecipe(id, { isFavorite: !recipe.isFavorite });
 }
 
-function getRecipeStats() {
+export function getRecipeStats() {
   const recipes = _data.recipes;
   return {
     total: recipes.length,
@@ -129,17 +133,17 @@ function getRecipeStats() {
   };
 }
 
-function formatDate(date) {
+export function formatDate(date) {
   const d = date instanceof Date ? date : new Date(date);
   return d.toISOString().split('T')[0];
 }
 
-function getMealLog(date) {
+export function getMealLog(date) {
   const key = formatDate(date);
   return _data.mealLog[key] || [];
 }
 
-function addMealEntry(date, entry) {
+export function addMealEntry(date, entry) {
   const key = formatDate(date);
   if (!_data.mealLog[key]) _data.mealLog[key] = [];
   _data.mealLog[key].push({
@@ -158,14 +162,14 @@ function addMealEntry(date, entry) {
   return _data.mealLog[key];
 }
 
-function removeMealEntry(date, entryId) {
+export function removeMealEntry(date, entryId) {
   const key = formatDate(date);
   if (!_data.mealLog[key]) return;
   _data.mealLog[key] = _data.mealLog[key].filter((e) => e.id !== entryId);
   saveData();
 }
 
-function getDailyTotals(date) {
+export function getDailyTotals(date) {
   const entries = getMealLog(date);
   return {
     calories: entries.reduce((s, e) => s + e.calories, 0),
@@ -176,7 +180,7 @@ function getDailyTotals(date) {
   };
 }
 
-function getMealTypeTotals(date) {
+export function getMealTypeTotals(date) {
   const entries = getMealLog(date);
   const types = { breakfast: [], lunch: [], dinner: [], snack: [] };
   entries.forEach((e) => {
@@ -190,20 +194,20 @@ function getMealTypeTotals(date) {
   return types;
 }
 
-function getProfile() {
+export function getProfile() {
   return _data.profile;
 }
 
-function updateProfile(updates) {
+export function updateProfile(updates) {
   _data.profile = { ..._data.profile, ...updates };
   saveData();
 }
 
-function getWeightLog() {
+export function getWeightLog() {
   return [..._data.weightLog].sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
-function addWeightEntry(weight) {
+export function addWeightEntry(weight) {
   _data.weightLog.push({
     id: generateId(),
     date: new Date().toISOString(),
@@ -212,12 +216,12 @@ function addWeightEntry(weight) {
   saveData();
 }
 
-function deleteWeightEntry(id) {
+export function deleteWeightEntry(id) {
   _data.weightLog = _data.weightLog.filter((e) => e.id !== id);
   saveData();
 }
 
-function calculateTDEE() {
+export function calculateTDEE() {
   const p = _data.profile;
   if (!p.weight || !p.height || !p.age || !p.gender) return null;
 
@@ -239,7 +243,7 @@ function calculateTDEE() {
   return Math.round(bmr * (multipliers[p.activityLevel] || 1.55));
 }
 
-function getWeightTrend() {
+export function getWeightTrend() {
   const log = getWeightLog();
   if (log.length < 2) return null;
 
@@ -255,16 +259,16 @@ function getWeightTrend() {
   };
 }
 
-function resetAll() {
+export function resetAll() {
   localStorage.removeItem(STORAGE_KEY);
   _data = load();
 }
 
-function exportData() {
+export function exportData() {
   return JSON.stringify(getData(), null, 2);
 }
 
-function importData(jsonString) {
+export function importData(jsonString) {
   let parsed;
   try {
     parsed = JSON.parse(jsonString);
@@ -281,32 +285,3 @@ function importData(jsonString) {
   _data = merged;
   saveData();
 }
-
-export {
-  getData,
-  saveData,
-  generateId,
-  getRecipes,
-  getRecipe,
-  addRecipe,
-  updateRecipe,
-  deleteRecipe,
-  toggleFavorite,
-  getRecipeStats,
-  getMealLog,
-  addMealEntry,
-  removeMealEntry,
-  getDailyTotals,
-  getMealTypeTotals,
-  getProfile,
-  updateProfile,
-  getWeightLog,
-  addWeightEntry,
-  deleteWeightEntry,
-  calculateTDEE,
-  getWeightTrend,
-  formatDate,
-  resetAll,
-  exportData,
-  importData,
-};

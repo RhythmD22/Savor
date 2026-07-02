@@ -1,4 +1,8 @@
-function showToast(message, type = '') {
+export const MS_PER_DAY = 86400000;
+export const TOAST_DURATION = 2800;
+export const DEBOUNCE_DELAY = 300;
+
+export function showToast(message, type = '') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
@@ -12,10 +16,10 @@ function showToast(message, type = '') {
 
   setTimeout(() => {
     if (toast.parentNode) toast.remove();
-  }, 2800);
+  }, TOAST_DURATION);
 }
 
-function showDialog({ title, content, actions } = {}) {
+export function showDialog({ title, content, actions } = {}) {
   const existing = document.querySelector('.dialog-overlay');
   if (existing) existing.remove();
   const previousFocus = document.activeElement;
@@ -44,7 +48,7 @@ function showDialog({ title, content, actions } = {}) {
   overlay.innerHTML = `
     <div class="dialog-sheet">
       <div class="dialog-handle"></div>
-      <button class="icon-btn dialog-close-btn" aria-label="Close dialog" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+      <button class="icon-btn dialog-close-btn" aria-label="Close dialog">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       ${title ? `<h2 class="dialog-title">${title}</h2>` : ''}
@@ -109,7 +113,7 @@ function showDialog({ title, content, actions } = {}) {
   return { close: closeDialog };
 }
 
-function showConfirm(message, onConfirm) {
+export function showConfirm(message, onConfirm) {
   return showDialog({
     title: message,
     actions: [
@@ -119,17 +123,17 @@ function showConfirm(message, onConfirm) {
   });
 }
 
-function formatNumber(n) {
+export function formatNumber(n) {
   if (n === null || n === undefined) return '—';
   return Math.round(n).toLocaleString();
 }
 
-function formatDecimal(n, decimals = 1) {
+export function formatDecimal(n, decimals = 1) {
   if (n === null || n === undefined) return '—';
   return parseFloat(n).toFixed(decimals);
 }
 
-function getRelativeDate(dateStr) {
+export function getRelativeDate(dateStr) {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now - date;
@@ -143,7 +147,7 @@ function getRelativeDate(dateStr) {
   return `${Math.floor(diffDays / 365)}y ago`;
 }
 
-function debounce(fn, delay = 300) {
+export function debounce(fn, delay = DEBOUNCE_DELAY) {
   let timer;
   return function (...args) {
     clearTimeout(timer);
@@ -151,7 +155,7 @@ function debounce(fn, delay = 300) {
   };
 }
 
-function formatTime(minutes) {
+export function formatTime(minutes) {
   if (!minutes || minutes <= 0) return '—';
   if (minutes < 60) return `${minutes}m`;
   const h = Math.floor(minutes / 60);
@@ -159,41 +163,8 @@ function formatTime(minutes) {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function getMealTypeEmoji(type) {
-  const map = {
-    breakfast: '🌅',
-    lunch: '☀️',
-    dinner: '🌙',
-    snack: '🍎',
-  };
-  return map[type] || '🍽️';
-}
-
-function getMacroColor(type) {
-  const map = {
-    protein: 'var(--macro-protein)',
-    carbs: 'var(--macro-carbs)',
-    fat: 'var(--macro-fat)',
-  };
-  return map[type] || 'var(--text-secondary)';
-}
-
-function escapeHTML(str) {
+export function escapeHTML(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
-
-export {
-  showToast,
-  showDialog,
-  showConfirm,
-  formatNumber,
-  formatDecimal,
-  getRelativeDate,
-  debounce,
-  formatTime,
-  getMealTypeEmoji,
-  getMacroColor,
-  escapeHTML,
-};

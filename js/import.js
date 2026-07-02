@@ -1,4 +1,4 @@
-import { addRecipe, getRecipes } from './data.js';
+import { addRecipe } from './data.js';
 import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
 import { showToast, escapeHTML } from './utils.js';
 import { initConversions } from './conversions.js';
@@ -8,14 +8,14 @@ let manualIngredients = [{ text: '' }];
 let manualInstructions = [''];
 let conversionsInitialized = false;
 
-function initImport() {
+export function initImport() {
   previewRecipe = null;
   manualIngredients = [{ text: '' }];
   manualInstructions = [''];
   conversionsInitialized = false;
 
   switchTab('url');
-  bindEvents();
+  bindImportEvents();
   resetForms();
   refreshApiStatus();
 }
@@ -34,7 +34,7 @@ function switchTab(tabId) {
   }
 }
 
-function bindEvents() {
+function bindImportEvents() {
   document.querySelectorAll('.import-tab').forEach((tab) => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
@@ -91,7 +91,9 @@ async function refreshApiStatus() {
     const status = await response.json();
     updateBadge('usda-status', status.usda);
     updateBadge('spoonacular-status', status.spoonacular);
-  } catch { }
+  } catch (err) {
+    console.warn('API status check failed:', err);
+  }
 }
 
 function updateBadge(id, isConfigured) {
@@ -389,5 +391,3 @@ function resetForms() {
   renderInstructionsEditor();
   hidePreview();
 }
-
-export { initImport };

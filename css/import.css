@@ -220,17 +220,6 @@
   border-color: var(--glass-border-hover);
 }
 
-.import-api-option.selected {
-  border-color: var(--brand-600);
-  box-shadow: 0 0 0 1px var(--brand-600);
-}
-
-.import-api-radio {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--brand-600);
-}
-
 .import-api-info {
   flex: 1;
 }

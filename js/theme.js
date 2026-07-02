@@ -20,7 +20,7 @@ function applyTheme(theme) {
   }
 }
 
-function initTheme() {
+export function initTheme() {
   applyTheme(getPreferredTheme());
 
   const btn = document.getElementById('btn-theme');
@@ -37,5 +37,3 @@ function initTheme() {
     }
   });
 }
-
-export { initTheme };

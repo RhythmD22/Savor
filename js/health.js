@@ -1,16 +1,4 @@
-import {
-  getProfile,
-  updateProfile,
-  getWeightLog,
-  addWeightEntry,
-  deleteWeightEntry,
-  calculateTDEE,
-  getWeightTrend,
-  getDailyTotals,
-  resetAll,
-  exportData,
-  importData,
-} from './data.js';
+import { getProfile, updateProfile, getWeightLog, addWeightEntry, deleteWeightEntry, calculateTDEE, getWeightTrend, resetAll, exportData, importData } from './data.js';
 import { formatNumber, formatDecimal, showToast, showConfirm } from './utils.js';
 
 const LBS_PER_KG = 2.20462;
@@ -33,10 +21,10 @@ function cmFromIn(inches) {
 
 let weightChart = null;
 
-function initHealth() {
+export function initHealth() {
   renderHealthProfile();
   renderWeightLog();
-  bindEvents();
+  bindHealthEvents();
 }
 
 function renderHealthProfile() {
@@ -307,7 +295,7 @@ function renderSimpleChart(canvas, log, tickColor) {
   });
 }
 
-function bindEvents() {
+function bindHealthEvents() {
   const profileForm = document.getElementById('health-profile-form');
   if (profileForm) {
     profileForm.addEventListener('submit', (e) => {
@@ -434,5 +422,3 @@ function bindEvents() {
     });
   }
 }
-
-export { initHealth };

@@ -1,4 +1,4 @@
-function initConversions() {
+export function initConversions() {
   bindOvenToAirFryer();
   bindVolumeConverter();
   bindWeightConverter();
@@ -154,4 +154,3 @@ function bindTemperatureConverter() {
   unitSelect.addEventListener('change', update);
 }
 
-export { initConversions };

@@ -128,11 +128,6 @@
   flex-shrink: 0;
 }
 
-.meal-entry-info {
-  flex: 1;
-  min-width: 0;
-}
-
 .meal-entry-name {
   font-weight: 500;
   font-size: var(--text-sm);
@@ -150,22 +145,6 @@
   font-size: var(--text-sm);
   color: var(--text-secondary);
   flex-shrink: 0;
-}
-
-.meal-entry-remove {
-  color: var(--text-tertiary);
-  padding: var(--space-xs);
-  border-radius: var(--radius-full);
-  transition: color 0.15s ease;
-  width: var(--touch-target);
-  height: var(--touch-target);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.meal-entry-remove:hover {
-  color: var(--danger);
 }
 
 .recent-recipes-grid {

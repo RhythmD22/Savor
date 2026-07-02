@@ -1,10 +1,10 @@
-import { getMealLog, getMealTypeTotals, getDailyTotals, addMealEntry, removeMealEntry, getRecipes, getProfile } from './data.js';
+import { getMealLog, getMealTypeTotals, getDailyTotals, addMealEntry, removeMealEntry, getProfile, DEFAULT_CALORIE_GOAL } from './data.js';
 import { searchFood } from './api.js';
-import { formatNumber, formatDate, showToast, debounce, escapeHTML } from './utils.js';
+import { formatNumber, formatDate, showToast, debounce, escapeHTML, MS_PER_DAY } from './utils.js';
 
 let currentDate = new Date();
 
-function initMealLog() {
+export function initMealLog() {
   currentDate = new Date();
   updateDateDisplay();
   renderMealLog();
@@ -43,9 +43,9 @@ function updateDateDisplay() {
 
   if (current === today) {
     display.textContent = 'Today';
-  } else if (current === formatDate(new Date(Date.now() - 86400000))) {
+  } else if (current === formatDate(new Date(Date.now() - MS_PER_DAY))) {
     display.textContent = 'Yesterday';
-  } else if (current === formatDate(new Date(Date.now() + 86400000))) {
+  } else if (current === formatDate(new Date(Date.now() + MS_PER_DAY))) {
     display.textContent = 'Tomorrow';
   } else {
     display.textContent = currentDate.toLocaleDateString('en-US', {
@@ -62,7 +62,7 @@ function renderMealLog() {
   const profile = getProfile();
   const mealTypes = getMealTypeTotals(date);
 
-  const calGoal = profile.calorieGoal || 2000;
+  const calGoal = profile.calorieGoal || DEFAULT_CALORIE_GOAL;
   const calPercent = Math.min((totals.calories / calGoal) * 100, 100);
 
   const elements = {
@@ -206,7 +206,7 @@ function openFoodSearch(mealType) {
   overlay.innerHTML = `
     <div class="dialog-sheet food-search-dialog">
       <div class="dialog-handle"></div>
-      <button class="icon-btn dialog-close-btn" aria-label="Close search" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+      <button class="icon-btn dialog-close-btn" aria-label="Close search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
@@ -344,5 +344,3 @@ function renderFoodResults(results, overlay, mealType) {
     });
   });
 }
-
-export { initMealLog };

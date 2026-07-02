@@ -1,3 +1,7 @@
+/* ══════════════════════════════════════════════════════════
+   SAVOR — Global Styles
+   ══════════════════════════════════════════════════════════ */
+
 @layer tokens, reset, layout, components;
 
 /* ── DESIGN TOKENS ─────────────────────────────────────── */
@@ -627,6 +631,12 @@
     gap: var(--space-lg);
   }
 
+  .page-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
   .page-section {
     display: flex;
     flex-direction: column;
@@ -749,6 +759,11 @@
   .glass-textarea::placeholder {
     color: var(--text-tertiary);
   }
+
+  .select-native {
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
 }
 
 /* ── BUTTONS ───────────────────────────────────────────── */
@@ -826,57 +841,6 @@
 
 /* ── CARDS ─────────────────────────────────────────────── */
 
-@layer components {
-  .card {
-    background: var(--bg-elevated);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-  }
-
-  .card-body {
-    padding: var(--space-lg);
-  }
-
-  .card-header {
-    padding: var(--space-lg);
-    border-bottom: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .card-footer {
-    padding: var(--space-md) var(--space-lg);
-    border-top: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-  }
-
-  .card-image {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    background: var(--bg-highlight);
-  }
-
-  .card-image-placeholder {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    background: linear-gradient(135deg, var(--brand-100), var(--brand-200));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--brand-700);
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      0 1px 3px rgba(0, 0, 0, 0.08);
-  }
-}
-
 /* ── TAGS / PILLS ──────────────────────────────────────── */
 
 @layer components {
@@ -897,34 +861,9 @@
     color: var(--brand-text);
   }
 
-  .tag-success {
-    background: var(--success-bg);
-    color: var(--success);
-  }
-
   .tag-warning {
     background: var(--warning-bg);
     color: var(--warning);
-  }
-
-  .tag-info {
-    background: var(--info-bg);
-    color: var(--info);
-  }
-
-  .tag-protein {
-    background: var(--info-bg);
-    color: var(--macro-protein);
-  }
-
-  .tag-carbs {
-    background: var(--warning-bg);
-    color: var(--macro-carbs);
-  }
-
-  .tag-fat {
-    background: var(--danger-bg);
-    color: var(--macro-fat);
   }
 
   .tag-group {
@@ -954,16 +893,8 @@
     background: var(--brand-600);
   }
 
-  .progress-fill-success {
-    background: var(--success);
-  }
-
   .progress-fill-warning {
     background: var(--warning);
-  }
-
-  .progress-fill-danger {
-    background: var(--danger);
   }
 
   .progress-fill-protein {
@@ -976,22 +907,6 @@
 
   .progress-fill-fat {
     background: var(--macro-fat);
-  }
-
-  .progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--text-xs);
-    color: var(--text-secondary);
-    margin-bottom: var(--space-xs);
-  }
-
-  .progress-stats {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--text-xs);
-    color: var(--text-tertiary);
-    margin-top: var(--space-xs);
   }
 }
 
@@ -1204,6 +1119,12 @@
     inset: -12px -16px;
   }
 
+  .dialog-close-btn {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+  }
+
   .dialog-title {
     font-family: var(--font-display);
     font-size: var(--text-lg);
@@ -1258,8 +1179,7 @@
     line-height: 1.5;
   }
 
-  [class*="-grid"]>.empty-state,
-  .card-grid>.empty-state {
+  [class*="-grid"]>.empty-state {
     grid-column: 1 / -1;
   }
 }
@@ -1498,6 +1418,10 @@
     font-size: var(--text-sm);
   }
 
+  .text-base {
+    font-size: var(--text-base);
+  }
+
   .text-xs {
     font-size: var(--text-xs);
   }
@@ -1571,5 +1495,17 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .grid-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  .grid-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
   }
 }

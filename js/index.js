@@ -1,13 +1,13 @@
-import { getDailyTotals, getMealTypeTotals, getRecipes, getProfile } from './data.js';
+import { getDailyTotals, getMealTypeTotals, getRecipes, getProfile, DEFAULT_CALORIE_GOAL } from './data.js';
 import { formatNumber, escapeHTML } from './utils.js';
 
-function initHome() {
+export function initHome() {
   const today = new Date();
   const totals = getDailyTotals(today);
   const profile = getProfile();
   const recipes = getRecipes();
 
-  const calorieGoal = profile.calorieGoal || 2000;
+  const calorieGoal = profile.calorieGoal || DEFAULT_CALORIE_GOAL;
   const percent = Math.min((totals.calories / calorieGoal) * 100, 100);
   const remaining = calorieGoal - totals.calories;
 
@@ -55,9 +55,7 @@ function initHome() {
         .map(
           (r) => `
           <button class="glass glass-card mini-recipe-card" data-route="recipe-detail" data-id="${r.id}">
-            <div class="mini-recipe-image-placeholder" aria-hidden="true">
-              ${r.title.charAt(0).toUpperCase()}
-            </div>
+            ${r.image ? `<img class="mini-recipe-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="mini-recipe-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
             <span class="mini-recipe-name truncate">${escapeHTML(r.title)}</span>
             <span class="mini-recipe-meta">${r.nutrition?.calories ? formatNumber(r.nutrition.calories) + ' cal' : ''}</span>
           </button>`
@@ -102,5 +100,3 @@ function initHome() {
     }
   }
 }
-
-export { initHome };

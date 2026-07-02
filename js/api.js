@@ -1,4 +1,4 @@
-async function fetchRecipeFromUrl(url) {
+export async function fetchRecipeFromUrl(url) {
   try {
     const response = await fetch('/api/recipe-extractor', {
       method: 'POST',
@@ -18,7 +18,7 @@ async function fetchRecipeFromUrl(url) {
   }
 }
 
-async function extractRecipeLocally(url) {
+export async function extractRecipeLocally(url) {
   const proxies = [
     (fetchUrl) => fetch(fetchUrl),
     (fetchUrl) => fetch(`https://proxy.cors.sh/${fetchUrl}`),
@@ -39,7 +39,9 @@ async function extractRecipeLocally(url) {
           break;
         }
       }
-    } catch { }
+    } catch (err) {
+      console.warn('CORS proxy failed:', err);
+    }
   }
 
   if (!html) {
@@ -56,7 +58,9 @@ async function extractRecipeLocally(url) {
         const parsed = JSON.parse(script.textContent);
         const recipe = findRecipeInJsonLd(parsed);
         if (recipe) return { success: true, recipe };
-      } catch { }
+      } catch (err) {
+        console.warn('JSON-LD parse error:', err);
+      }
     }
 
     const microdata = extractMicrodata(doc);
@@ -431,7 +435,8 @@ async function searchRemoteFood(query) {
     if (!response.ok) return [];
     const data = await response.json();
     return data.results || [];
-  } catch {
+  } catch (err) {
+    console.warn('Remote food search failed:', err);
     return [];
   }
 }
@@ -448,7 +453,7 @@ function looksLikeRecipePage(html) {
 
 
 
-async function searchFood(query) {
+export async function searchFood(query) {
   if (!query || query.length < 2) return [];
   const lower = query.toLowerCase();
   const results = [];
@@ -471,14 +476,17 @@ async function searchFood(query) {
         }
       });
     }
-  } catch { }
+  } catch (err) {
+    console.warn('Local storage read failed:', err);
+    return [];
+  }
 
   try {
     const remote = await searchRemoteFood(query);
     results.push(...remote);
-  } catch { }
+  } catch (err) {
+    console.warn('Remote food search failed:', err);
+  }
 
   return results.slice(0, 20);
 }
-
-export { fetchRecipeFromUrl, extractRecipeLocally, searchFood };

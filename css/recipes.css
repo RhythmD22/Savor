@@ -144,12 +144,6 @@ button.recipe-card {
   flex-wrap: wrap;
 }
 
-.recipe-card-actions {
-  display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-sm);
-}
-
 .recipe-cards-grid .empty-state {
   grid-column: 1 / -1;
 }

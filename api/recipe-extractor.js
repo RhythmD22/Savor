@@ -134,7 +134,9 @@ function extractJsonLd(html) {
       const data = JSON.parse(match[1]);
       const recipe = findRecipeNode(data);
       if (recipe) return recipe;
-    } catch { }
+    } catch {
+      console.warn('JSON-LD parse error');
+    }
   }
 
   return null;

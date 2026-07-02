@@ -1,9 +1,11 @@
-import { getRecipe, toggleFavorite, deleteRecipe, addMealEntry } from './data.js';
+import { getRecipe, updateRecipe, toggleFavorite, deleteRecipe, addMealEntry } from './data.js';
 import { formatNumber, formatTime, formatDecimal, showToast, showConfirm, escapeHTML } from './utils.js';
 
 let currentRecipeId = null;
+let editIngredients = [];
+let editInstructions = [];
 
-function initRecipeDetail(data) {
+export function initRecipeDetail(data) {
   if (!data?.id) {
     window.navigateTo('recipes');
     return;
@@ -173,6 +175,23 @@ function bindActions(recipe) {
     });
   }
 
+  const editBtn = document.getElementById('btn-edit-recipe');
+  if (editBtn) {
+    editBtn.addEventListener('click', () => showEditForm(recipe));
+  }
+
+  const cancelEditBtn = document.getElementById('btn-cancel-edit');
+  if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', hideEditForm);
+  }
+
+  const saveEditBtn = document.getElementById('btn-save-edit');
+  if (saveEditBtn) {
+    saveEditBtn.addEventListener('click', () => handleSaveEdit(recipe));
+  }
+
+  bindEditEditorEvents();
+
   const deleteBtn = document.getElementById('btn-delete-recipe');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', () => {
@@ -185,4 +204,189 @@ function bindActions(recipe) {
   }
 }
 
-export { initRecipeDetail };
+function showEditForm(recipe) {
+  document.getElementById('recipe-view-content').setAttribute('hidden', '');
+  document.getElementById('recipe-edit-form').removeAttribute('hidden');
+
+  document.getElementById('edit-recipe-title').value = recipe.title || '';
+  document.getElementById('edit-recipe-description').value = recipe.description || '';
+  document.getElementById('edit-recipe-servings').value = recipe.servings || '';
+  document.getElementById('edit-recipe-prep').value = recipe.prepTime || '';
+  document.getElementById('edit-recipe-cook').value = recipe.cookTime || '';
+  document.getElementById('edit-recipe-calories').value = recipe.nutrition?.calories || '';
+  document.getElementById('edit-recipe-protein').value = recipe.nutrition?.protein || '';
+  document.getElementById('edit-recipe-carbs').value = recipe.nutrition?.carbs || '';
+  document.getElementById('edit-recipe-fat').value = recipe.nutrition?.fat || '';
+  document.getElementById('edit-recipe-fiber').value = recipe.nutrition?.fiber || '';
+  document.getElementById('edit-recipe-sugar').value = recipe.nutrition?.sugar || '';
+  document.getElementById('edit-recipe-sodium').value = recipe.nutrition?.sodium || '';
+  document.getElementById('edit-recipe-tags').value = (recipe.tags || []).join(', ');
+  document.getElementById('edit-recipe-cuisine').value = recipe.cuisine || '';
+  document.getElementById('edit-recipe-meal-type').value = recipe.mealType || '';
+
+  editIngredients = (recipe.ingredients || []).length > 0
+    ? recipe.ingredients.slice()
+    : [{ text: '' }];
+  editInstructions = (recipe.instructions || []).length > 0
+    ? recipe.instructions.slice()
+    : [''];
+
+  renderEditIngredients();
+  renderEditInstructions();
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function hideEditForm() {
+  document.getElementById('recipe-edit-form').setAttribute('hidden', '');
+  document.getElementById('recipe-view-content').removeAttribute('hidden');
+}
+
+function handleSaveEdit(recipe) {
+  const title = document.getElementById('edit-recipe-title')?.value?.trim();
+  if (!title) {
+    showToast('Please enter a recipe title', 'error');
+    return;
+  }
+
+  const updates = {
+    title,
+    description: document.getElementById('edit-recipe-description')?.value || '',
+    servings: parseInt(document.getElementById('edit-recipe-servings')?.value) || recipe.servings,
+    prepTime: parseInt(document.getElementById('edit-recipe-prep')?.value) || 0,
+    cookTime: parseInt(document.getElementById('edit-recipe-cook')?.value) || 0,
+    totalTime: (parseInt(document.getElementById('edit-recipe-prep')?.value) || 0) +
+      (parseInt(document.getElementById('edit-recipe-cook')?.value) || 0),
+    ingredients: editIngredients.filter((i) => i.text?.trim()),
+    instructions: editInstructions.filter((s) => s?.trim()),
+    nutrition: {
+      calories: parseFloat(document.getElementById('edit-recipe-calories')?.value) || 0,
+      protein: parseFloat(document.getElementById('edit-recipe-protein')?.value) || 0,
+      carbs: parseFloat(document.getElementById('edit-recipe-carbs')?.value) || 0,
+      fat: parseFloat(document.getElementById('edit-recipe-fat')?.value) || 0,
+      fiber: parseFloat(document.getElementById('edit-recipe-fiber')?.value) || 0,
+      sugar: parseFloat(document.getElementById('edit-recipe-sugar')?.value) || 0,
+      sodium: parseFloat(document.getElementById('edit-recipe-sodium')?.value) || 0,
+    },
+    tags: (document.getElementById('edit-recipe-tags')?.value || '').split(',').map((t) => t.trim()).filter(Boolean),
+    cuisine: document.getElementById('edit-recipe-cuisine')?.value || '',
+    mealType: document.getElementById('edit-recipe-meal-type')?.value || '',
+  };
+
+  const updated = updateRecipe(recipe.id, updates);
+  if (updated) {
+    showToast('Recipe updated');
+    hideEditForm();
+    renderRecipeDetail(updated);
+    document.getElementById('page-title').textContent = updated.title;
+    document.title = `${updated.title} — Savor`;
+  }
+}
+
+function renderEditIngredients() {
+  const container = document.getElementById('edit-ingredients-editor');
+  if (!container) return;
+
+  container.innerHTML = editIngredients
+    .map((ing, i) => {
+      if (ing.heading) {
+        return `<div class="ingredient-heading">${escapeHTML(ing.text)}</div>`;
+      }
+      return `
+      <div class="import-ingredient-row">
+        <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
+          data-edit-ingredient-index="${i}" placeholder="e.g. 2 cups flour">
+        <button class="btn btn-icon-only btn-small" data-edit-remove-ingredient="${i}" aria-label="Remove ingredient">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>`;
+    })
+    .join('');
+}
+
+function renderEditInstructions() {
+  const container = document.getElementById('edit-instructions-editor');
+  if (!container) return;
+
+  container.innerHTML = editInstructions
+    .map((step, i) => `
+      <div class="import-ingredient-row">
+        <textarea class="glass-textarea" data-edit-instruction-index="${i}" rows="2"
+          placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
+        <button class="btn btn-icon-only btn-small" data-edit-remove-instruction="${i}" aria-label="Remove step">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>`)
+    .join('');
+}
+
+function bindEditEditorEvents() {
+  const addIngredientBtn = document.getElementById('btn-edit-add-ingredient');
+  if (addIngredientBtn) {
+    addIngredientBtn.addEventListener('click', () => {
+      editIngredients.push({ text: '' });
+      renderEditIngredients();
+      rebindEditIngredientEvents();
+    });
+  }
+
+  const addInstructionBtn = document.getElementById('btn-edit-add-instruction');
+  if (addInstructionBtn) {
+    addInstructionBtn.addEventListener('click', () => {
+      editInstructions.push('');
+      renderEditInstructions();
+      rebindEditInstructionEvents();
+    });
+  }
+
+  rebindEditIngredientEvents();
+  rebindEditInstructionEvents();
+}
+
+function rebindEditIngredientEvents() {
+  const container = document.getElementById('edit-ingredients-editor');
+  if (!container) return;
+
+  container.querySelectorAll('[data-edit-ingredient-index]').forEach((input) => {
+    input.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.dataset.editIngredientIndex);
+      editIngredients[idx] = { text: e.target.value };
+    });
+  });
+
+  container.querySelectorAll('[data-edit-remove-ingredient]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.editRemoveIngredient);
+      editIngredients.splice(idx, 1);
+      if (editIngredients.length === 0) editIngredients = [{ text: '' }];
+      renderEditIngredients();
+      rebindEditIngredientEvents();
+    });
+  });
+}
+
+function rebindEditInstructionEvents() {
+  const container = document.getElementById('edit-instructions-editor');
+  if (!container) return;
+
+  container.querySelectorAll('[data-edit-instruction-index]').forEach((textarea) => {
+    textarea.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.dataset.editInstructionIndex);
+      editInstructions[idx] = e.target.value;
+    });
+  });
+
+  container.querySelectorAll('[data-edit-remove-instruction]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.editRemoveInstruction);
+      editInstructions.splice(idx, 1);
+      if (editInstructions.length === 0) editInstructions = [''];
+      renderEditInstructions();
+      rebindEditInstructionEvents();
+    });
+  });
+}

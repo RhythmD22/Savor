@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build production bundle by concatenating JS modules into a single IIFE.
-# Strips import/export statements since functions share a single closure.
+# Strips import/export keywords since functions share a single closure.
 
 set -euo pipefail
 
@@ -33,8 +33,9 @@ for file in "${FILES[@]}"; do
   echo "  // ============================================================" >> "$OUTPUT"
   echo "" >> "$OUTPUT"
 
-  # Strip import/export lines, then indent remaining lines
-  sed -E '/^[[:space:]]*(import|export)[[:space:]]+/d' "$file" \
+  # Delete import lines and strip export keyword from declarations
+  sed -E '/^[[:space:]]*import /d' "$file" \
+    | sed -E 's/^([[:space:]]*)export /\1/' \
     | sed -E 's/^/  /' \
     >> "$OUTPUT"
 done

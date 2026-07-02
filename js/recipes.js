@@ -1,11 +1,10 @@
-import { getRecipes, getRecipeStats, toggleFavorite, deleteRecipe } from './data.js';
-import { formatNumber, formatTime, showToast, showConfirm, debounce, escapeHTML } from './utils.js';
+import { getRecipes } from './data.js';
+import { formatNumber, formatTime, debounce, escapeHTML } from './utils.js';
 
 let currentFilter = 'all';
-let currentSort = 'newest';
 let searchQuery = '';
 
-function initRecipes() {
+export function initRecipes() {
   renderRecipes();
 
   const searchInput = document.getElementById('recipe-search-input');
@@ -48,13 +47,7 @@ function renderRecipes() {
     recipes = recipes.filter((r) => r.mealType === currentFilter || r.tags.includes(currentFilter));
   }
 
-  if (currentSort === 'newest') {
-    recipes.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-  } else if (currentSort === 'oldest') {
-    recipes.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
-  } else if (currentSort === 'name') {
-    recipes.sort((a, b) => a.title.localeCompare(b.title));
-  }
+  recipes.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
 
   const container = document.getElementById('recipe-cards');
   const stats = document.getElementById('recipe-stats');
@@ -105,5 +98,3 @@ function renderRecipes() {
     )
     .join('');
 }
-
-export { initRecipes };

@@ -83,12 +83,6 @@
   color: var(--text-primary);
 }
 
-.nutrition-item-dv {
-  font-size: var(--text-xs);
-  color: var(--text-tertiary);
-  margin-left: var(--space-xs);
-}
-
 .ingredients-list {
   display: flex;
   flex-direction: column;

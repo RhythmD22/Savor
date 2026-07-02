@@ -44,12 +44,15 @@
       }
     });
   }
-  
 
   // ============================================================
   // utils.js
   // ============================================================
 
+  const MS_PER_DAY = 86400000;
+  const TOAST_DURATION = 2800;
+  const DEBOUNCE_DELAY = 300;
+  
   function showToast(message, type = '') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -64,7 +67,7 @@
   
     setTimeout(() => {
       if (toast.parentNode) toast.remove();
-    }, 2800);
+    }, TOAST_DURATION);
   }
   
   function showDialog({ title, content, actions } = {}) {
@@ -96,7 +99,7 @@
     overlay.innerHTML = `
       <div class="dialog-sheet">
         <div class="dialog-handle"></div>
-        <button class="icon-btn dialog-close-btn" aria-label="Close dialog" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+        <button class="icon-btn dialog-close-btn" aria-label="Close dialog">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         ${title ? `<h2 class="dialog-title">${title}</h2>` : ''}
@@ -195,7 +198,7 @@
     return `${Math.floor(diffDays / 365)}y ago`;
   }
   
-  function debounce(fn, delay = 300) {
+  function debounce(fn, delay = DEBOUNCE_DELAY) {
     let timer;
     return function (...args) {
       clearTimeout(timer);
@@ -211,48 +214,20 @@
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
   
-  function getMealTypeEmoji(type) {
-    const map = {
-      breakfast: '🌅',
-      lunch: '☀️',
-      dinner: '🌙',
-      snack: '🍎',
-    };
-    return map[type] || '🍽️';
-  }
-  
-  function getMacroColor(type) {
-    const map = {
-      protein: 'var(--macro-protein)',
-      carbs: 'var(--macro-carbs)',
-      fat: 'var(--macro-fat)',
-    };
-    return map[type] || 'var(--text-secondary)';
-  }
-  
   function escapeHTML(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
-  
-    showToast,
-    showDialog,
-    showConfirm,
-    formatNumber,
-    formatDecimal,
-    getRelativeDate,
-    debounce,
-    formatTime,
-    getMealTypeEmoji,
-    getMacroColor,
-    escapeHTML,
-  };
   // ============================================================
   // data.js
   // ============================================================
 
   const STORAGE_KEY = 'savor_data';
+  const DEFAULT_CALORIE_GOAL = 2000;
+  const DEFAULT_PROTEIN_GOAL = 150;
+  const DEFAULT_CARBS_GOAL = 200;
+  const DEFAULT_FAT_GOAL = 65;
   
   const defaults = {
     recipes: [],
@@ -264,10 +239,10 @@
       age: null,
       gender: null,
       activityLevel: 'moderate',
-      calorieGoal: 2000,
-      proteinGoal: 150,
-      carbsGoal: 200,
-      fatGoal: 65,
+      calorieGoal: DEFAULT_CALORIE_GOAL,
+      proteinGoal: DEFAULT_PROTEIN_GOAL,
+      carbsGoal: DEFAULT_CARBS_GOAL,
+      fatGoal: DEFAULT_FAT_GOAL,
     },
     version: 1,
   };
@@ -535,34 +510,6 @@
     _data = merged;
     saveData();
   }
-  
-    getData,
-    saveData,
-    generateId,
-    getRecipes,
-    getRecipe,
-    addRecipe,
-    updateRecipe,
-    deleteRecipe,
-    toggleFavorite,
-    getRecipeStats,
-    getMealLog,
-    addMealEntry,
-    removeMealEntry,
-    getDailyTotals,
-    getMealTypeTotals,
-    getProfile,
-    updateProfile,
-    getWeightLog,
-    addWeightEntry,
-    deleteWeightEntry,
-    calculateTDEE,
-    getWeightTrend,
-    formatDate,
-    resetAll,
-    exportData,
-    importData,
-  };
   // ============================================================
   // api.js
   // ============================================================
@@ -608,7 +555,9 @@
             break;
           }
         }
-      } catch { }
+      } catch (err) {
+        console.warn('CORS proxy failed:', err);
+      }
     }
   
     if (!html) {
@@ -625,7 +574,9 @@
           const parsed = JSON.parse(script.textContent);
           const recipe = findRecipeInJsonLd(parsed);
           if (recipe) return { success: true, recipe };
-        } catch { }
+        } catch (err) {
+          console.warn('JSON-LD parse error:', err);
+        }
       }
   
       const microdata = extractMicrodata(doc);
@@ -1000,7 +951,8 @@
       if (!response.ok) return [];
       const data = await response.json();
       return data.results || [];
-    } catch {
+    } catch (err) {
+      console.warn('Remote food search failed:', err);
       return [];
     }
   }
@@ -1040,17 +992,20 @@
           }
         });
       }
-    } catch { }
+    } catch (err) {
+      console.warn('Local storage read failed:', err);
+      return [];
+    }
   
     try {
       const remote = await searchRemoteFood(query);
       results.push(...remote);
-    } catch { }
+    } catch (err) {
+      console.warn('Remote food search failed:', err);
+    }
   
     return results.slice(0, 20);
   }
-  
-
   // ============================================================
   // conversions.js
   // ============================================================
@@ -1223,7 +1178,7 @@
     const profile = getProfile();
     const recipes = getRecipes();
   
-    const calorieGoal = profile.calorieGoal || 2000;
+    const calorieGoal = profile.calorieGoal || DEFAULT_CALORIE_GOAL;
     const percent = Math.min((totals.calories / calorieGoal) * 100, 100);
     const remaining = calorieGoal - totals.calories;
   
@@ -1271,9 +1226,7 @@
           .map(
             (r) => `
             <button class="glass glass-card mini-recipe-card" data-route="recipe-detail" data-id="${r.id}">
-              <div class="mini-recipe-image-placeholder" aria-hidden="true">
-                ${r.title.charAt(0).toUpperCase()}
-              </div>
+              ${r.image ? `<img class="mini-recipe-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="mini-recipe-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
               <span class="mini-recipe-name truncate">${escapeHTML(r.title)}</span>
               <span class="mini-recipe-meta">${r.nutrition?.calories ? formatNumber(r.nutrition.calories) + ' cal' : ''}</span>
             </button>`
@@ -1318,15 +1271,12 @@
       }
     }
   }
-  
-
   // ============================================================
   // recipes.js
   // ============================================================
 
   
   let currentFilter = 'all';
-  let currentSort = 'newest';
   let searchQuery = '';
   
   function initRecipes() {
@@ -1372,13 +1322,7 @@
       recipes = recipes.filter((r) => r.mealType === currentFilter || r.tags.includes(currentFilter));
     }
   
-    if (currentSort === 'newest') {
-      recipes.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-    } else if (currentSort === 'oldest') {
-      recipes.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
-    } else if (currentSort === 'name') {
-      recipes.sort((a, b) => a.title.localeCompare(b.title));
-    }
+    recipes.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
   
     const container = document.getElementById('recipe-cards');
     const stats = document.getElementById('recipe-stats');
@@ -1429,14 +1373,14 @@
       )
       .join('');
   }
-  
-
   // ============================================================
   // recipe-detail.js
   // ============================================================
 
   
   let currentRecipeId = null;
+  let editIngredients = [];
+  let editInstructions = [];
   
   function initRecipeDetail(data) {
     if (!data?.id) {
@@ -1608,6 +1552,23 @@
       });
     }
   
+    const editBtn = document.getElementById('btn-edit-recipe');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => showEditForm(recipe));
+    }
+  
+    const cancelEditBtn = document.getElementById('btn-cancel-edit');
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener('click', hideEditForm);
+    }
+  
+    const saveEditBtn = document.getElementById('btn-save-edit');
+    if (saveEditBtn) {
+      saveEditBtn.addEventListener('click', () => handleSaveEdit(recipe));
+    }
+  
+    bindEditEditorEvents();
+  
     const deleteBtn = document.getElementById('btn-delete-recipe');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
@@ -1620,6 +1581,192 @@
     }
   }
   
+  function showEditForm(recipe) {
+    document.getElementById('recipe-view-content').setAttribute('hidden', '');
+    document.getElementById('recipe-edit-form').removeAttribute('hidden');
+  
+    document.getElementById('edit-recipe-title').value = recipe.title || '';
+    document.getElementById('edit-recipe-description').value = recipe.description || '';
+    document.getElementById('edit-recipe-servings').value = recipe.servings || '';
+    document.getElementById('edit-recipe-prep').value = recipe.prepTime || '';
+    document.getElementById('edit-recipe-cook').value = recipe.cookTime || '';
+    document.getElementById('edit-recipe-calories').value = recipe.nutrition?.calories || '';
+    document.getElementById('edit-recipe-protein').value = recipe.nutrition?.protein || '';
+    document.getElementById('edit-recipe-carbs').value = recipe.nutrition?.carbs || '';
+    document.getElementById('edit-recipe-fat').value = recipe.nutrition?.fat || '';
+    document.getElementById('edit-recipe-fiber').value = recipe.nutrition?.fiber || '';
+    document.getElementById('edit-recipe-sugar').value = recipe.nutrition?.sugar || '';
+    document.getElementById('edit-recipe-sodium').value = recipe.nutrition?.sodium || '';
+    document.getElementById('edit-recipe-tags').value = (recipe.tags || []).join(', ');
+    document.getElementById('edit-recipe-cuisine').value = recipe.cuisine || '';
+    document.getElementById('edit-recipe-meal-type').value = recipe.mealType || '';
+  
+    editIngredients = (recipe.ingredients || []).length > 0
+      ? recipe.ingredients.slice()
+      : [{ text: '' }];
+    editInstructions = (recipe.instructions || []).length > 0
+      ? recipe.instructions.slice()
+      : [''];
+  
+    renderEditIngredients();
+    renderEditInstructions();
+  
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  
+  function hideEditForm() {
+    document.getElementById('recipe-edit-form').setAttribute('hidden', '');
+    document.getElementById('recipe-view-content').removeAttribute('hidden');
+  }
+  
+  function handleSaveEdit(recipe) {
+    const title = document.getElementById('edit-recipe-title')?.value?.trim();
+    if (!title) {
+      showToast('Please enter a recipe title', 'error');
+      return;
+    }
+  
+    const updates = {
+      title,
+      description: document.getElementById('edit-recipe-description')?.value || '',
+      servings: parseInt(document.getElementById('edit-recipe-servings')?.value) || recipe.servings,
+      prepTime: parseInt(document.getElementById('edit-recipe-prep')?.value) || 0,
+      cookTime: parseInt(document.getElementById('edit-recipe-cook')?.value) || 0,
+      totalTime: (parseInt(document.getElementById('edit-recipe-prep')?.value) || 0) +
+        (parseInt(document.getElementById('edit-recipe-cook')?.value) || 0),
+      ingredients: editIngredients.filter((i) => i.text?.trim()),
+      instructions: editInstructions.filter((s) => s?.trim()),
+      nutrition: {
+        calories: parseFloat(document.getElementById('edit-recipe-calories')?.value) || 0,
+        protein: parseFloat(document.getElementById('edit-recipe-protein')?.value) || 0,
+        carbs: parseFloat(document.getElementById('edit-recipe-carbs')?.value) || 0,
+        fat: parseFloat(document.getElementById('edit-recipe-fat')?.value) || 0,
+        fiber: parseFloat(document.getElementById('edit-recipe-fiber')?.value) || 0,
+        sugar: parseFloat(document.getElementById('edit-recipe-sugar')?.value) || 0,
+        sodium: parseFloat(document.getElementById('edit-recipe-sodium')?.value) || 0,
+      },
+      tags: (document.getElementById('edit-recipe-tags')?.value || '').split(',').map((t) => t.trim()).filter(Boolean),
+      cuisine: document.getElementById('edit-recipe-cuisine')?.value || '',
+      mealType: document.getElementById('edit-recipe-meal-type')?.value || '',
+    };
+  
+    const updated = updateRecipe(recipe.id, updates);
+    if (updated) {
+      showToast('Recipe updated');
+      hideEditForm();
+      renderRecipeDetail(updated);
+      document.getElementById('page-title').textContent = updated.title;
+      document.title = `${updated.title} — Savor`;
+    }
+  }
+  
+  function renderEditIngredients() {
+    const container = document.getElementById('edit-ingredients-editor');
+    if (!container) return;
+  
+    container.innerHTML = editIngredients
+      .map((ing, i) => {
+        if (ing.heading) {
+          return `<div class="ingredient-heading">${escapeHTML(ing.text)}</div>`;
+        }
+        return `
+        <div class="import-ingredient-row">
+          <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
+            data-edit-ingredient-index="${i}" placeholder="e.g. 2 cups flour">
+          <button class="btn btn-icon-only btn-small" data-edit-remove-ingredient="${i}" aria-label="Remove ingredient">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>`;
+      })
+      .join('');
+  }
+  
+  function renderEditInstructions() {
+    const container = document.getElementById('edit-instructions-editor');
+    if (!container) return;
+  
+    container.innerHTML = editInstructions
+      .map((step, i) => `
+        <div class="import-ingredient-row">
+          <textarea class="glass-textarea" data-edit-instruction-index="${i}" rows="2"
+            placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
+          <button class="btn btn-icon-only btn-small" data-edit-remove-instruction="${i}" aria-label="Remove step">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>`)
+      .join('');
+  }
+  
+  function bindEditEditorEvents() {
+    const addIngredientBtn = document.getElementById('btn-edit-add-ingredient');
+    if (addIngredientBtn) {
+      addIngredientBtn.addEventListener('click', () => {
+        editIngredients.push({ text: '' });
+        renderEditIngredients();
+        rebindEditIngredientEvents();
+      });
+    }
+  
+    const addInstructionBtn = document.getElementById('btn-edit-add-instruction');
+    if (addInstructionBtn) {
+      addInstructionBtn.addEventListener('click', () => {
+        editInstructions.push('');
+        renderEditInstructions();
+        rebindEditInstructionEvents();
+      });
+    }
+  
+    rebindEditIngredientEvents();
+    rebindEditInstructionEvents();
+  }
+  
+  function rebindEditIngredientEvents() {
+    const container = document.getElementById('edit-ingredients-editor');
+    if (!container) return;
+  
+    container.querySelectorAll('[data-edit-ingredient-index]').forEach((input) => {
+      input.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.editIngredientIndex);
+        editIngredients[idx] = { text: e.target.value };
+      });
+    });
+  
+    container.querySelectorAll('[data-edit-remove-ingredient]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.editRemoveIngredient);
+        editIngredients.splice(idx, 1);
+        if (editIngredients.length === 0) editIngredients = [{ text: '' }];
+        renderEditIngredients();
+        rebindEditIngredientEvents();
+      });
+    });
+  }
+  
+  function rebindEditInstructionEvents() {
+    const container = document.getElementById('edit-instructions-editor');
+    if (!container) return;
+  
+    container.querySelectorAll('[data-edit-instruction-index]').forEach((textarea) => {
+      textarea.addEventListener('input', (e) => {
+        const idx = parseInt(e.target.dataset.editInstructionIndex);
+        editInstructions[idx] = e.target.value;
+      });
+    });
+  
+    container.querySelectorAll('[data-edit-remove-instruction]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.editRemoveInstruction);
+        editInstructions.splice(idx, 1);
+        if (editInstructions.length === 0) editInstructions = [''];
+        renderEditInstructions();
+        rebindEditInstructionEvents();
+      });
+    });
+  }
 
   // ============================================================
   // import.js
@@ -1638,7 +1785,7 @@
     conversionsInitialized = false;
   
     switchTab('url');
-    bindEvents();
+    bindImportEvents();
     resetForms();
     refreshApiStatus();
   }
@@ -1657,7 +1804,7 @@
     }
   }
   
-  function bindEvents() {
+  function bindImportEvents() {
     document.querySelectorAll('.import-tab').forEach((tab) => {
       tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
@@ -1714,7 +1861,9 @@
       const status = await response.json();
       updateBadge('usda-status', status.usda);
       updateBadge('spoonacular-status', status.spoonacular);
-    } catch { }
+    } catch (err) {
+      console.warn('API status check failed:', err);
+    }
   }
   
   function updateBadge(id, isConfigured) {
@@ -2012,8 +2161,6 @@
     renderInstructionsEditor();
     hidePreview();
   }
-  
-
   // ============================================================
   // meal-log.js
   // ============================================================
@@ -2060,9 +2207,9 @@
   
     if (current === today) {
       display.textContent = 'Today';
-    } else if (current === formatDate(new Date(Date.now() - 86400000))) {
+    } else if (current === formatDate(new Date(Date.now() - MS_PER_DAY))) {
       display.textContent = 'Yesterday';
-    } else if (current === formatDate(new Date(Date.now() + 86400000))) {
+    } else if (current === formatDate(new Date(Date.now() + MS_PER_DAY))) {
       display.textContent = 'Tomorrow';
     } else {
       display.textContent = currentDate.toLocaleDateString('en-US', {
@@ -2079,7 +2226,7 @@
     const profile = getProfile();
     const mealTypes = getMealTypeTotals(date);
   
-    const calGoal = profile.calorieGoal || 2000;
+    const calGoal = profile.calorieGoal || DEFAULT_CALORIE_GOAL;
     const calPercent = Math.min((totals.calories / calGoal) * 100, 100);
   
     const elements = {
@@ -2223,7 +2370,7 @@
     overlay.innerHTML = `
       <div class="dialog-sheet food-search-dialog">
         <div class="dialog-handle"></div>
-        <button class="icon-btn dialog-close-btn" aria-label="Close search" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+        <button class="icon-btn dialog-close-btn" aria-label="Close search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
@@ -2361,24 +2508,10 @@
       });
     });
   }
-  
-
   // ============================================================
   // health.js
   // ============================================================
 
-    getProfile,
-    updateProfile,
-    getWeightLog,
-    addWeightEntry,
-    deleteWeightEntry,
-    calculateTDEE,
-    getWeightTrend,
-    getDailyTotals,
-    resetAll,
-    exportData,
-    importData,
-  } from './data.js';
   
   const LBS_PER_KG = 2.20462;
   
@@ -2403,7 +2536,7 @@
   function initHealth() {
     renderHealthProfile();
     renderWeightLog();
-    bindEvents();
+    bindHealthEvents();
   }
   
   function renderHealthProfile() {
@@ -2674,7 +2807,7 @@
     });
   }
   
-  function bindEvents() {
+  function bindHealthEvents() {
     const profileForm = document.getElementById('health-profile-form');
     if (profileForm) {
       profileForm.addEventListener('submit', (e) => {
@@ -2801,8 +2934,6 @@
       });
     }
   }
-  
-
   // ============================================================
   // app.js
   // ============================================================
@@ -2841,7 +2972,6 @@
         if (existingPage && route !== 'recipe-detail') return;
       }
   
-      const prevRoute = currentRoute;
       currentRoute = route;
       currentDetailId = route === 'recipe-detail' ? data?.id : null;
   
@@ -2930,7 +3060,9 @@
     }
   
     if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-      navigator.serviceWorker.register('/Savor/service-worker.js').catch(() => {});
+      navigator.serviceWorker.register('/Savor/service-worker.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
     }
   })();
 })();

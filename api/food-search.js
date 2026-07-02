@@ -50,7 +50,8 @@ export default async function handler(req, res) {
           per100g: true,
         };
       }).filter((r) => r.name && r.calories > 0);
-    } catch {
+    } catch (err) {
+      console.warn('USDA search failed:', err);
       return [];
     }
   })();
@@ -73,7 +74,8 @@ export default async function handler(req, res) {
         servingSize: 1,
         needsLookup: true,
       })).filter((r) => r.name);
-    } catch {
+    } catch (err) {
+      console.warn('USDA search failed:', err);
       return [];
     }
   })();
@@ -100,7 +102,8 @@ export default async function handler(req, res) {
           per100g: true,
         };
       }).filter(Boolean);
-    } catch {
+    } catch (err) {
+      console.warn('USDA search failed:', err);
       return [];
     }
   })();
