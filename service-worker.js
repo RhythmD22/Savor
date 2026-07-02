@@ -1,28 +1,29 @@
-const CACHE_NAME = 'savor-v1.0';
+const CACHE_NAME = 'savor-v1.1';
 
 const urlsToCache = [
-  '/Savor/',
-  '/Savor/index.html',
-  '/Savor/css/styles.css',
-  '/Savor/css/index.css',
-  '/Savor/css/recipes.css',
-  '/Savor/css/recipe-detail.css',
-  '/Savor/css/import.css',
-  '/Savor/css/meal-log.css',
-  '/Savor/css/health.css',
-  '/Savor/js/bundle.js',
-  '/Savor/manifest.json',
-  '/Savor/icon.svg',
-  '/Savor/icon-maskable.svg',
-  '/Savor/favicon.ico',
-  '/Savor/apple-touch-icon.png',
-  '/Savor/apple-touch-icon-120x120.png',
-  '/Savor/apple-touch-icon-152x152.png',
-  '/Savor/apple-touch-icon-167x167.png',
-  '/Savor/android-chrome-192x192.png',
-  '/Savor/android-chrome-512x512.png',
-  '/Savor/android-chrome-maskable-192x192.png',
-  '/Savor/android-chrome-maskable-512x512.png',
+  '/',
+  '/index.html',
+  '/css/styles.css',
+  '/css/index.css',
+  '/css/recipes.css',
+  '/css/recipe-detail.css',
+  '/css/import.css',
+  '/css/meal-log.css',
+  '/css/health.css',
+  '/css/conversions.css',
+  '/js/bundle.js',
+  '/manifest.json',
+  '/icon.svg',
+  '/icon-maskable.svg',
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/apple-touch-icon-120x120.png',
+  '/apple-touch-icon-152x152.png',
+  '/apple-touch-icon-167x167.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  '/android-chrome-maskable-192x192.png',
+  '/android-chrome-maskable-512x512.png',
 ];
 
 self.addEventListener('install', event => {
@@ -45,51 +46,29 @@ self.addEventListener('activate', event => {
   );
 });
 
+function staleWhileRevalidate(request) {
+  return caches.match(request).then(cached => {
+    const fetchPromise = fetch(request).then(response => {
+      if (response && response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+      }
+      return response;
+    }).catch(() => cached);
+    return cached || fetchPromise;
+  });
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  if (event.request.url.includes('fonts.googleapis.com') || event.request.url.includes('fonts.gstatic.com')) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        const fetchPromise = fetch(event.request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        });
-        return cached || fetchPromise;
-      })
-    );
+  const url = event.request.url;
+  if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com') || url.includes('cdn.jsdelivr.net')) {
+    event.respondWith(staleWhileRevalidate(event.request));
     return;
   }
 
-  if (event.request.url.includes('cdn.jsdelivr.net')) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        const fetchPromise = fetch(event.request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        });
-        return cached || fetchPromise;
-      })
-    );
-    return;
-  }
+  if (url.includes('/api/')) return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      const fetchPromise = fetch(event.request).then(response => {
-        if (response && response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      });
-      return cached || fetchPromise;
-    })
-  );
+  event.respondWith(staleWhileRevalidate(event.request));
 });

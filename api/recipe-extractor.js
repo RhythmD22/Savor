@@ -1,5 +1,10 @@
+import { capitalizeFirst, parseNumber, parseDuration, extractImageUrl } from '../js/recipe-parsers.js';
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const allowedOrigin = process.env.VERCEL_ENV
+    ? 'https://savor-note.vercel.app'
+    : 'http://localhost:3000';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -171,12 +176,7 @@ function parseJsonLdRecipe(r, sourceUrl) {
     return '';
   };
 
-  const getNumber = (v) => {
-    if (!v) return 0;
-    if (typeof v === 'number') return v;
-    const num = parseFloat(String(v).replace(/[^0-9.]/g, ''));
-    return isNaN(num) ? 0 : num;
-  };
+  const getNumber = parseNumber;
 
   const ingredients = (r.recipeIngredient || [])
     .map(getText)
@@ -394,34 +394,6 @@ function extractInstructionsFromHtml(html) {
   }
 
   return instructions.slice(0, 25).map(capitalizeFirst);
-}
-
-function capitalizeFirst(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function parseDuration(val) {
-  if (!val) return 0;
-  if (typeof val === 'number') return val;
-  const str = String(val);
-
-  const isoMatch = str.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
-  if (isoMatch) {
-    return (parseInt(isoMatch[1]) || 0) * 60 + (parseInt(isoMatch[2]) || 0);
-  }
-
-  const num = parseInt(str.match(/\d+/)?.[0]);
-  return isNaN(num) ? 0 : num;
-}
-
-function extractImageUrl(image) {
-  if (!image) return '';
-  if (typeof image === 'string') return image;
-  if (Array.isArray(image) && image.length > 0) return extractImageUrl(image[0]);
-  if (image.url) return image.url;
-  if (image['@id']) return image['@id'];
-  return '';
 }
 
 function stripHtml(str) {

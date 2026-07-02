@@ -75,7 +75,7 @@ export default async function handler(req, res) {
         needsLookup: true,
       })).filter((r) => r.name);
     } catch (err) {
-      console.warn('USDA search failed:', err);
+      console.warn('Spoonacular search failed:', err);
       return [];
     }
   })();
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
         };
       }).filter(Boolean);
     } catch (err) {
-      console.warn('USDA search failed:', err);
+      console.warn('Open Food Facts search failed:', err);
       return [];
     }
   })();

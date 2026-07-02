@@ -88,7 +88,7 @@ function renderRecipeDetail(recipe) {
           (ing, i) => `
         <label class="ingredient-item">
           <input type="checkbox" class="ingredient-checkbox">
-          <span class="ingredient-name">${escapeHTML(typeof ing === 'string' ? ing : ing.text || ing.quantity + ' ' + ing.unit + ' ' + ing.name)}</span>
+          <span class="ingredient-name">${escapeHTML(typeof ing === 'string' ? ing : ing.text || [ing.quantity, ing.unit, ing.name].filter(Boolean).join(' '))}</span>
         </label>`
         )
         .join('');

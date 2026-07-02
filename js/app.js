@@ -127,7 +127,7 @@ import { initHealth } from './health.js';
   }
 
   if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-    navigator.serviceWorker.register('/Savor/service-worker.js').catch((err) => {
+    navigator.serviceWorker.register('/service-worker.js').catch((err) => {
       console.warn('Service worker registration failed:', err);
     });
   }

@@ -11,6 +11,7 @@ FILES=(
   js/theme.js
   js/utils.js
   js/data.js
+  js/recipe-parsers.js
   js/api.js
   js/conversions.js
   js/index.js

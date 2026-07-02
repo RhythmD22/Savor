@@ -40,11 +40,11 @@ function save(data) {
 
 let _data = load();
 
-export function getData() {
+function getData() {
   return _data;
 }
 
-export function saveData() {
+function saveData() {
   save(_data);
 }
 
@@ -123,7 +123,7 @@ export function toggleFavorite(id) {
   updateRecipe(id, { isFavorite: !recipe.isFavorite });
 }
 
-export function getRecipeStats() {
+function getRecipeStats() {
   const recipes = _data.recipes;
   return {
     total: recipes.length,
