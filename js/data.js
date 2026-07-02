@@ -123,16 +123,6 @@ export function toggleFavorite(id) {
   updateRecipe(id, { isFavorite: !recipe.isFavorite });
 }
 
-function getRecipeStats() {
-  const recipes = _data.recipes;
-  return {
-    total: recipes.length,
-    favorites: recipes.filter((r) => r.isFavorite).length,
-    cuisines: [...new Set(recipes.map((r) => r.cuisine).filter(Boolean))],
-    tags: [...new Set(recipes.flatMap((r) => r.tags))],
-  };
-}
-
 export function formatDate(date) {
   const d = date instanceof Date ? date : new Date(date);
   return d.toISOString().split('T')[0];

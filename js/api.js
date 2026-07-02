@@ -1,4 +1,4 @@
-import { capitalizeFirst, parseNumber, parseDuration, extractImageUrl } from './recipe-parsers.js';
+import { capitalizeFirst, parseNumber, parseDuration, isIngredient, looksLikeInstructionList, extractServingsFromText, extractTimeFromText, extractNutritionFromText, findRecipeInJsonLd, parseJsonLdRecipe } from './recipe-parsers.js';
 
 export async function fetchRecipeFromUrl(url) {
   try {
@@ -58,8 +58,8 @@ export async function extractRecipeLocally(url) {
     for (const script of jsonLdScripts) {
       try {
         const parsed = JSON.parse(script.textContent);
-        const recipe = findRecipeInJsonLd(parsed);
-        if (recipe) return { success: true, recipe };
+        const recipeNode = findRecipeInJsonLd(parsed);
+        if (recipeNode) return { success: true, recipe: parseJsonLdRecipe(recipeNode) };
       } catch (err) {
         console.warn('JSON-LD parse error:', err);
       }
@@ -84,88 +84,9 @@ export async function extractRecipeLocally(url) {
         nutrition: extractNutrition(doc),
       },
     };
-  } catch (err) {
+  } catch {
     return { success: false, error: 'Could not parse recipe from this page.' };
   }
-}
-
-function findRecipeInJsonLd(data) {
-  const items = Array.isArray(data) ? data : [data];
-  for (const item of items) {
-    if (!item) continue;
-    if (item['@type'] === 'Recipe') return parseJsonLdRecipe(item);
-    if (item['@graph']) {
-      for (const node of item['@graph']) {
-        if (node['@type'] === 'Recipe') return parseJsonLdRecipe(node);
-      }
-    }
-    if (item.recipe) return parseJsonLdRecipe(item.recipe);
-  }
-  return null;
-}
-
-function parseJsonLdRecipe(r) {
-  const getText = (v) => {
-    if (!v) return '';
-    if (typeof v === 'string') return v.trim();
-    if (Array.isArray(v)) return v.map(getText).filter(Boolean).join('\n');
-    return '';
-  };
-
-  const ingredients = (r.recipeIngredient || [])
-    .map(getText)
-    .filter(Boolean);
-
-  const instructions = [];
-  const rawInstructions = r.recipeInstructions || [];
-  if (typeof rawInstructions === 'string') {
-    instructions.push(rawInstructions.trim());
-  } else if (Array.isArray(rawInstructions)) {
-    const collectSteps = (arr) => {
-      arr.forEach((step) => {
-        if (typeof step === 'string') instructions.push(step.trim());
-        else if (step.text) instructions.push(getText(step.text));
-        else if (step['@type'] === 'HowToStep') {
-          const name = step.name ? getText(step.name) + ': ' : '';
-          instructions.push(name + getText(step.text));
-        } else if (step['@type'] === 'HowToSection' || step.itemListElement) {
-          const items = Array.isArray(step.itemListElement) ? step.itemListElement : [step.itemListElement];
-          collectSteps(items);
-        }
-      });
-    };
-    collectSteps(rawInstructions);
-  }
-
-  const nutrition = r.nutrition
-    ? {
-        calories: parseNumber(r.nutrition.calories),
-        protein: parseNumber(r.nutrition.proteinContent),
-        carbs: parseNumber(r.nutrition.carbohydrateContent),
-        fat: parseNumber(r.nutrition.fatContent),
-        fiber: parseNumber(r.nutrition.fiberContent),
-        sugar: parseNumber(r.nutrition.sugarContent),
-        sodium: parseNumber(r.nutrition.sodiumContent),
-      }
-    : {};
-
-  return {
-    title: r.name || '',
-    description: r.description || '',
-    image: extractImageUrl(r.image),
-    sourceUrl: r.url || '',
-    sourceName: r.author?.name || r.publisher?.name || '',
-    servings: parseInt(r.recipeYield) || 0,
-    prepTime: parseDuration(r.prepTime),
-    cookTime: parseDuration(r.cookTime),
-    totalTime: parseDuration(r.totalTime),
-    ingredients: ingredients.map((i) => ({ text: i })),
-    instructions: instructions.map(capitalizeFirst),
-    nutrition,
-    tags: (r.recipeCategory ? [].concat(r.recipeCategory) : []),
-    cuisine: r.recipeCuisine || '',
-    mealType: r.recipeCategory || '',
-  };
 }
 
 function extractMicrodata(doc) {
@@ -212,18 +133,7 @@ function extractMicrodata(doc) {
 
 function extractIngredients(doc) {
   const ingredients = [];
-  const excludeKeywords = /\b(calories|kcal|protein|carbs|carbohydrate|fat|fiber|fibre|sugar|sodium|cholesterol|saturated|trans fat|serving|yield|min|mins|minute|minutes|hour|hours|cook time|prep time|preparation time|total time|ingredients|grain)\b/i;
 
-  const isIngredient = (text) => {
-    if (excludeKeywords.test(text)) return false;
-    const patterns = [
-      /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|pound|ounce|gram|teaspoon|tablespoon|pinch|dash|clove|slice|piece|whole|bunch|head|can|jar|package|box|bag|bottle)/i,
-      /(\d+\/?\d*\s*)(cup|tbsp|tsp|oz|lb|g|kg|ml|l)/i,
-    ];
-    return patterns.some((p) => p.test(text));
-  };
-
-  // Try <li> elements first
   const lists = doc.querySelectorAll('ul li, ol li');
   lists.forEach((li) => {
     const text = li.textContent?.trim();
@@ -233,7 +143,6 @@ function extractIngredients(doc) {
     }
   });
 
-  // Fallback: scan <p> tags for ingredient patterns
   if (ingredients.length === 0) {
     const paragraphs = doc.querySelectorAll('p');
     let skipped = 0;
@@ -273,21 +182,12 @@ function extractIngredients(doc) {
 function extractInstructions(doc) {
   const instructions = [];
   const ingredientPattern = /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|pound|ounce|gram|teaspoon|tablespoon)/i;
-  const cookingVerbs = /\b(heat|bake|mix|add|stir|cook|beat|pour|combine|preheat|melt|chop|dice|slice|grate|drain|boil|simmer|fry|grill|roast|blend|whisk|fold|roll|cut|place|transfer|remove|cool|let|bring|spread|sprinkle|top|drizzle|season|serve|garnish|drop|scrape|line|scoop|freeze|refrigerate|chill|toast|mash|dissolve|grease|flour|whip|cream|knead|shape|cover|steep|strain|marinate|broil|poach|steam|reduce|caramelize|deglaze|braise|saute|plunge|temper|separate|sift|toss|crush)\b/i;
-
-  const looksLikeInstructionList = (items) => {
-    const viable = items.filter((t) => t.length > 10 && !ingredientPattern.test(t));
-    if (viable.length < 3) return false;
-    const verbCount = viable.filter((t) => cookingVerbs.test(t.slice(0, 30))).length;
-    return verbCount >= Math.ceil(viable.length * 0.4);
-  };
 
   const isNavElement = (el) => {
     const classId = (el.className || '') + ' ' + (el.id || '');
     return /\b(nav|menu|dropdown|footer)\b/i.test(classId) || el.closest('nav, footer, header');
   };
 
-  // Try ordered lists first
   const orderedLists = doc.querySelectorAll('ol');
   for (const ol of orderedLists) {
     const items = Array.from(ol.querySelectorAll('li'))
@@ -299,7 +199,6 @@ function extractInstructions(doc) {
     }
   }
 
-  // Try unordered lists that look like instructions (not nav, not ingredients)
   if (instructions.length === 0) {
     const lists = doc.querySelectorAll('ul');
     for (const ul of lists) {
@@ -318,38 +217,14 @@ function extractInstructions(doc) {
 }
 
 function extractServings(doc) {
-  const text = doc.body.textContent;
-  const match = text.match(/(\d+)\s*(serving|servings|serves|yield|makes|bars|cookies|pieces)/i);
-  return match ? parseInt(match[1]) : 0;
+  return extractServingsFromText(doc.body.textContent);
 }
 
 function extractTime(doc, type) {
-  const text = doc.body.textContent.replace(/\s+/g, ' ');
-  const keywords = type === 'prep' ? '\\bprep\\b|\\bpreparation\\b'
-    : type === 'cook' ? '\\bcook\\b|\\bcooking\\b'
-      : '\\btotal\\b|\\bready in\\b';
-  const pattern = new RegExp(
-    `(?:${keywords})[^\\d]{0,40}?(\\d+)\\s*(?:min|mins|minute|minutes|h|hour|hours)\\b`,
-    'i'
-  );
-  const match = text.match(pattern);
-  if (match) {
-    const num = parseInt(match[1]);
-    if (match[0].match(/\b(hour|hours|h)\b/i) && !match[0].match(/\bmin\b/i)) return num * 60;
-    return num;
-  }
-  const revPattern = new RegExp(
-    `(\\d+)\\s*(?:min|mins|minute|minutes)[^\\d]{0,40}?(?:${keywords})\\b`,
-    'i'
-  );
-  const revMatch = text.match(revPattern);
-  return revMatch ? parseInt(revMatch[1]) : 0;
+  return extractTimeFromText(doc.body.textContent.replace(/\s+/g, ' '), type);
 }
 
 function extractNutrition(doc) {
-  const result = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
-
-  // Find nutrition section via heading
   const headings = doc.querySelectorAll('h2, h3, h4, strong, b, .nutrition, [id*="nutrition"], [class*="nutrition"]');
   let sectionEl = null;
   for (const h of headings) {
@@ -360,7 +235,6 @@ function extractNutrition(doc) {
   }
   if (!sectionEl) sectionEl = doc.body;
 
-  // Try <strong>/<b> values from a table/list layout
   const strongs = sectionEl.querySelectorAll('strong, b');
   const values = [];
   for (const s of strongs) {
@@ -369,33 +243,18 @@ function extractNutrition(doc) {
   }
 
   if (values.length >= 9) {
-    result.calories = values[0];
-    result.fat = values[1];
-    result.sodium = values[4];
-    result.carbs = values[5];
-    result.fiber = values[6];
-    result.sugar = values[7];
-    result.protein = values[8];
-    return result;
+    return {
+      calories: values[0],
+      fat: values[1],
+      sodium: values[4],
+      carbs: values[5],
+      fiber: values[6],
+      sugar: values[7],
+      protein: values[8],
+    };
   }
 
-  // Generic fallback
-  const text = sectionEl.textContent.replace(/\s+/g, ' ');
-  const extract = (label) => {
-    const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const m = text.match(new RegExp(esc + '[^\\d]*?(\\d+)', 'i'));
-    return m ? parseInt(m[1]) : 0;
-  };
-
-  result.calories = extract('calories');
-  result.protein = extract('protein');
-  result.carbs = extract('carbohydrate') || extract('carbs');
-  result.fiber = extract('fiber') || extract('fibre');
-  result.sugar = extract('sugar') || extract('sugars');
-  result.sodium = extract('sodium');
-  result.fat = extract('total fat') || extract('fat');
-
-  return result;
+  return extractNutritionFromText(sectionEl.textContent.replace(/\s+/g, ' '));
 }
 
 export async function searchRemoteFood(query) {
@@ -423,8 +282,6 @@ function looksLikeRecipePage(html) {
     !lower.includes('cf-browser-verification')
   );
 }
-
-
 
 export async function searchFood(query) {
   if (!query || query.length < 2) return [];

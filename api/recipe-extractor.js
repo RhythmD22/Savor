@@ -1,4 +1,4 @@
-import { capitalizeFirst, parseNumber, parseDuration, extractImageUrl } from '../js/recipe-parsers.js';
+import { capitalizeFirst, parseDuration, isIngredient, looksLikeInstructionList, extractServingsFromText, extractTimeFromText, extractNutritionFromText, findRecipeInJsonLd, parseJsonLdRecipe } from '../js/recipe-parsers.js';
 
 export default async function handler(req, res) {
   const allowedOrigin = process.env.VERCEL_ENV
@@ -137,7 +137,7 @@ function extractJsonLd(html) {
   for (const match of matches) {
     try {
       const data = JSON.parse(match[1]);
-      const recipe = findRecipeNode(data);
+      const recipe = findRecipeInJsonLd(data);
       if (recipe) return recipe;
     } catch {
       console.warn('JSON-LD parse error');
@@ -145,91 +145,6 @@ function extractJsonLd(html) {
   }
 
   return null;
-}
-
-function findRecipeNode(data) {
-  const items = Array.isArray(data) ? data : [data];
-
-  for (const item of items) {
-    if (!item) continue;
-
-    if (item['@type'] === 'Recipe') return item;
-    if (Array.isArray(item['@graph'])) {
-      for (const node of item['@graph']) {
-        if (node['@type'] === 'Recipe') return node;
-      }
-    }
-
-    if (item.recipe && item.recipe['@type'] === 'Recipe') {
-      return item.recipe;
-    }
-  }
-
-  return null;
-}
-
-function parseJsonLdRecipe(r, sourceUrl) {
-  const getText = (v) => {
-    if (!v) return '';
-    if (typeof v === 'string') return v.trim();
-    if (Array.isArray(v)) return v.map(getText).filter(Boolean).join('\n');
-    return '';
-  };
-
-  const getNumber = parseNumber;
-
-  const ingredients = (r.recipeIngredient || [])
-    .map(getText)
-    .filter(Boolean)
-    .map((text) => ({ text }));
-
-  const instructions = [];
-  const rawInstructions = r.recipeInstructions || [];
-  if (typeof rawInstructions === 'string') {
-    instructions.push(rawInstructions.trim());
-  } else if (Array.isArray(rawInstructions)) {
-    const collectSteps = (arr) => {
-      arr.forEach((step) => {
-        if (typeof step === 'string') instructions.push(step.trim());
-        else if (step.text) instructions.push(getText(step.text));
-        else if (step['@type'] === 'HowToStep') {
-          instructions.push(getText(step.text));
-        } else if (step['@type'] === 'HowToSection' || step.itemListElement) {
-          const items = Array.isArray(step.itemListElement) ? step.itemListElement : [step.itemListElement];
-          collectSteps(items);
-        }
-      });
-    };
-    collectSteps(rawInstructions);
-  }
-
-  const nutrition = r.nutrition || {};
-
-  return {
-    title: r.name || '',
-    description: r.description || '',
-    image: extractImageUrl(r.image),
-    sourceUrl: r.url || sourceUrl || '',
-    sourceName: r.author?.name || r.publisher?.name || '',
-    servings: parseInt(String(r.recipeYield).match(/\d+/)?.[0]) || 0,
-    prepTime: parseDuration(r.prepTime),
-    cookTime: parseDuration(r.cookTime),
-    totalTime: parseDuration(r.totalTime),
-    ingredients,
-    instructions: instructions.filter(Boolean).map(capitalizeFirst),
-    nutrition: {
-      calories: getNumber(nutrition.calories),
-      protein: getNumber(nutrition.proteinContent),
-      carbs: getNumber(nutrition.carbohydrateContent),
-      fat: getNumber(nutrition.fatContent),
-      fiber: getNumber(nutrition.fiberContent),
-      sugar: getNumber(nutrition.sugarContent),
-      sodium: getNumber(nutrition.sodiumContent),
-    },
-    tags: Array.isArray(r.recipeCategory) ? r.recipeCategory : r.recipeCategory ? [r.recipeCategory] : [],
-    cuisine: r.recipeCuisine || '',
-    mealType: r.recipeCategory || '',
-  };
 }
 
 function extractMicrodata(html) {
@@ -267,18 +182,7 @@ function extractMicrodata(html) {
 
 function extractIngredientsFromHtml(html) {
   const ingredients = [];
-  const ingredientPatterns = [
-    /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|pound|ounce|gram|teaspoon|tablespoon|pinch|dash|clove|slice|piece|whole|bunch|head|can|jar)/i,
-    /(\d+\/?\d*\s*)(cup|tbsp|tsp|oz|lb|g|kg|ml|l)/i,
-  ];
-  const excludeKeywords = /\b(calories|kcal|protein|carbs|carbohydrate|fat|fiber|fibre|sugar|sodium|cholesterol|saturated|trans fat|serving|yield|min|mins|minute|minutes|hour|hours|cook time|prep time|preparation time|total time|ingredients|grain)\b/i;
 
-  const isIngredient = (text) => {
-    if (excludeKeywords.test(text)) return false;
-    return ingredientPatterns.some((p) => p.test(text));
-  };
-
-  // Try <li> elements first
   const listItemRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi;
   let match;
   while ((match = listItemRegex.exec(html)) !== null) {
@@ -290,7 +194,6 @@ function extractIngredientsFromHtml(html) {
     }
   }
 
-  // Fallback: scan <p> tags for ingredient patterns
   if (ingredients.length === 0) {
     const pRegex = /<p[^>]*>([\s\S]*?)<\/p>/gi;
     let skipped = 0;
@@ -330,16 +233,8 @@ function extractIngredientsFromHtml(html) {
 function extractInstructionsFromHtml(html) {
   const instructions = [];
   const ingredientPattern = /\d+\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|pound|ounce|gram|teaspoon|tablespoon)/i;
-  const cookingVerbs = /\b(heat|bake|mix|add|stir|cook|beat|pour|combine|preheat|melt|chop|dice|slice|grate|drain|boil|simmer|fry|grill|roast|blend|whisk|fold|roll|cut|place|transfer|remove|cool|let|bring|spread|sprinkle|top|drizzle|season|serve|garnish|drop|scrape|line|scoop|freeze|refrigerate|chill|toast|mash|dissolve|grease|flour|whip|cream|knead|shape|cover|steep|strain|marinate|broil|poach|steam|reduce|caramelize|deglaze|braise|saute|plunge|temper|separate|sift|toss|crush)\b/i;
 
   const looksNav = (tag) => /\b(nav|menu|dropdown|footer)\b/i.test(tag);
-
-  const looksLikeInstructionList = (items) => {
-    const viable = items.filter((t) => t.length > 10 && !ingredientPattern.test(t));
-    if (viable.length < 3) return false;
-    const verbCount = viable.filter((t) => cookingVerbs.test(t.slice(0, 30))).length;
-    return verbCount >= Math.ceil(viable.length * 0.4);
-  };
 
   const extractListItems = (listHtml) => {
     const items = [];
@@ -352,7 +247,6 @@ function extractInstructionsFromHtml(html) {
     return items;
   };
 
-  // Try <ol><li> ordered lists first
   const olRegex = /<ol[^>]*>([\s\S]*?)<\/ol>/gi;
   let olMatch;
   while ((olMatch = olRegex.exec(html)) !== null) {
@@ -363,7 +257,6 @@ function extractInstructionsFromHtml(html) {
     }
   }
 
-  // Try <ul> lists that look like instructions
   if (instructions.length === 0) {
     const ulRegex = /<ul[^>]*>([\s\S]*?)<\/ul>/gi;
     let ulMatch;
@@ -377,7 +270,6 @@ function extractInstructionsFromHtml(html) {
     }
   }
 
-  // Fallback: look for <p> tags that start with numbers (e.g., "1. ", "2. ")
   if (instructions.length === 0) {
     const stepRegex = /<p[^>]*>([\s\S]*?)<\/p>/gi;
     let stepMatch;
@@ -411,39 +303,16 @@ function decodeHtmlEntities(str) {
 }
 
 function extractServingsFromHtml(html) {
-  const text = stripHtml(html).replace(/\s+/g, ' ');
-  const pattern = /(\d+)\s+(serving|servings|serves|yield|makes|bars|cookies|pieces)\b/i;
-  const match = text.match(pattern);
-  return match ? parseInt(match[1]) : 0;
+  return extractServingsFromText(stripHtml(html).replace(/\s+/g, ' '));
 }
 
 function extractTimeFromHtml(html, type) {
-  const text = stripHtml(html).replace(/\s+/g, ' ');
-  const keywords = type === 'prep' ? '\\bprep\\b|\\bpreparation\\b'
-    : type === 'cook' ? '\\bcook\\b|\\bcooking\\b'
-      : '\\btotal\\b|\\bready in\\b';
-  const pattern = new RegExp(
-    `(?:${keywords})[^\\d]{0,40}?(\\d+)\\s*(?:min|mins|minute|minutes|h|hour|hours)\\b`,
-    'i'
-  );
-  const match = text.match(pattern);
-  if (match) {
-    const num = parseInt(match[1]);
-    if (match[0].match(/\b(hour|hours|h)\b/i) && !match[0].match(/\bmin\b/i)) return num * 60;
-    return num;
-  }
-  const revPattern = new RegExp(
-    `(\\d+)\\s*(?:min|mins|minute|minutes)[^\\d]{0,40}?(?:${keywords})\\b`,
-    'i'
-  );
-  const revMatch = text.match(revPattern);
-  return revMatch ? parseInt(revMatch[1]) : 0;
+  return extractTimeFromText(stripHtml(html).replace(/\s+/g, ' '), type);
 }
 
 function extractNutritionFromHtml(html) {
   const result = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
 
-  // Find the LAST "Nutrition Info/Facts" heading (skip tab/nav links)
   const headingMatches = [...html.matchAll(/nutrition\s*(?:info|facts|information)/gi)];
   if (!headingMatches.length) return result;
 
@@ -451,7 +320,6 @@ function extractNutritionFromHtml(html) {
   const sectionStart = headingMatch.index;
   const section = html.slice(sectionStart, sectionStart + 5000);
 
-  // Extract all strong/bold numeric values in order
   const valueRegex = /<strong[^>]*>\s*(\d+)[^<]*<\/strong>/gi;
   const values = [];
   let vm;
@@ -460,31 +328,16 @@ function extractNutritionFromHtml(html) {
   }
 
   if (values.length >= 9) {
-    result.calories = values[0];
-    result.fat = values[1];
-    result.sodium = values[4];
-    result.carbs = values[5];
-    result.fiber = values[6];
-    result.sugar = values[7];
-    result.protein = values[8];
-    return result;
+    return {
+      calories: values[0],
+      fat: values[1],
+      sodium: values[4],
+      carbs: values[5],
+      fiber: values[6],
+      sugar: values[7],
+      protein: values[8],
+    };
   }
 
-  // Generic fallback
-  const text = stripHtml(section).replace(/\s+/g, ' ');
-  const extract = (label) => {
-    const esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const m = text.match(new RegExp(esc + '[^\\d]*?(\\d+)', 'i'));
-    return m ? parseInt(m[1]) : 0;
-  };
-
-  result.calories = extract('calories');
-  result.protein = extract('protein');
-  result.carbs = extract('carbohydrate') || extract('carbs');
-  result.fiber = extract('fiber') || extract('fibre');
-  result.sugar = extract('sugar') || extract('sugars');
-  result.sodium = extract('sodium');
-  result.fat = extract('total fat') || extract('fat');
-
-  return result;
+  return extractNutritionFromText(stripHtml(section).replace(/\s+/g, ' '));
 }

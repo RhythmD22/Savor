@@ -1,0 +1,17 @@
+{
+  "name": "savor",
+  "version": "1.0.0",
+  "description": "Savor — Recipe Book & Health Tracker",
+  "type": "module",
+  "scripts": {
+    "build": "bash build-bundle.sh",
+    "lint": "npx eslint js/ api/ service-worker.js",
+    "test": "node --test tests/",
+    "start": "vercel dev"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0"
+  },
+  "license": "MIT"
+}
