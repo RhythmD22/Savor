@@ -38,6 +38,7 @@
 | Nutrition Goals | Set custom daily targets for calories, protein, carbs, and fat — progress bars update in real time |
 | Food Search | Search across Open Food Facts, USDA FoodData Central, and Spoonacular — proxied through a Vercel serverless function to keep API keys secure |
 | Health Dashboard | Weight logging with Chart.js trend visualization, BMI calculation, and TDEE estimation based on your profile |
+| Data Management | Export all data as a JSON backup (timestamped download), import a previously exported backup to restore, or reset all data with a confirmation dialog — all from the Health page |
 | Light / Dark Theme | System-aware `prefers-color-scheme` with floating manual toggle (sun/moon), persisted to `localStorage` |
 | Notebook Aesthetic | Ruled paper background with red margin line, paper grain texture, and warm gradient washes — like a Moleskine journal |
 | Custom Dialogs | Bottom-sheet modals with drag handle, keyboard support (Escape to close), and focus restoration |
@@ -45,7 +46,7 @@
 | Frosted Glass UI | `backdrop-filter: blur()` glassmorphism on cards, inputs, navigation, and the floating bottom bar |
 | Local Storage | All recipes, meal logs, weight entries, and profile data persisted in `localStorage` — no account, no server, no sign-up |
 | Responsive PWA | Mobile-first with a floating bottom nav bar; converts to a 240px sidebar on desktop (768px+) |
-| Accessibility | `role="dialog"`, `role="tablist"`, `aria-modal`, `aria-selected`, skip-to-main-content link, `:focus-visible` glow rings, `prefers-reduced-motion`, heading hierarchy, WCAG 2.1 AA color contrast |
+| Accessibility | WCAG 2.1 AA: `for` attributes on all form labels, `aria-hidden` on decorative SVGs, `role="tabpanel"` with `aria-labelledby`, `role="progressbar"` with `aria-valuenow/min/max` on macro bars, `aria-live` announcements on navigation, converter results, and toasts, focus trapping in dialogs, keyboard-accessible food search with Escape/close, visible `:focus-visible` indicators on inputs, nav items, and interactive controls, chart canvas with `role="img"` + `aria-label`, programmatic label-input associations, skip-to-main-content link |
 | No Build Step | Vanilla HTML, CSS, and JavaScript — no npm, no bundler, no framework; CSS `@layer` organization |
 
 ---
@@ -105,7 +106,7 @@ Savor/
 ├── js/
 │   ├── app.js                  # SPA router, navigation, page initialization
 │   ├── theme.js                # Light/dark theme persistence and toggle
-│   ├── data.js                 # localStorage CRUD (recipes, meal logs, weight entries, profile)
+│   ├── data.js                 # localStorage CRUD (recipes, meal logs, weight entries, profile) + export/import/reset
 │   ├── utils.js                # Shared utilities: toast, dialog, debounce, formatting
 │   ├── api.js                  # Client-side API: recipe extraction, food search (via serverless proxy)
 │   ├── index.js                # Dashboard: calorie ring, macro breakdown, recent recipes, meal log summary
@@ -113,7 +114,7 @@ Savor/
 │   ├── recipe-detail.js        # Recipe detail: nutrition, ingredients, instructions, log/delete actions
 │   ├── import.js               # Import page: URL extraction, manual create, API source status, cooking conversions tab
 │   ├── meal-log.js             # Food diary: date navigation, food search, meal entries, macro bars
-│   ├── health.js               # Health page: weight chart (Chart.js), profile, TDEE calculation
+│   ├── health.js               # Health page: weight chart (Chart.js), profile, TDEE, data export/import/reset
 │   ├── conversions.js          # Cooking unit converters (volume, weight, temperature, oven → air fryer)
 │   └── bundle.js               # Concatenated production bundle (all JS modules)
 ├── api/
@@ -152,6 +153,8 @@ The app is a single-page application. All views live as `<template>` elements in
 - Notebook paper aesthetic: ruled lines, red margin, paper grain — thematically appropriate for recipes and journaling
 - Floating bottom nav on mobile, sidebar on desktop — distinct from EcoFlow's edge-to-edge approach
 - Bottom-sheet dialogs instead of center modals — more natural on mobile
+- Focus trapping and Escape-key dismissal on all dialogs — keyboard-only navigation works end-to-end
+- Full WCAG 2.1 AA compliance — labels, roles, live regions, focus indicators, and chart accessibility
 
 ---
 
