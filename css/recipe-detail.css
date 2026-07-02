@@ -92,7 +92,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-sm) 0;
+  padding: var(--space-md) 0;
   border-bottom: 1px solid var(--glass-border);
   font-size: var(--text-sm);
 }
@@ -173,7 +173,7 @@
   font-size: var(--text-sm);
   color: var(--text-primary);
   line-height: 1.6;
-  padding-top: 3px;
+  padding-top: var(--space-xs);
 }
 
 .recipe-actions {

@@ -19,6 +19,7 @@ function showDialog({ title, content, actions } = {}) {
   const existing = document.querySelector('.dialog-overlay');
   if (existing) existing.remove();
   const previousFocus = document.activeElement;
+  const scrollY = window.scrollY;
 
   const overlay = document.createElement('div');
   overlay.className = 'dialog-overlay';
@@ -54,8 +55,9 @@ function showDialog({ title, content, actions } = {}) {
   const closeDialog = () => {
     overlay.remove();
     document.body.style.overflow = '';
+    window.scrollTo({ top: scrollY, behavior: 'instant' });
     if (previousFocus && typeof previousFocus.focus === 'function') {
-      previousFocus.focus();
+      previousFocus.focus({ preventScroll: true });
     }
   };
 
@@ -70,6 +72,19 @@ function showDialog({ title, content, actions } = {}) {
     if (e.key === 'Escape') {
       e.stopPropagation();
       closeDialog();
+      return;
+    }
+    if (e.key === 'Tab') {
+      const focusable = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 

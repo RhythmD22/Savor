@@ -80,6 +80,7 @@ function renderMealLog() {
   const calBar = document.getElementById('calorie-bar-fill');
   if (calBar) {
     calBar.style.width = `${calPercent}%`;
+    calBar.setAttribute('aria-valuenow', Math.round(calPercent));
     calBar.className = `progress-fill ${calPercent >= 100 ? 'progress-fill-warning' : 'progress-fill-brand'}`;
   }
 
@@ -87,17 +88,24 @@ function renderMealLog() {
   const carbsBar = document.getElementById('carbs-bar-fill');
   const fatBar = document.getElementById('fat-bar-fill');
 
+  const proteinGoal = profile.proteinGoal || 150;
+  const carbsGoal = profile.carbsGoal || 200;
+  const fatGoal = profile.fatGoal || 65;
+
   if (proteinBar) {
-    const pct = Math.min((totals.protein / (profile.proteinGoal || 150)) * 100, 100);
+    const pct = Math.min((totals.protein / proteinGoal) * 100, 100);
     proteinBar.style.width = `${pct}%`;
+    proteinBar.setAttribute('aria-valuenow', Math.round(pct));
   }
   if (carbsBar) {
-    const pct = Math.min((totals.carbs / (profile.carbsGoal || 200)) * 100, 100);
+    const pct = Math.min((totals.carbs / carbsGoal) * 100, 100);
     carbsBar.style.width = `${pct}%`;
+    carbsBar.setAttribute('aria-valuenow', Math.round(pct));
   }
   if (fatBar) {
-    const pct = Math.min((totals.fat / (profile.fatGoal || 65)) * 100, 100);
+    const pct = Math.min((totals.fat / fatGoal) * 100, 100);
     fatBar.style.width = `${pct}%`;
+    fatBar.setAttribute('aria-valuenow', Math.round(pct));
   }
 
   const barValues = {
@@ -140,7 +148,7 @@ function renderMealLog() {
               </div>
               <span class="meal-log-entry-calories">${formatNumber(e.calories)} cal</span>
               <button class="meal-log-entry-actions btn-icon-only" data-remove-entry="${e.id}" aria-label="Remove entry">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
               </button>
@@ -158,7 +166,7 @@ function renderMealLog() {
               ${entriesHTML}
             </div>
             <button class="add-food-btn" data-meal-type="${type}">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
               Add Food
@@ -198,6 +206,9 @@ function openFoodSearch(mealType) {
   overlay.innerHTML = `
     <div class="dialog-sheet food-search-dialog">
       <div class="dialog-handle"></div>
+      <button class="icon-btn dialog-close-btn" aria-label="Close search" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
       <div class="food-search-results" id="food-search-results">
         <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
@@ -215,6 +226,15 @@ function openFoodSearch(mealType) {
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) removeOverlay();
   });
+
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      removeOverlay();
+    }
+  });
+
+  const closeBtn = overlay.querySelector('.dialog-close-btn');
+  if (closeBtn) closeBtn.addEventListener('click', removeOverlay);
 
   const sheet = overlay.querySelector('.dialog-sheet');
   const handle = overlay.querySelector('.dialog-handle');

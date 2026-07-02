@@ -83,6 +83,17 @@ import { initHealth } from './health.js';
     window.scrollTo({ top: 0, behavior: 'instant' });
     root.setAttribute('tabindex', '-1');
     root.focus({ preventScroll: true });
+
+    const announcer = document.getElementById('nav-announcer') || (() => {
+      const el = document.createElement('div');
+      el.id = 'nav-announcer';
+      el.className = 'sr-only';
+      el.setAttribute('aria-live', 'assertive');
+      el.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(el);
+      return el;
+    })();
+    announcer.textContent = spec.heading;
   }
 
   function init() {

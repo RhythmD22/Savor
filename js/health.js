@@ -7,8 +7,11 @@ import {
   calculateTDEE,
   getWeightTrend,
   getDailyTotals,
+  resetAll,
+  exportData,
+  importData,
 } from './data.js';
-import { formatNumber, formatDecimal, showToast } from './utils.js';
+import { formatNumber, formatDecimal, showToast, showConfirm } from './utils.js';
 
 const LBS_PER_KG = 2.20462;
 
@@ -90,9 +93,12 @@ function renderHealthProfile() {
     }
   }
 
-  document.getElementById('profile-height')?.setAttribute('value', profile.height ? formatDecimal(inFromCm(profile.height)) : '');
-  document.getElementById('profile-weight')?.setAttribute('value', profile.weight ? formatDecimal(toLbs(profile.weight)) : '');
-  document.getElementById('profile-age')?.setAttribute('value', profile.age || '');
+  const heightEl = document.getElementById('profile-height');
+  if (heightEl) heightEl.value = profile.height ? formatDecimal(inFromCm(profile.height)) : '';
+  const weightEl = document.getElementById('profile-weight');
+  if (weightEl) weightEl.value = profile.weight ? formatDecimal(toLbs(profile.weight)) : '';
+  const ageEl = document.getElementById('profile-age');
+  if (ageEl) ageEl.value = profile.age || '';
 
   const genderSelect = document.getElementById('profile-gender');
   if (genderSelect) genderSelect.value = profile.gender || '';
@@ -101,11 +107,14 @@ function renderHealthProfile() {
   if (activitySelect) activitySelect.value = profile.activityLevel || 'moderate';
 
   const calGoal = document.getElementById('profile-calorie-goal');
-  if (calGoal) calGoal.setAttribute('value', profile.calorieGoal || 2000);
+  if (calGoal) calGoal.value = profile.calorieGoal || 2000;
 
-  document.getElementById('profile-protein-goal')?.setAttribute('value', profile.proteinGoal || 150);
-  document.getElementById('profile-carbs-goal')?.setAttribute('value', profile.carbsGoal || 200);
-  document.getElementById('profile-fat-goal')?.setAttribute('value', profile.fatGoal || 65);
+  const proteinGoalEl = document.getElementById('profile-protein-goal');
+  if (proteinGoalEl) proteinGoalEl.value = profile.proteinGoal || 150;
+  const carbsGoalEl = document.getElementById('profile-carbs-goal');
+  if (carbsGoalEl) carbsGoalEl.value = profile.carbsGoal || 200;
+  const fatGoalEl = document.getElementById('profile-fat-goal');
+  if (fatGoalEl) fatGoalEl.value = profile.fatGoal || 65;
 }
 
 function calcBMI(profile) {
@@ -182,7 +191,7 @@ function renderWeightChart(log) {
     return;
   }
 
-  chartContainer.innerHTML = '<canvas id="weightCanvas"></canvas>';
+  chartContainer.innerHTML = '<canvas id="weightCanvas" role="img" aria-label="Weight trend chart"></canvas>';
 
   if (typeof Chart === 'undefined') {
     setTimeout(() => {
@@ -330,7 +339,7 @@ function bindEvents() {
       const tdee = calculateTDEE();
       if (tdee && !document.getElementById('profile-calorie-goal')?.value) {
         const calGoalEl = document.getElementById('profile-calorie-goal');
-        if (calGoalEl) calGoalEl.setAttribute('value', tdee);
+        if (calGoalEl) calGoalEl.value = tdee;
       }
     });
   }
@@ -369,6 +378,64 @@ function bindEvents() {
       showToast('Entry deleted');
       renderHealthProfile();
       renderWeightLog();
+    });
+  }
+
+  const exportBtn = document.getElementById('btn-export-data');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const json = exportData();
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `savor-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Data exported', 'success');
+    });
+  }
+
+  const importBtn = document.getElementById('btn-import-data');
+  if (importBtn) {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.hidden = true;
+    document.body.appendChild(fileInput);
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        showConfirm('Import data from this file? Your current data will be replaced.', () => {
+          try {
+            importData(reader.result);
+            showToast('Data imported successfully', 'success');
+            renderHealthProfile();
+            renderWeightLog();
+          } catch (err) {
+            showToast(err.message || 'Failed to import data', 'error');
+          }
+        });
+        fileInput.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    importBtn.addEventListener('click', () => fileInput.click());
+  }
+
+  const resetBtn = document.getElementById('btn-reset-data');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      showConfirm('Delete all your recipes, meal logs, weight entries, and profile? This cannot be undone.', () => {
+        resetAll();
+        showToast('All data has been reset');
+        renderHealthProfile();
+        renderWeightLog();
+      });
     });
   }
 }

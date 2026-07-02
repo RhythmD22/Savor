@@ -153,7 +153,7 @@
 
       <div class="hero-calorie-ring">
         <div class="ring-container">
-          <svg class="ring-svg" viewBox="0 0 180 180">
+          <svg class="ring-svg" viewBox="0 0 180 180" aria-hidden="true">
             <circle class="ring-bg" cx="90" cy="90" r="80" />
             <circle class="ring-fill" id="calorie-ring-fill" cx="90" cy="90" r="80" />
           </svg>
@@ -216,7 +216,7 @@
       <div class="recipe-filters">
         <button class="filter-chip active" data-filter="all">All</button>
         <button class="filter-chip" data-filter="favorites">
-          <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="chip-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon
               points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
@@ -253,7 +253,7 @@
 
       <div class="recipe-info-bar">
         <div class="recipe-info-item">
-          <svg class="recipe-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg class="recipe-info-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
@@ -262,7 +262,7 @@
           <div class="recipe-info-label">Prep</div>
         </div>
         <div class="recipe-info-item">
-          <svg class="recipe-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg class="recipe-info-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
             <path d="M12 2a10 10 0 0 0 0 20" />
@@ -272,7 +272,7 @@
           <div class="recipe-info-label">Cook</div>
         </div>
         <div class="recipe-info-item">
-          <svg class="recipe-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg class="recipe-info-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
@@ -283,7 +283,7 @@
           <div class="recipe-info-label">Serves</div>
         </div>
         <div class="recipe-info-item">
-          <svg class="recipe-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg class="recipe-info-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8h1a4 4 0 1 1 0 8h-1" />
             <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
@@ -299,7 +299,7 @@
       <div class="recipe-actions">
         <button class="btn btn-primary" id="btn-cook-recipe">Log This Recipe</button>
         <button class="btn btn-icon-only btn-secondary" id="btn-favorite" aria-label="Add to favorites">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <polygon
               points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -323,7 +323,7 @@
       </div>
 
       <a class="recipe-source-link" id="recipe-source-link" href="#" target="_blank" rel="noopener noreferrer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
           <polyline points="15 3 21 3 21 9" />
@@ -347,14 +347,14 @@
       <div class="page-content">
 
       <div class="import-tabs" role="tablist" aria-label="Import method">
-        <button class="import-tab active" data-tab="url" role="tab" aria-selected="true">From URL</button>
-        <button class="import-tab" data-tab="manual" role="tab" aria-selected="false">Create Manually</button>
-        <button class="import-tab" data-tab="api" role="tab" aria-selected="false">API</button>
-        <button class="import-tab" data-tab="convert" role="tab" aria-selected="false">Convert</button>
+        <button class="import-tab active" id="tab-url" data-tab="url" role="tab" aria-selected="true">From URL</button>
+        <button class="import-tab" id="tab-manual" data-tab="manual" role="tab" aria-selected="false">Create Manually</button>
+        <button class="import-tab" id="tab-api" data-tab="api" role="tab" aria-selected="false">API</button>
+        <button class="import-tab" id="tab-convert" data-tab="convert" role="tab" aria-selected="false">Convert</button>
       </div>
 
       <!-- URL Import -->
-      <div class="import-tab-content active" data-tab="url">
+      <div class="import-tab-content active" data-tab="url" role="tabpanel" aria-labelledby="tab-url">
         <div class="import-url-section">
           <p class="text-sm text-secondary">Paste a link from any recipe website or food blog to automatically extract
             ingredients, instructions, and nutrition info.</p>
@@ -378,43 +378,43 @@
 
           <form class="import-form" onsubmit="return false">
             <div class="import-form-field">
-              <label class="import-form-label">Title</label>
+              <label class="import-form-label" for="edit-title">Title</label>
               <input type="text" class="glass-input" id="edit-title">
             </div>
             <div class="import-form-field">
-              <label class="import-form-label">Description</label>
+              <label class="import-form-label" for="edit-description">Description</label>
               <textarea class="glass-textarea" id="edit-description" rows="2"></textarea>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md)">
               <div class="import-form-field">
-                <label class="import-form-label">Servings</label>
+                <label class="import-form-label" for="edit-servings">Servings</label>
                 <input type="number" class="glass-input" id="edit-servings" min="1">
               </div>
               <div class="import-form-field">
-                <label class="import-form-label">Prep (min)</label>
+                <label class="import-form-label" for="edit-prep-time">Prep (min)</label>
                 <input type="number" class="glass-input" id="edit-prep-time" min="0">
               </div>
               <div class="import-form-field">
-                <label class="import-form-label">Cook (min)</label>
+                <label class="import-form-label" for="edit-cook-time">Cook (min)</label>
                 <input type="number" class="glass-input" id="edit-cook-time" min="0">
               </div>
             </div>
 
             <h3 class="section-title mt-md" style="font-size:var(--text-base)">Nutrition (per serving)</h3>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
-              <div class="import-form-field"><label class="import-form-label">Calories</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-calories">Calories</label><input type="number"
                   class="glass-input" id="edit-calories" min="0"></div>
-              <div class="import-form-field"><label class="import-form-label">Protein (g)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-protein">Protein (g)</label><input type="number"
                   class="glass-input" id="edit-protein" min="0" step="0.1"></div>
-              <div class="import-form-field"><label class="import-form-label">Carbs (g)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-carbs">Carbs (g)</label><input type="number"
                   class="glass-input" id="edit-carbs" min="0" step="0.1"></div>
-              <div class="import-form-field"><label class="import-form-label">Fat (g)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-fat">Fat (g)</label><input type="number"
                   class="glass-input" id="edit-fat" min="0" step="0.1"></div>
-              <div class="import-form-field"><label class="import-form-label">Fiber (g)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-fiber">Fiber (g)</label><input type="number"
                   class="glass-input" id="edit-fiber" min="0" step="0.1"></div>
-              <div class="import-form-field"><label class="import-form-label">Sugar (g)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-sugar">Sugar (g)</label><input type="number"
                   class="glass-input" id="edit-sugar" min="0" step="0.1"></div>
-              <div class="import-form-field"><label class="import-form-label">Sodium (mg)</label><input type="number"
+              <div class="import-form-field"><label class="import-form-label" for="edit-sodium">Sodium (mg)</label><input type="number"
                   class="glass-input" id="edit-sodium" min="0"></div>
             </div>
 
@@ -422,7 +422,7 @@
               <label class="import-form-label">Ingredients</label>
               <div class="import-ingredients-editor" id="ingredients-editor"></div>
               <button type="button" class="import-add-btn" id="btn-add-ingredient">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -434,7 +434,7 @@
               <label class="import-form-label">Instructions</label>
               <div class="import-ingredients-editor" id="instructions-editor"></div>
               <button type="button" class="import-add-btn" id="btn-add-instruction">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -444,15 +444,15 @@
 
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md)">
               <div class="import-form-field">
-                <label class="import-form-label">Tags (comma)</label>
+                <label class="import-form-label" for="edit-tags">Tags (comma)</label>
                 <input type="text" class="glass-input" id="edit-tags" placeholder="vegan, salad">
               </div>
               <div class="import-form-field">
-                <label class="import-form-label">Cuisine</label>
+                <label class="import-form-label" for="edit-cuisine">Cuisine</label>
                 <input type="text" class="glass-input" id="edit-cuisine" placeholder="Italian">
               </div>
               <div class="import-form-field">
-                <label class="import-form-label">Meal Type</label>
+                <label class="import-form-label" for="edit-meal-type">Meal Type</label>
                 <select class="glass-input" id="edit-meal-type" style="appearance:auto;-webkit-appearance:auto">
                   <option value="">—</option>
                   <option value="breakfast">Breakfast</option>
@@ -472,51 +472,51 @@
       </div>
 
       <!-- Manual Create -->
-      <div class="import-tab-content" data-tab="manual">
+      <div class="import-tab-content" data-tab="manual" role="tabpanel" aria-labelledby="tab-manual">
         <form class="import-form" id="manual-recipe-form">
           <p class="text-sm text-secondary">Create a recipe from scratch with custom ingredients and instructions.</p>
 
           <div class="import-form-field">
-            <label class="import-form-label">Title *</label>
+            <label class="import-form-label" for="manual-title">Title *</label>
             <input type="text" class="glass-input" id="manual-title" placeholder="Recipe name" required>
           </div>
           <div class="import-form-field">
-            <label class="import-form-label">Description</label>
+            <label class="import-form-label" for="manual-description">Description</label>
             <textarea class="glass-textarea" id="manual-description" rows="2"
               placeholder="Brief description"></textarea>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md)">
-            <div class="import-form-field"><label class="import-form-label">Servings</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-servings">Servings</label><input type="number"
                 class="glass-input" id="manual-servings" min="1" value="4"></div>
-            <div class="import-form-field"><label class="import-form-label">Prep (min)</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-prep-time">Prep (min)</label><input type="number"
                 class="glass-input" id="manual-prep-time" min="0" value="15"></div>
-            <div class="import-form-field"><label class="import-form-label">Cook (min)</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-cook-time">Cook (min)</label><input type="number"
                 class="glass-input" id="manual-cook-time" min="0" value="30"></div>
           </div>
 
           <h3 class="section-title mt-md" style="font-size:var(--text-base)">Nutrition (per serving)</h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
-            <div class="import-form-field"><label class="import-form-label">Calories</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-calories">Calories</label><input type="number"
                 class="glass-input" id="manual-calories" min="0"></div>
-            <div class="import-form-field"><label class="import-form-label">Protein (g)</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-protein">Protein (g)</label><input type="number"
                 class="glass-input" id="manual-protein" min="0" step="0.1"></div>
-            <div class="import-form-field"><label class="import-form-label">Carbs (g)</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-carbs">Carbs (g)</label><input type="number"
                 class="glass-input" id="manual-carbs" min="0" step="0.1"></div>
-            <div class="import-form-field"><label class="import-form-label">Fat (g)</label><input type="number"
+            <div class="import-form-field"><label class="import-form-label" for="manual-fat">Fat (g)</label><input type="number"
                 class="glass-input" id="manual-fat" min="0" step="0.1"></div>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
             <div class="import-form-field">
-              <label class="import-form-label">Tags</label>
+              <label class="import-form-label" for="manual-tags">Tags</label>
               <input type="text" class="glass-input" id="manual-tags" placeholder="vegan, healthy">
             </div>
             <div class="import-form-field">
-              <label class="import-form-label">Cuisine</label>
+              <label class="import-form-label" for="manual-cuisine">Cuisine</label>
               <input type="text" class="glass-input" id="manual-cuisine" placeholder="Italian">
             </div>
             <div class="import-form-field">
-              <label class="import-form-label">Meal Type</label>
+              <label class="import-form-label" for="manual-meal-type">Meal Type</label>
               <select class="glass-input" id="manual-meal-type" style="appearance:auto;-webkit-appearance:auto">
                 <option value="">—</option>
                 <option value="breakfast">Breakfast</option>
@@ -532,7 +532,7 @@
       </div>
 
       <!-- API -->
-      <div class="import-tab-content" data-tab="api">
+      <div class="import-tab-content" data-tab="api" role="tabpanel" aria-labelledby="tab-api">
         <div class="import-api-select">
           <p class="text-sm text-secondary">Food search results come from Open Food Facts, USDA FoodData Central, and Spoonacular — all proxied through the server to keep API keys secure.</p>
 
@@ -565,13 +565,13 @@
       </div>
 
       <!-- Convert -->
-      <div class="import-tab-content" data-tab="convert">
+      <div class="import-tab-content" data-tab="convert" role="tabpanel" aria-labelledby="tab-convert">
         <div class="conversions-grid">
 
           <!-- Volume Converter -->
           <div class="converter-card glass glass-card">
             <div class="converter-card-header">
-              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 2h12l4 6-4 14H6L2 8z"/>
               </svg>
               <span class="converter-card-title">Volume</span>
@@ -587,13 +587,13 @@
                 <option value="liter">Liters</option>
               </select>
             </div>
-            <div class="converter-result" id="conv-vol-result"></div>
+            <div class="converter-result" id="conv-vol-result" aria-live="polite"></div>
           </div>
 
           <!-- Weight Converter -->
           <div class="converter-card glass glass-card">
             <div class="converter-card-header">
-              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="3" x2="12" y2="13"/><line x1="3" y1="13" x2="21" y2="13"/><polyline points="6 13 3 19 9 19"/><polyline points="18 13 21 19 15 19"/>
               </svg>
               <span class="converter-card-title">Weight</span>
@@ -607,13 +607,13 @@
                 <option value="kg">Kilograms</option>
               </select>
             </div>
-            <div class="converter-result" id="conv-wt-result"></div>
+            <div class="converter-result" id="conv-wt-result" aria-live="polite"></div>
           </div>
 
           <!-- Temperature Converter -->
           <div class="converter-card glass glass-card">
             <div class="converter-card-header">
-              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="6" x2="12.01" y2="6"/>
               </svg>
               <span class="converter-card-title">Temperature</span>
@@ -625,13 +625,13 @@
                 <option value="C">&deg;C</option>
               </select>
             </div>
-            <div class="converter-result" id="conv-temp-result"></div>
+            <div class="converter-result" id="conv-temp-result" aria-live="polite"></div>
           </div>
 
           <!-- Common Equivalents -->
           <div class="converter-card glass glass-card">
             <div class="converter-card-header">
-              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
               </svg>
               <span class="converter-card-title">Quick Reference</span>
@@ -653,18 +653,18 @@
           <!-- Oven → Air Fryer -->
           <div class="converter-card glass glass-card wide">
             <div class="converter-card-header">
-              <svg class="converter-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="6" width="18" height="16" rx="2"/><rect x="8" y="10" width="8" height="6" rx="1"/><line x1="8" y1="17" x2="16" y2="17"/><path d="M5 3v3M12 3v3M19 3v3"/>
               </svg>
               <span class="converter-card-title">Oven &rarr; Air Fryer</span>
             </div>
             <div class="airfryer-dual-input">
               <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
-                <label>Oven Temp (&deg;F)</label>
+                <label for="conv-oven-temp">Oven Temp (&deg;F)</label>
                 <input type="number" class="glass-input" id="conv-oven-temp" placeholder="350" min="0" max="550">
               </div>
               <div class="airfryer-arrow">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
               </div>
@@ -677,11 +677,11 @@
             </div>
             <div class="airfryer-dual-input">
               <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
-                <label>Oven Time (min)</label>
+                <label for="conv-oven-time">Oven Time (min)</label>
                 <input type="number" class="glass-input" id="conv-oven-time" placeholder="30" min="1" max="600">
               </div>
               <div class="airfryer-arrow">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
               </div>
@@ -709,14 +709,14 @@
 
       <div class="date-selector">
         <button class="date-nav" id="btn-date-prev" aria-label="Previous day">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
         <span class="date-display" id="meal-log-date">Today</span>
         <button class="date-nav" id="btn-date-next" aria-label="Next day">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6" />
           </svg>
@@ -750,7 +750,7 @@
                 id="bar-cal-goal">2000</span></span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill progress-fill-brand" id="calorie-bar-fill" style="width:0%"></div>
+            <div class="progress-fill progress-fill-brand" id="calorie-bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Calorie progress" style="width:0%"></div>
           </div>
         </div>
         <div class="summary-bar">
@@ -760,7 +760,7 @@
                 id="bar-protein-goal">150</span>g</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill progress-fill-protein" id="protein-bar-fill" style="width:0%"></div>
+            <div class="progress-fill progress-fill-protein" id="protein-bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Protein progress" style="width:0%"></div>
           </div>
         </div>
         <div class="summary-bar">
@@ -770,7 +770,7 @@
                 id="bar-carbs-goal">200</span>g</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill progress-fill-carbs" id="carbs-bar-fill" style="width:0%"></div>
+            <div class="progress-fill progress-fill-carbs" id="carbs-bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Carbs progress" style="width:0%"></div>
           </div>
         </div>
         <div class="summary-bar">
@@ -780,7 +780,7 @@
                 id="bar-fat-goal">65</span>g</span>
           </div>
           <div class="progress-bar">
-            <div class="progress-fill progress-fill-fat" id="fat-bar-fill" style="width:0%"></div>
+            <div class="progress-fill progress-fill-fat" id="fat-bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Fat progress" style="width:0%"></div>
           </div>
         </div>
       </div>
@@ -799,7 +799,7 @@
         <h2 class="section-title">Overview</h2>
         <div class="health-metrics">
           <div class="health-metric-card glass glass-card">
-            <svg class="health-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 3h18v18H3z" />
               <path d="M3 9h18" />
@@ -810,7 +810,7 @@
             <div class="health-metric-change" id="health-weight-trend">—</div>
           </div>
           <div class="health-metric-card glass glass-card">
-            <svg class="health-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="20" x2="12" y2="10" />
               <line x1="18" y1="20" x2="18" y2="4" />
@@ -820,7 +820,7 @@
             <div class="health-metric-label">Height</div>
           </div>
           <div class="health-metric-card glass glass-card">
-            <svg class="health-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M8 8h8v2H8z" />
@@ -831,7 +831,7 @@
             <div class="health-metric-category" id="health-bmi-category"></div>
           </div>
           <div class="health-metric-card glass glass-card">
-            <svg class="health-metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
@@ -850,6 +850,7 @@
       <div class="page-section">
         <h2 class="section-title">Weight Log</h2>
         <form class="add-weight-form" id="add-weight-form">
+          <label class="sr-only" for="new-weight-input">Weight</label>
           <input type="number" class="glass-input" id="new-weight-input" placeholder="Enter weight (lbs)" step="0.1"
             min="10" max="300">
           <button type="submit" class="btn btn-primary weight-add-btn">Log</button>
@@ -863,21 +864,21 @@
         <form class="profile-form" id="health-profile-form">
           <div class="profile-input-group">
             <div class="profile-field flex-1">
-              <label class="profile-label">Height (in)</label>
+              <label class="profile-label" for="profile-height">Height (in)</label>
               <input type="number" class="glass-input" id="profile-height" min="20" max="100" step="0.1">
             </div>
             <div class="profile-field flex-1">
-              <label class="profile-label">Weight (lbs)</label>
+              <label class="profile-label" for="profile-weight">Weight (lbs)</label>
               <input type="number" class="glass-input" id="profile-weight" min="10" max="300" step="0.1">
             </div>
           </div>
           <div class="profile-input-group">
             <div class="profile-field flex-1">
-              <label class="profile-label">Age</label>
+              <label class="profile-label" for="profile-age">Age</label>
               <input type="number" class="glass-input" id="profile-age" min="1" max="120">
             </div>
             <div class="profile-field flex-1">
-              <label class="profile-label">Gender</label>
+              <label class="profile-label" for="profile-gender">Gender</label>
               <select class="glass-input" id="profile-gender" style="appearance:auto;-webkit-appearance:auto">
                 <option value="">—</option>
                 <option value="male">Male</option>
@@ -886,7 +887,7 @@
             </div>
           </div>
           <div class="profile-field">
-            <label class="profile-label">Activity Level</label>
+            <label class="profile-label" for="profile-activity">Activity Level</label>
             <select class="glass-input" id="profile-activity" style="appearance:auto;-webkit-appearance:auto">
               <option value="sedentary">Sedentary — little or no exercise</option>
               <option value="light">Light — 1-3 days/week</option>
@@ -899,27 +900,57 @@
           <h3 class="section-title mt-md" style="font-size:var(--text-base)">Daily Goals</h3>
           <div class="profile-input-group">
             <div class="profile-field flex-1">
-              <label class="profile-label">Calories</label>
+              <label class="profile-label" for="profile-calorie-goal">Calories</label>
               <input type="number" class="glass-input" id="profile-calorie-goal" min="500" max="10000">
             </div>
             <div class="profile-field flex-1">
-              <label class="profile-label">Protein (g)</label>
+              <label class="profile-label" for="profile-protein-goal">Protein (g)</label>
               <input type="number" class="glass-input" id="profile-protein-goal" min="0" max="500">
             </div>
           </div>
           <div class="profile-input-group">
             <div class="profile-field flex-1">
-              <label class="profile-label">Carbs (g)</label>
+              <label class="profile-label" for="profile-carbs-goal">Carbs (g)</label>
               <input type="number" class="glass-input" id="profile-carbs-goal" min="0" max="1000">
             </div>
             <div class="profile-field flex-1">
-              <label class="profile-label">Fat (g)</label>
+              <label class="profile-label" for="profile-fat-goal">Fat (g)</label>
               <input type="number" class="glass-input" id="profile-fat-goal" min="0" max="500">
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block mt-md">Save Profile</button>
         </form>
+      </div>
+
+      <div class="page-section">
+        <h2 class="section-title">Data</h2>
+        <p class="text-sm text-secondary data-section-desc">Export your recipes, meal log, weight entries, and profile as a JSON backup, import a previous backup, or reset everything to start fresh.</p>
+        <div class="glass glass-card data-section-actions">
+          <button class="btn btn-secondary btn-block" id="btn-export-data">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Data as JSON
+          </button>
+          <button class="btn btn-secondary btn-block" id="btn-import-data">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Import Data from JSON
+          </button>
+          <button class="btn btn-danger btn-block" id="btn-reset-data">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            Reset All Data
+          </button>
+        </div>
       </div>
 
     </div>

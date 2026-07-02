@@ -70,6 +70,7 @@
     const existing = document.querySelector('.dialog-overlay');
     if (existing) existing.remove();
     const previousFocus = document.activeElement;
+  const scrollY = window.scrollY;
 
     const overlay = document.createElement('div');
     overlay.className = 'dialog-overlay';
@@ -105,8 +106,9 @@
     const closeDialog = () => {
       overlay.remove();
       document.body.style.overflow = '';
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
       if (previousFocus && typeof previousFocus.focus === 'function') {
-        previousFocus.focus();
+        previousFocus.focus({ preventScroll: true });
       }
     };
 
@@ -121,6 +123,19 @@
       if (e.key === 'Escape') {
         e.stopPropagation();
         closeDialog();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusable = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
 
@@ -480,6 +495,33 @@
       daysDiff: Math.round(daysDiff),
       weeklyRate: daysDiff >= 7 ? Math.round((weightDiff / (daysDiff / 7)) * 100) / 100 : null,
     };
+  }
+
+  function resetAll() {
+    localStorage.removeItem(STORAGE_KEY);
+    _data = load();
+  }
+
+  function exportData() {
+    return JSON.stringify(getData(), null, 2);
+  }
+
+  function importData(jsonString) {
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch {
+      throw new Error('Invalid JSON file');
+    }
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Invalid data format');
+    }
+    if (!parsed.version) {
+      throw new Error('Missing data version');
+    }
+    const merged = { ...structuredClone(defaults), ...parsed };
+    _data = merged;
+    saveData();
   }
 
   // ============================================================
@@ -1844,6 +1886,7 @@
     const calBar = document.getElementById('calorie-bar-fill');
     if (calBar) {
       calBar.style.width = `${calPercent}%`;
+      calBar.setAttribute('aria-valuenow', Math.round(calPercent));
       calBar.className = `progress-fill ${calPercent >= 100 ? 'progress-fill-warning' : 'progress-fill-brand'}`;
     }
 
@@ -1851,17 +1894,24 @@
     const carbsBar = document.getElementById('carbs-bar-fill');
     const fatBar = document.getElementById('fat-bar-fill');
 
+    const proteinGoal = profile.proteinGoal || 150;
+    const carbsGoal = profile.carbsGoal || 200;
+    const fatGoal = profile.fatGoal || 65;
+
     if (proteinBar) {
-      const pct = Math.min((totals.protein / (profile.proteinGoal || 150)) * 100, 100);
+      const pct = Math.min((totals.protein / proteinGoal) * 100, 100);
       proteinBar.style.width = `${pct}%`;
+      proteinBar.setAttribute('aria-valuenow', Math.round(pct));
     }
     if (carbsBar) {
-      const pct = Math.min((totals.carbs / (profile.carbsGoal || 200)) * 100, 100);
+      const pct = Math.min((totals.carbs / carbsGoal) * 100, 100);
       carbsBar.style.width = `${pct}%`;
+      carbsBar.setAttribute('aria-valuenow', Math.round(pct));
     }
     if (fatBar) {
-      const pct = Math.min((totals.fat / (profile.fatGoal || 65)) * 100, 100);
+      const pct = Math.min((totals.fat / fatGoal) * 100, 100);
       fatBar.style.width = `${pct}%`;
+      fatBar.setAttribute('aria-valuenow', Math.round(pct));
     }
 
     const barValues = {
@@ -1904,7 +1954,7 @@
                 </div>
                 <span class="meal-log-entry-calories">${formatNumber(e.calories)} cal</span>
                 <button class="meal-log-entry-actions btn-icon-only" data-remove-entry="${e.id}" aria-label="Remove entry">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                   </svg>
                 </button>
@@ -1922,7 +1972,7 @@
                 ${entriesHTML}
               </div>
               <button class="add-food-btn" data-meal-type="${type}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Add Food
@@ -1962,6 +2012,9 @@
     overlay.innerHTML = `
       <div class="dialog-sheet food-search-dialog">
         <div class="dialog-handle"></div>
+        <button class="icon-btn dialog-close-btn" aria-label="Close search" style="position:absolute;top:var(--space-md);right:var(--space-md)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
         <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
         <div class="food-search-results" id="food-search-results">
           <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
@@ -1979,6 +2032,15 @@
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) removeOverlay();
     });
+
+    overlay.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        removeOverlay();
+      }
+    });
+
+    const closeBtn = overlay.querySelector('.dialog-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', removeOverlay);
 
     const sheet = overlay.querySelector('.dialog-sheet');
     const handle = overlay.querySelector('.dialog-handle');
@@ -2173,9 +2235,12 @@
       }
     }
 
-    document.getElementById('profile-height')?.setAttribute('value', profile.height ? formatDecimal(inFromCm(profile.height)) : '');
-    document.getElementById('profile-weight')?.setAttribute('value', profile.weight ? formatDecimal(toLbs(profile.weight)) : '');
-    document.getElementById('profile-age')?.setAttribute('value', profile.age || '');
+    const heightEl = document.getElementById('profile-height');
+    if (heightEl) heightEl.value = profile.height ? formatDecimal(inFromCm(profile.height)) : '';
+    const weightEl = document.getElementById('profile-weight');
+    if (weightEl) weightEl.value = profile.weight ? formatDecimal(toLbs(profile.weight)) : '';
+    const ageEl = document.getElementById('profile-age');
+    if (ageEl) ageEl.value = profile.age || '';
 
     const genderSelect = document.getElementById('profile-gender');
     if (genderSelect) genderSelect.value = profile.gender || '';
@@ -2184,11 +2249,14 @@
     if (activitySelect) activitySelect.value = profile.activityLevel || 'moderate';
 
     const calGoal = document.getElementById('profile-calorie-goal');
-    if (calGoal) calGoal.setAttribute('value', profile.calorieGoal || 2000);
+    if (calGoal) calGoal.value = profile.calorieGoal || 2000;
 
-    document.getElementById('profile-protein-goal')?.setAttribute('value', profile.proteinGoal || 150);
-    document.getElementById('profile-carbs-goal')?.setAttribute('value', profile.carbsGoal || 200);
-    document.getElementById('profile-fat-goal')?.setAttribute('value', profile.fatGoal || 65);
+    const proteinGoalEl = document.getElementById('profile-protein-goal');
+    if (proteinGoalEl) proteinGoalEl.value = profile.proteinGoal || 150;
+    const carbsGoalEl = document.getElementById('profile-carbs-goal');
+    if (carbsGoalEl) carbsGoalEl.value = profile.carbsGoal || 200;
+    const fatGoalEl = document.getElementById('profile-fat-goal');
+    if (fatGoalEl) fatGoalEl.value = profile.fatGoal || 65;
   }
 
   function calcBMI(profile) {
@@ -2265,7 +2333,7 @@
       return;
     }
 
-    chartContainer.innerHTML = '<canvas id="weightCanvas"></canvas>';
+    chartContainer.innerHTML = '<canvas id="weightCanvas" role="img" aria-label="Weight trend chart"></canvas>';
 
     if (typeof Chart === 'undefined') {
       setTimeout(() => {
@@ -2413,7 +2481,7 @@
         const tdee = calculateTDEE();
         if (tdee && !document.getElementById('profile-calorie-goal')?.value) {
           const calGoalEl = document.getElementById('profile-calorie-goal');
-          if (calGoalEl) calGoalEl.setAttribute('value', tdee);
+          if (calGoalEl) calGoalEl.value = tdee;
         }
       });
     }
@@ -2452,6 +2520,64 @@
         showToast('Entry deleted');
         renderHealthProfile();
         renderWeightLog();
+      });
+    }
+
+    const exportBtn = document.getElementById('btn-export-data');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const json = exportData();
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `savor-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Data exported', 'success');
+      });
+    }
+
+    const importBtn = document.getElementById('btn-import-data');
+    if (importBtn) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.hidden = true;
+      document.body.appendChild(fileInput);
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          showConfirm('Import data from this file? Your current data will be replaced.', () => {
+            try {
+              importData(reader.result);
+              showToast('Data imported successfully', 'success');
+              renderHealthProfile();
+              renderWeightLog();
+            } catch (err) {
+              showToast(err.message || 'Failed to import data', 'error');
+            }
+          });
+          fileInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      importBtn.addEventListener('click', () => fileInput.click());
+    }
+
+    const resetBtn = document.getElementById('btn-reset-data');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        showConfirm('Delete all your recipes, meal logs, weight entries, and profile? This cannot be undone.', () => {
+          resetAll();
+          showToast('All data has been reset');
+          renderHealthProfile();
+          renderWeightLog();
+        });
       });
     }
   }
@@ -2686,6 +2812,17 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     root.setAttribute('tabindex', '-1');
     root.focus({ preventScroll: true });
+
+    const announcer = document.getElementById('nav-announcer') || (() => {
+      const el = document.createElement('div');
+      el.id = 'nav-announcer';
+      el.className = 'sr-only';
+      el.setAttribute('aria-live', 'assertive');
+      el.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(el);
+      return el;
+    })();
+    announcer.textContent = spec.heading;
   }
 
   function init() {

@@ -256,6 +256,33 @@ function getWeightTrend() {
   };
 }
 
+function resetAll() {
+  localStorage.removeItem(STORAGE_KEY);
+  _data = load();
+}
+
+function exportData() {
+  return JSON.stringify(getData(), null, 2);
+}
+
+function importData(jsonString) {
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonString);
+  } catch {
+    throw new Error('Invalid JSON file');
+  }
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Invalid data format');
+  }
+  if (!parsed.version) {
+    throw new Error('Missing data version');
+  }
+  const merged = { ...structuredClone(defaults), ...parsed };
+  _data = merged;
+  saveData();
+}
+
 export {
   getData,
   saveData,
@@ -280,4 +307,7 @@ export {
   calculateTDEE,
   getWeightTrend,
   formatDate,
+  resetAll,
+  exportData,
+  importData,
 };
