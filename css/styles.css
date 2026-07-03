@@ -764,6 +764,11 @@
     appearance: auto;
     -webkit-appearance: auto;
   }
+
+  select.glass-input {
+    padding-top: 14.5px;
+    padding-bottom: 14.5px;
+  }
 }
 
 /* ── BUTTONS ───────────────────────────────────────────── */

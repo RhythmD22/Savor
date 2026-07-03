@@ -782,7 +782,7 @@
               </div>
             </div>
 
-            <!-- Oven → Air Fryer -->
+            <!-- Oven ↔ Air Fryer -->
             <div class="converter-card glass glass-card wide">
               <div class="converter-card-header">
                 <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
@@ -792,10 +792,10 @@
                   <line x1="8" y1="17" x2="16" y2="17" />
                   <path d="M5 3v3M12 3v3M19 3v3" />
                 </svg>
-                <span class="converter-card-title">Oven &rarr; Air Fryer</span>
+                <span class="converter-card-title">Oven &harr; Air Fryer</span>
               </div>
               <div class="airfryer-dual-input">
-                <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <div class="converter-input-group converter-input-group-stacked">
                   <label for="conv-oven-temp">Oven Temp (&deg;F)</label>
                   <input type="number" class="glass-input" id="conv-oven-temp" placeholder="350" min="0" max="550">
                 </div>
@@ -806,15 +806,13 @@
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
                 </div>
-                <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
-                  <label>Air Fryer Temp</label>
-                  <div class="converter-result" style="min-height:42px;display:flex;align-items:center">
-                    <strong id="conv-af-temp">&mdash;</strong>
-                  </div>
+                <div class="converter-input-group converter-input-group-stacked">
+                  <label for="conv-af-temp">Air Fryer Temp</label>
+                  <input type="number" class="glass-input" id="conv-af-temp" placeholder="325" min="0" max="550">
                 </div>
               </div>
               <div class="airfryer-dual-input">
-                <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
+                <div class="converter-input-group converter-input-group-stacked">
                   <label for="conv-oven-time">Oven Time (min)</label>
                   <input type="number" class="glass-input" id="conv-oven-time" placeholder="30" min="1" max="600">
                 </div>
@@ -825,14 +823,12 @@
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
                 </div>
-                <div class="converter-input-group" style="flex-direction:column;align-items:stretch">
-                  <label>Air Fryer Time</label>
-                  <div class="converter-result" style="min-height:42px;display:flex;align-items:center">
-                    <strong id="conv-af-time">&mdash;</strong>
-                  </div>
+                <div class="converter-input-group converter-input-group-stacked">
+                  <label for="conv-af-time">Air Fryer Time</label>
+                  <input type="number" class="glass-input" id="conv-af-time" placeholder="24" min="1" max="600">
                 </div>
               </div>
-              <p class="text-xs text-tertiary" id="conv-af-note" hidden>Temp reduced by 25&deg;F, time reduced by ~20%.
+              <p class="text-xs text-tertiary" id="conv-af-note" hidden>Air fryer: 25&deg;F lower temp, ~20% less time.
                 Start checking a few minutes early.</p>
             </div>
 

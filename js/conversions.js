@@ -22,40 +22,55 @@ function parseFraction(val) {
   return NaN;
 }
 
-/* ── Oven → Air Fryer ─────────────────────────────────── */
+/* ── Oven ↔ Air Fryer ──────────────────────────────────── */
 
 function bindOvenToAirFryer() {
-  const tempInput = document.getElementById('conv-oven-temp');
-  const timeInput = document.getElementById('conv-oven-time');
+  const ovenTemp = document.getElementById('conv-oven-temp');
+  const ovenTime = document.getElementById('conv-oven-time');
+  const afTemp = document.getElementById('conv-af-temp');
+  const afTime = document.getElementById('conv-af-time');
+  const note = document.getElementById('conv-af-note');
 
-  if (!tempInput || !timeInput) return;
+  if (!ovenTemp || !ovenTime || !afTemp || !afTime) return;
 
-  const update = () => {
-    const temp = parseFloat(tempInput.value);
-    const time = parseFloat(timeInput.value);
+  ovenTemp.addEventListener('input', () => {
+    const v = parseFloat(ovenTemp.value);
+    afTemp.value = (!isNaN(v) && v > 0) ? Math.round(v - 25) : '';
+    updateNote();
+  });
 
-    document.getElementById('conv-af-temp').textContent =
-      !isNaN(temp) && temp > 0 ? Math.round(temp - 25) + '\u00B0F / ' + Math.round((temp - 25 - 32) * 5 / 9) + '\u00B0C' : '\u2014';
+  afTemp.addEventListener('input', () => {
+    const v = parseFloat(afTemp.value);
+    ovenTemp.value = (!isNaN(v) && v > 0) ? Math.round(v + 25) : '';
+    updateNote();
+  });
 
-    document.getElementById('conv-af-time').textContent =
-      !isNaN(time) && time > 0 ? Math.round(time * 0.8) + ' min' : '\u2014';
+  ovenTime.addEventListener('input', () => {
+    const v = parseFloat(ovenTime.value);
+    afTime.value = (!isNaN(v) && v > 0) ? Math.round(v * 0.8) : '';
+  });
 
-    document.getElementById('conv-af-note').hidden = isNaN(temp) || temp <= 0;
-  };
+  afTime.addEventListener('input', () => {
+    const v = parseFloat(afTime.value);
+    ovenTime.value = (!isNaN(v) && v > 0) ? Math.round(v / 0.8) : '';
+  });
 
-  tempInput.addEventListener('input', update);
-  timeInput.addEventListener('input', update);
+  function updateNote() {
+    const ovenVal = parseFloat(ovenTemp.value);
+    const afVal = parseFloat(afTemp.value);
+    note.hidden = (isNaN(ovenVal) || ovenVal <= 0) && (isNaN(afVal) || afVal <= 0);
+  }
 }
 
 /* ── Volume Converter ──────────────────────────────────── */
 
 const VOLUME_UNITS = {
-  cup:    { name: 'Cups',      ml: 236.588 },
-  tbsp:   { name: 'Tbsp',       ml: 14.787 },
-  tsp:    { name: 'Tsp',        ml: 4.929 },
-  'fl-oz':{ name: 'Fl oz',     ml: 29.574 },
-  ml:     { name: 'ml',         ml: 1 },
-  liter:  { name: 'Liters',     ml: 1000 },
+  cup: { name: 'Cups', ml: 236.588 },
+  tbsp: { name: 'Tbsp', ml: 14.787 },
+  tsp: { name: 'Tsp', ml: 4.929 },
+  'fl-oz': { name: 'Fl oz', ml: 29.574 },
+  ml: { name: 'ml', ml: 1 },
+  liter: { name: 'Liters', ml: 1000 },
 };
 
 function bindVolumeConverter() {
@@ -90,9 +105,9 @@ function bindVolumeConverter() {
 
 const WEIGHT_UNITS = {
   lb: { name: 'Pounds (lbs)', g: 453.592 },
-  oz: { name: 'Ounces (oz)',  g: 28.35 },
-  g:  { name: 'Grams (g)',     g: 1 },
-  kg: { name: 'Kilograms',     g: 1000 },
+  oz: { name: 'Ounces (oz)', g: 28.35 },
+  g: { name: 'Grams (g)', g: 1 },
+  kg: { name: 'Kilograms', g: 1000 },
 };
 
 function bindWeightConverter() {
@@ -153,4 +168,3 @@ function bindTemperatureConverter() {
   input.addEventListener('input', update);
   unitSelect.addEventListener('change', update);
 }
-
