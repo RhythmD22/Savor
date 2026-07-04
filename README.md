@@ -42,7 +42,7 @@
 | Light / Dark Theme | System-aware `prefers-color-scheme` with floating manual toggle (sun/moon), persisted to `localStorage` |
 | Notebook Aesthetic | Ruled paper background with red margin line, paper grain texture, and warm gradient washes — like a Moleskine journal |
 | Custom Dialogs | Bottom-sheet modals with drag handle, keyboard support (Escape to close), and focus restoration |
-| Toast Notifications | Rounded-rectangular toasts with success/error/warning color coding and auto-dismiss |
+| Toast Notifications | Non-intrusive confirmations with Lucide SVG icons for every action — color-coded success/error/warning with auto-dismiss |
 | Frosted Glass UI | `backdrop-filter: blur()` glassmorphism on cards, inputs, navigation, and the floating bottom bar |
 | Local Storage | All recipes, meal logs, weight entries, and profile data persisted in `localStorage` — no account, no server, no sign-up |
 | Responsive PWA | Mobile-first with a floating bottom nav bar; converts to a 240px sidebar on desktop (768px+) |
@@ -151,7 +151,7 @@ The app is a single-page application. All views live as `<template>` elements in
 
 **Design decisions:**
 - `<template>`-based SPA instead of multi-page HTML (keeps navigation instant)
-- Inline SVG icons instead of icon libraries (zero external dependencies)
+- Inline Lucide SVG icons — drawn directly in JS with `viewBox="0 0 24 24"`, no icon font dependency
 - `localStorage` for persistence (works offline, no server, no privacy concerns)
 - `backdrop-filter` glassmorphism on all containers (modern iOS/Android feel)
 - CSS `@layer` organization (tokens → reset → layout → components)
@@ -162,6 +162,7 @@ The app is a single-page application. All views live as `<template>` elements in
 - Bottom-sheet dialogs instead of center modals — more natural on mobile
 - Focus trapping and Escape-key dismissal on all dialogs — keyboard-only navigation works end-to-end
 - Full WCAG 2.1 AA compliance — labels, roles, live regions, focus indicators, and chart accessibility
+- All SVG icons use Lucide (MIT-licensed inline SVGs, no icon font dependency)
 
 ---
 
