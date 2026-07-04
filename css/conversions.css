@@ -1,10 +1,55 @@
 /* ── CONVERSIONS ──────────────────────────────────────── */
 
+.conversions-toggle {
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  overflow: hidden;
+}
+
+.conversions-toggle-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+  list-style: none;
+}
+
+.conversions-toggle-summary::-webkit-details-marker {
+  display: none;
+}
+
+.conversions-toggle-summary::marker {
+  display: none;
+  content: "";
+}
+
+.conversions-toggle-chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.conversions-toggle[open] .conversions-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+.conversions-toggle[open] .conversions-toggle-summary {
+  border-bottom: 1px solid var(--glass-border);
+}
+
 .conversions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-md);
-  padding-top: var(--space-sm);
+  padding: var(--space-md);
 }
 
 .converter-card {

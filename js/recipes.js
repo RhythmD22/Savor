@@ -1,11 +1,13 @@
 import { getRecipes } from './data.js';
 import { formatNumber, formatTime, debounce, escapeHTML } from './utils.js';
+import { initConversions } from './conversions.js';
 
 let currentFilter = 'all';
 let searchQuery = '';
 
 export function initRecipes() {
   renderRecipes();
+  initConversions();
 
   const searchInput = document.getElementById('recipe-search-input');
   if (searchInput) {

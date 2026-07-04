@@ -111,9 +111,9 @@ Savor/
 │   ├── api.js                  # Client-side API: recipe extraction, food search (via serverless proxy)
 │   ├── recipe-parsers.js       # Shared recipe parsers (used by both client and serverless function)
 │   ├── index.js                # Dashboard: calorie ring, macro breakdown, recent recipes, meal log summary
-│   ├── recipes.js              # Recipe list: search, filter, sort, favorites
+│   ├── recipes.js              # Recipe list: search, filter, sort, favorites + unit conversions
 │   ├── recipe-detail.js        # Recipe detail: nutrition, ingredients, instructions, log/delete actions
-│   ├── import.js               # Import page: URL extraction, manual create, API source status, cooking conversions tab
+│   ├── import.js               # Import page: URL extraction, manual create, API source status
 │   ├── meal-log.js             # Food diary: date navigation, food search, meal entries, macro bars
 │   ├── health.js               # Health page: weight chart (Chart.js), profile, TDEE, data export/import/reset
 │   └── conversions.js          # Cooking unit converters (volume, weight, temperature, oven → air fryer)

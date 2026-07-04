@@ -96,8 +96,10 @@
       <button class="nav-item" data-route="recipes" aria-label="Recipes">
         <svg aria-hidden="true" focusable="false" class="nav-icon" width="24" height="24" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M2 12h20" />
+          <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+          <path d="m4 8 16-4" />
+          <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
         </svg>
         <span class="nav-label">Recipes</span>
       </button>
@@ -112,9 +114,13 @@
       <button class="nav-item" data-route="meal-log" aria-label="Meal Log">
         <svg aria-hidden="true" focusable="false" class="nav-icon" width="24" height="24" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-          <rect x="9" y="3" width="6" height="4" rx="1" />
-          <path d="M9 14l2 2 4-4" />
+          <path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" />
+          <path d="M2 6h4" />
+          <path d="M2 10h4" />
+          <path d="M2 14h4" />
+          <path d="M2 18h4" />
+          <path
+            d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" />
         </svg>
         <span class="nav-label">Log</span>
       </button>
@@ -234,6 +240,181 @@
       <div class="flex-between">
         <span class="text-sm text-secondary" id="recipe-stats">0 recipes</span>
       </div>
+
+      <details class="conversions-toggle">
+        <summary class="conversions-toggle-summary">
+          <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+            <path d="m14.5 12.5 2-2" />
+            <path d="m11.5 9.5 2-2" />
+            <path d="m8.5 6.5 2-2" />
+            <path d="m17.5 15.5 2-2" />
+          </svg>
+          <span>Unit Conversions</span>
+          <svg class="conversions-toggle-chevron" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </summary>
+        <div class="conversions-grid">
+
+          <!-- Volume Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 22v-8" />
+                <path d="M2.336 8.89 10 14l11.715-7.029" />
+                <path
+                  d="M22 14a2 2 0 0 1-.971 1.715l-10 6a2 2 0 0 1-2.138-.05l-6-4A2 2 0 0 1 2 16v-6a2 2 0 0 1 .971-1.715l10-6a2 2 0 0 1 2.138.05l6 4A2 2 0 0 1 22 8z" />
+              </svg>
+              <span class="converter-card-title">Volume</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-vol-input" placeholder="e.g. 1 1/2">
+              <select class="glass-input" id="conv-vol-unit">
+                <option value="cup">Cups</option>
+                <option value="tbsp">Tbsp</option>
+                <option value="tsp">Tsp</option>
+                <option value="fl-oz">Fl oz</option>
+                <option value="ml">ml</option>
+                <option value="liter">Liters</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-vol-result" aria-live="polite"></div>
+          </div>
+
+          <!-- Weight Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M6.5 8a2 2 0 0 0-1.906 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8z" />
+                <path d="M7.999 15a2.5 2.5 0 0 1 4 0 2.5 2.5 0 0 0 4 0" />
+                <circle cx="12" cy="5" r="3" />
+              </svg>
+              <span class="converter-card-title">Weight</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-wt-input" placeholder="e.g. 1.5">
+              <select class="glass-input" id="conv-wt-unit">
+                <option value="lb">Pounds</option>
+                <option value="oz">Ounces</option>
+                <option value="g">Grams</option>
+                <option value="kg">Kilograms</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-wt-result" aria-live="polite"></div>
+          </div>
+
+          <!-- Temperature Converter -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
+              </svg>
+              <span class="converter-card-title">Temperature</span>
+            </div>
+            <div class="converter-input-group">
+              <input type="text" inputmode="decimal" class="glass-input" id="conv-temp-input" placeholder="350">
+              <select class="glass-input" id="conv-temp-unit">
+                <option value="F">&deg;F</option>
+                <option value="C">&deg;C</option>
+              </select>
+            </div>
+            <div class="converter-result" id="conv-temp-result" aria-live="polite"></div>
+          </div>
+
+          <!-- Common Equivalents -->
+          <div class="converter-card glass glass-card">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 2v8l3-3 3 3V2" />
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+              </svg>
+              <span class="converter-card-title">Quick Reference</span>
+            </div>
+            <div class="converter-result">
+              <div class="converter-result-row"><span>1 tbsp</span><span class="converter-result-value">3 tsp</span>
+              </div>
+              <div class="converter-result-row"><span>1/4 cup</span><span class="converter-result-value">4 tbsp</span>
+              </div>
+              <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">16 tbsp</span>
+              </div>
+              <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">8 fl oz</span>
+              </div>
+              <div class="converter-result-row"><span>1 pint</span><span class="converter-result-value">2 cups</span>
+              </div>
+              <div class="converter-result-row"><span>1 quart</span><span class="converter-result-value">4 cups</span>
+              </div>
+              <div class="converter-result-row"><span>1 gallon</span><span class="converter-result-value">16
+                  cups</span></div>
+              <div class="converter-result-row"><span>1 stick butter</span><span class="converter-result-value">1/2
+                  cup</span></div>
+              <div class="converter-result-row"><span>1 oz</span><span class="converter-result-value">28 g</span>
+              </div>
+              <div class="converter-result-row"><span>1 lb</span><span class="converter-result-value">454 g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Oven ↔ Air Fryer -->
+          <div class="converter-card glass glass-card wide">
+            <div class="converter-card-header">
+              <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="16" rx="2" />
+                <rect x="8" y="10" width="8" height="6" rx="1" />
+                <line x1="8" y1="17" x2="16" y2="17" />
+                <path d="M5 3v3M12 3v3M19 3v3" />
+              </svg>
+              <span class="converter-card-title">Oven &harr; Air Fryer</span>
+            </div>
+            <div class="airfryer-dual-input">
+              <div class="converter-input-group converter-input-group-stacked">
+                <label for="conv-oven-temp">Oven Temp (&deg;F)</label>
+                <input type="number" class="glass-input" id="conv-oven-temp" placeholder="350" min="0" max="550">
+              </div>
+              <div class="airfryer-arrow">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+              <div class="converter-input-group converter-input-group-stacked">
+                <label for="conv-af-temp">Air Fryer Temp</label>
+                <input type="number" class="glass-input" id="conv-af-temp" placeholder="325" min="0" max="550">
+              </div>
+            </div>
+            <div class="airfryer-dual-input">
+              <div class="converter-input-group converter-input-group-stacked">
+                <label for="conv-oven-time">Oven Time (min)</label>
+                <input type="number" class="glass-input" id="conv-oven-time" placeholder="30" min="1" max="600">
+              </div>
+              <div class="airfryer-arrow">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+              <div class="converter-input-group converter-input-group-stacked">
+                <label for="conv-af-time">Air Fryer Time</label>
+                <input type="number" class="glass-input" id="conv-af-time" placeholder="24" min="1" max="600">
+              </div>
+            </div>
+            <p class="text-xs text-tertiary" id="conv-af-note" hidden>Air fryer: 25&deg;F lower temp, ~20% less time.
+              Start checking a few minutes early.</p>
+          </div>
+
+        </div>
+      </details>
 
       <div class="recipe-cards-grid" id="recipe-cards">
       </div>
@@ -452,8 +633,6 @@
           <button class="import-tab" id="tab-manual" data-tab="manual" role="tab" aria-selected="false">Create
             Manually</button>
           <button class="import-tab" id="tab-api" data-tab="api" role="tab" aria-selected="false">API</button>
-          <button class="import-tab" id="tab-convert" data-tab="convert" role="tab"
-            aria-selected="false">Convert</button>
         </div>
 
         <!-- URL Import -->
@@ -676,164 +855,6 @@
           </div>
         </div>
 
-        <!-- Convert -->
-        <div class="import-tab-content" data-tab="convert" role="tabpanel" aria-labelledby="tab-convert">
-          <div class="conversions-grid">
-
-            <!-- Volume Converter -->
-            <div class="converter-card glass glass-card">
-              <div class="converter-card-header">
-                <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 2h12l4 6-4 14H6L2 8z" />
-                </svg>
-                <span class="converter-card-title">Volume</span>
-              </div>
-              <div class="converter-input-group">
-                <input type="text" inputmode="decimal" class="glass-input" id="conv-vol-input" placeholder="e.g. 1 1/2">
-                <select class="glass-input" id="conv-vol-unit">
-                  <option value="cup">Cups</option>
-                  <option value="tbsp">Tbsp</option>
-                  <option value="tsp">Tsp</option>
-                  <option value="fl-oz">Fl oz</option>
-                  <option value="ml">ml</option>
-                  <option value="liter">Liters</option>
-                </select>
-              </div>
-              <div class="converter-result" id="conv-vol-result" aria-live="polite"></div>
-            </div>
-
-            <!-- Weight Converter -->
-            <div class="converter-card glass glass-card">
-              <div class="converter-card-header">
-                <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="3" x2="12" y2="13" />
-                  <line x1="3" y1="13" x2="21" y2="13" />
-                  <polyline points="6 13 3 19 9 19" />
-                  <polyline points="18 13 21 19 15 19" />
-                </svg>
-                <span class="converter-card-title">Weight</span>
-              </div>
-              <div class="converter-input-group">
-                <input type="text" inputmode="decimal" class="glass-input" id="conv-wt-input" placeholder="e.g. 1.5">
-                <select class="glass-input" id="conv-wt-unit">
-                  <option value="lb">Pounds</option>
-                  <option value="oz">Ounces</option>
-                  <option value="g">Grams</option>
-                  <option value="kg">Kilograms</option>
-                </select>
-              </div>
-              <div class="converter-result" id="conv-wt-result" aria-live="polite"></div>
-            </div>
-
-            <!-- Temperature Converter -->
-            <div class="converter-card glass glass-card">
-              <div class="converter-card-header">
-                <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="6" x2="12.01" y2="6" />
-                </svg>
-                <span class="converter-card-title">Temperature</span>
-              </div>
-              <div class="converter-input-group">
-                <input type="text" inputmode="decimal" class="glass-input" id="conv-temp-input" placeholder="350">
-                <select class="glass-input" id="conv-temp-unit">
-                  <option value="F">&deg;F</option>
-                  <option value="C">&deg;C</option>
-                </select>
-              </div>
-              <div class="converter-result" id="conv-temp-result" aria-live="polite"></div>
-            </div>
-
-            <!-- Common Equivalents -->
-            <div class="converter-card glass glass-card">
-              <div class="converter-card-header">
-                <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
-                <span class="converter-card-title">Quick Reference</span>
-              </div>
-              <div class="converter-result">
-                <div class="converter-result-row"><span>1 tbsp</span><span class="converter-result-value">3 tsp</span>
-                </div>
-                <div class="converter-result-row"><span>1/4 cup</span><span class="converter-result-value">4 tbsp</span>
-                </div>
-                <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">16 tbsp</span>
-                </div>
-                <div class="converter-result-row"><span>1 cup</span><span class="converter-result-value">8 fl oz</span>
-                </div>
-                <div class="converter-result-row"><span>1 pint</span><span class="converter-result-value">2 cups</span>
-                </div>
-                <div class="converter-result-row"><span>1 quart</span><span class="converter-result-value">4 cups</span>
-                </div>
-                <div class="converter-result-row"><span>1 gallon</span><span class="converter-result-value">16
-                    cups</span></div>
-                <div class="converter-result-row"><span>1 stick butter</span><span class="converter-result-value">1/2
-                    cup</span></div>
-                <div class="converter-result-row"><span>1 oz</span><span class="converter-result-value">28 g</span>
-                </div>
-                <div class="converter-result-row"><span>1 lb</span><span class="converter-result-value">454 g</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Oven ↔ Air Fryer -->
-            <div class="converter-card glass glass-card wide">
-              <div class="converter-card-header">
-                <svg class="converter-card-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="6" width="18" height="16" rx="2" />
-                  <rect x="8" y="10" width="8" height="6" rx="1" />
-                  <line x1="8" y1="17" x2="16" y2="17" />
-                  <path d="M5 3v3M12 3v3M19 3v3" />
-                </svg>
-                <span class="converter-card-title">Oven &harr; Air Fryer</span>
-              </div>
-              <div class="airfryer-dual-input">
-                <div class="converter-input-group converter-input-group-stacked">
-                  <label for="conv-oven-temp">Oven Temp (&deg;F)</label>
-                  <input type="number" class="glass-input" id="conv-oven-temp" placeholder="350" min="0" max="550">
-                </div>
-                <div class="airfryer-arrow">
-                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </div>
-                <div class="converter-input-group converter-input-group-stacked">
-                  <label for="conv-af-temp">Air Fryer Temp</label>
-                  <input type="number" class="glass-input" id="conv-af-temp" placeholder="325" min="0" max="550">
-                </div>
-              </div>
-              <div class="airfryer-dual-input">
-                <div class="converter-input-group converter-input-group-stacked">
-                  <label for="conv-oven-time">Oven Time (min)</label>
-                  <input type="number" class="glass-input" id="conv-oven-time" placeholder="30" min="1" max="600">
-                </div>
-                <div class="airfryer-arrow">
-                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </div>
-                <div class="converter-input-group converter-input-group-stacked">
-                  <label for="conv-af-time">Air Fryer Time</label>
-                  <input type="number" class="glass-input" id="conv-af-time" placeholder="24" min="1" max="600">
-                </div>
-              </div>
-              <p class="text-xs text-tertiary" id="conv-af-note" hidden>Air fryer: 25&deg;F lower temp, ~20% less time.
-                Start checking a few minutes early.</p>
-            </div>
-
-          </div>
-        </div>
 
       </div>
 
@@ -943,9 +964,9 @@
           <div class="health-metric-card glass glass-card">
             <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3h18v18H3z" />
-              <path d="M3 9h18" />
-              <path d="M9 21V9" />
+              <circle cx="12" cy="5" r="3" />
+              <path
+                d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z" />
             </svg>
             <div class="health-metric-value" id="health-current-weight">—</div>
             <div class="health-metric-label">Current Weight</div>
@@ -964,9 +985,9 @@
           <div class="health-metric-card glass glass-card">
             <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <path d="M8 8h8v2H8z" />
-              <path d="M8 12h4v2H8z" />
+              <path
+                d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+              <path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" />
             </svg>
             <div class="health-metric-value" id="health-bmi">—</div>
             <div class="health-metric-label">BMI</div>
@@ -975,7 +996,15 @@
           <div class="health-metric-card glass glass-card">
             <svg class="health-metric-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8" />
+              <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1" />
+              <path d="M2 21h20" />
+              <path d="M7 8v3" />
+              <path d="M12 8v3" />
+              <path d="M17 8v3" />
+              <path d="M7 4h.01" />
+              <path d="M12 4h.01" />
+              <path d="M17 4h.01" />
             </svg>
             <div class="health-metric-value" id="health-age">—</div>
             <div class="health-metric-label">Age</div>
