@@ -260,7 +260,7 @@ A fixed floating button in the top-right corner switches between themes. Persist
 | Charts | [Chart.js 4.5.1](https://www.chartjs.org/) (CDN) — weight trend visualization |
 | Recipe Extraction | Vercel serverless function (Node.js) — extracts structured data from recipe URLs |
 | Food Search | [Open Food Facts](https://world.openfoodfacts.org/), [USDA FoodData Central](https://fdc.nal.usda.gov/), [Spoonacular](https://spoonacular.com/food-api) |
-| Iconography | Custom inline SVG icons (no icon library dependency) |
+| Iconography | [Lucide](https://lucide.dev) — inline SVG icons (MIT licensed) |
 | Fonts | [Inter](https://fonts.google.com/specimen/Inter), [Playfair Display](https://fonts.google.com/specimen/Playfair+Display) (Google Fonts) |
 | Hosting | Vercel (or any static host for client-only use) |
 | PWA | Service Worker API, Web App Manifest |
