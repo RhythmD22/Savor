@@ -313,27 +313,93 @@ function renderFoodResults(results, overlay, mealType) {
   container.innerHTML = results
     .map(
       (r) => `
-      <button class="food-search-item glass glass-card" data-food-id="${r.id}" data-food-name="${escapeHTML(r.name)}"
+      <div class="food-search-item glass glass-card" data-food-id="${r.id}" data-food-name="${escapeHTML(r.name)}"
         data-calories="${r.calories}" data-protein="${r.protein}" data-carbs="${r.carbs}" data-fat="${r.fat}">
-        <div class="food-search-info">
-          <div class="food-search-name">${escapeHTML(r.name)}</div>
-          <div class="food-search-brand">${escapeHTML(r.source || '')} \u00B7 ${r.per100g ? 'per 100g' : 'per serving'}</div>
+        <div class="food-search-select" tabindex="0" role="button" aria-expanded="false">
+          <div class="food-search-info">
+            <div class="food-search-name">${escapeHTML(r.name)}</div>
+            <div class="food-search-brand">${escapeHTML(r.source || '')} \u00B7 ${r.per100g ? 'per 100g' : 'per serving'}</div>
+          </div>
+          <span class="food-search-calories" data-cals="${r.calories}">${formatNumber(r.calories)} cal</span>
         </div>
-        <span class="food-search-calories">${formatNumber(r.calories)} cal</span>
-      </button>`
+        <div class="food-search-stepper">
+          <div class="stepper-controls">
+            <button class="stepper-btn stepper-minus" aria-label="Decrease servings">-</button>
+            <span class="stepper-value">1</span>
+            <button class="stepper-btn stepper-plus" aria-label="Increase servings">+</button>
+            <span class="stepper-label">serving</span>
+          </div>
+          <button class="stepper-add-btn btn btn-primary">Add</button>
+        </div>
+      </div>`
     )
     .join('');
 
-  container.querySelectorAll('.food-search-item').forEach((item) => {
-    item.addEventListener('click', () => {
+  let activeItem = null;
+
+  container.querySelectorAll('.food-search-select').forEach((select) => {
+    const handleSelect = () => {
+      const item = select.closest('.food-search-item');
+
+      if (activeItem && activeItem !== item) {
+        activeItem.classList.remove('active');
+        activeItem.querySelector('.food-search-select').setAttribute('aria-expanded', 'false');
+        const val = activeItem.querySelector('.stepper-value');
+        if (val) val.textContent = '1';
+      }
+
+      if (!item.classList.contains('active')) {
+        item.classList.add('active');
+        select.setAttribute('aria-expanded', 'true');
+        activeItem = item;
+      }
+    };
+
+    select.addEventListener('click', handleSelect);
+    select.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleSelect();
+      }
+    });
+  });
+
+  container.querySelectorAll('.stepper-minus').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const item = btn.closest('.food-search-item');
+      const val = item.querySelector('.stepper-value');
+      const count = Math.max(1, parseInt(val.textContent) - 1);
+      val.textContent = count;
+      updateStepperCalories(item, count);
+    });
+  });
+
+  container.querySelectorAll('.stepper-plus').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const item = btn.closest('.food-search-item');
+      const val = item.querySelector('.stepper-value');
+      const count = parseInt(val.textContent) + 1;
+      val.textContent = count;
+      updateStepperCalories(item, count);
+    });
+  });
+
+  container.querySelectorAll('.stepper-add-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const item = btn.closest('.food-search-item');
+      const servingSize = parseInt(item.querySelector('.stepper-value').textContent) || 1;
+
       const entry = {
         foodName: item.dataset.foodName,
-        calories: parseFloat(item.dataset.calories) || 0,
-        protein: parseFloat(item.dataset.protein) || 0,
-        carbs: parseFloat(item.dataset.carbs) || 0,
-        fat: parseFloat(item.dataset.fat) || 0,
+        calories: (parseFloat(item.dataset.calories) || 0) * servingSize,
+        protein: (parseFloat(item.dataset.protein) || 0) * servingSize,
+        carbs: (parseFloat(item.dataset.carbs) || 0) * servingSize,
+        fat: (parseFloat(item.dataset.fat) || 0) * servingSize,
         mealType,
-        servingSize: 1,
+        servingSize,
       };
 
       addMealEntry(currentDate, entry);
@@ -343,4 +409,16 @@ function renderFoodResults(results, overlay, mealType) {
       renderMealLog();
     });
   });
+}
+
+function updateStepperCalories(item, count) {
+  const calEl = item.querySelector('.food-search-calories');
+  if (calEl) {
+    const baseCals = parseFloat(calEl.dataset.cals) || 0;
+    calEl.textContent = `${formatNumber(baseCals * count)} cal`;
+  }
+  const label = item.querySelector('.stepper-label');
+  if (label) {
+    label.textContent = count === 1 ? 'serving' : 'servings';
+  }
 }
