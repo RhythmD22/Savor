@@ -154,3 +154,8 @@ export function escapeHTML(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+export function autoSizeTextarea(el) {
+  el.style.height = '0px';
+  el.style.height = el.scrollHeight + 'px';
+}

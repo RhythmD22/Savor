@@ -1,6 +1,6 @@
 import { addRecipe } from './data.js';
 import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
-import { showToast, escapeHTML } from './utils.js';
+import { showToast, escapeHTML, autoSizeTextarea } from './utils.js';
 
 let previewRecipe = null;
 let manualIngredients = [{ text: '' }];
@@ -50,6 +50,11 @@ function bindImportEvents() {
       handleManualSave();
     });
   }
+
+  ['edit-description', 'manual-description'].forEach((id) => {
+    const ta = document.getElementById(id);
+    if (ta) ta.addEventListener('input', (e) => autoSizeTextarea(e.target));
+  });
 
   const addIngredientBtn = document.getElementById('btn-add-ingredient');
   if (addIngredientBtn) {
@@ -182,6 +187,12 @@ function showPreview(recipe) {
   renderInstructionsEditor();
 
   previewEl.removeAttribute('hidden');
+
+  autoSizeTextarea(document.getElementById('edit-description'));
+  const instructionsEditor = document.getElementById('instructions-editor');
+  if (instructionsEditor) {
+    instructionsEditor.querySelectorAll('textarea').forEach(autoSizeTextarea);
+  }
 }
 
 function hidePreview() {
@@ -263,7 +274,7 @@ function renderInstructionsEditor() {
     .map(
       (step, i) => `
       <div class="import-ingredient-row">
-        <textarea class="glass-textarea" data-instruction-index="${i}" rows="2"
+        <textarea class="glass-textarea" data-instruction-index="${i}"
           placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
         <button class="btn btn-icon-only btn-small" data-remove-instruction="${i}" aria-label="Remove step">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -275,7 +286,9 @@ function renderInstructionsEditor() {
     .join('');
 
   container.querySelectorAll('[data-instruction-index]').forEach((textarea) => {
+    autoSizeTextarea(textarea);
     textarea.addEventListener('input', (e) => {
+      autoSizeTextarea(e.target);
       const idx = parseInt(e.target.dataset.instructionIndex);
       manualInstructions[idx] = e.target.value;
     });

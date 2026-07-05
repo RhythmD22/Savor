@@ -12,6 +12,19 @@ export function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+export function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#?\w+;/g, '')
+    .trim();
+}
+
 export function parseNumber(val) {
   if (!val) return 0;
   if (typeof val === 'number') return val;
@@ -120,7 +133,7 @@ export function findRecipeInJsonLd(data) {
 export function parseJsonLdRecipe(recipeNode, sourceUrl = '') {
   const getText = (v) => {
     if (!v) return '';
-    if (typeof v === 'string') return v.trim();
+    if (typeof v === 'string') return decodeHtmlEntities(v.trim());
     if (Array.isArray(v)) return v.map(getText).filter(Boolean).join('\n');
     return '';
   };
@@ -133,11 +146,11 @@ export function parseJsonLdRecipe(recipeNode, sourceUrl = '') {
   const instructions = [];
   const rawInstructions = recipeNode.recipeInstructions || [];
   if (typeof rawInstructions === 'string') {
-    instructions.push(rawInstructions.trim());
+    instructions.push(decodeHtmlEntities(rawInstructions.trim()));
   } else if (Array.isArray(rawInstructions)) {
     const collectSteps = (arr) => {
       arr.forEach((step) => {
-        if (typeof step === 'string') instructions.push(step.trim());
+        if (typeof step === 'string') instructions.push(decodeHtmlEntities(step.trim()));
         else if (step.text) instructions.push(getText(step.text));
         else if (step['@type'] === 'HowToStep') {
           const name = step.name ? getText(step.name) + ': ' : '';
@@ -154,8 +167,8 @@ export function parseJsonLdRecipe(recipeNode, sourceUrl = '') {
   const nutrition = recipeNode.nutrition || {};
 
   return {
-    title: recipeNode.name || '',
-    description: recipeNode.description || '',
+    title: decodeHtmlEntities(recipeNode.name || ''),
+    description: decodeHtmlEntities(recipeNode.description || ''),
     image: extractImageUrl(recipeNode.image),
     sourceUrl: recipeNode.url || sourceUrl || '',
     sourceName: recipeNode.author?.name || recipeNode.publisher?.name || '',

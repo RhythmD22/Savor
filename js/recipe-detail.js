@@ -1,5 +1,5 @@
 import { getRecipe, updateRecipe, toggleFavorite, deleteRecipe, addMealEntry } from './data.js';
-import { formatNumber, formatTime, formatDecimal, showToast, showConfirm, escapeHTML } from './utils.js';
+import { formatNumber, formatTime, formatDecimal, showToast, showConfirm, escapeHTML, autoSizeTextarea } from './utils.js';
 
 let currentRecipeId = null;
 let editIngredients = [];
@@ -192,6 +192,11 @@ function bindActions(recipe) {
 
   bindEditEditorEvents();
 
+  const descTa = document.getElementById('edit-recipe-description');
+  if (descTa) {
+    descTa.addEventListener('input', (e) => autoSizeTextarea(e.target));
+  }
+
   const deleteBtn = document.getElementById('btn-delete-recipe');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', () => {
@@ -210,6 +215,8 @@ function showEditForm(recipe) {
 
   document.getElementById('edit-recipe-title').value = recipe.title || '';
   document.getElementById('edit-recipe-description').value = recipe.description || '';
+  autoSizeTextarea(document.getElementById('edit-recipe-description'));
+
   document.getElementById('edit-recipe-servings').value = recipe.servings || '';
   document.getElementById('edit-recipe-prep').value = recipe.prepTime || '';
   document.getElementById('edit-recipe-cook').value = recipe.cookTime || '';
@@ -233,6 +240,8 @@ function showEditForm(recipe) {
 
   renderEditIngredients();
   renderEditInstructions();
+  rebindEditIngredientEvents();
+  rebindEditInstructionEvents();
 
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -313,7 +322,7 @@ function renderEditInstructions() {
   container.innerHTML = editInstructions
     .map((step, i) => `
       <div class="import-ingredient-row">
-        <textarea class="glass-textarea" data-edit-instruction-index="${i}" rows="2"
+        <textarea class="glass-textarea" data-edit-instruction-index="${i}"
           placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
         <button class="btn btn-icon-only btn-small" data-edit-remove-instruction="${i}" aria-label="Remove step">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -322,6 +331,8 @@ function renderEditInstructions() {
         </button>
       </div>`)
     .join('');
+
+  container.querySelectorAll('textarea').forEach(autoSizeTextarea);
 }
 
 function bindEditEditorEvents() {
@@ -375,6 +386,7 @@ function rebindEditInstructionEvents() {
 
   container.querySelectorAll('[data-edit-instruction-index]').forEach((textarea) => {
     textarea.addEventListener('input', (e) => {
+      autoSizeTextarea(e.target);
       const idx = parseInt(e.target.dataset.editInstructionIndex);
       editInstructions[idx] = e.target.value;
     });
