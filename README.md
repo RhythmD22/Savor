@@ -172,7 +172,7 @@ The app is a single-page application. All views live as `<template>` elements in
 
 Savor uses a warm orange-tinted theme with frosted glass surfaces, notebook paper aesthetics, and a full light theme:
 
-### Dark Theme (Default)
+### Dark Theme
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -188,14 +188,14 @@ Savor uses a warm orange-tinted theme with frosted glass surfaces, notebook pape
 | `--text-tertiary` | `#BAB2A8` | Captions, hints, labels |
 | `--text-muted` | `#C3BCB2` | Disabled text, placeholder hints |
 
-### Light Theme (`[data-theme="light"]`)
+### Light Theme (Default)
 
 | Token | Value | Contrast | Usage |
 |-------|-------|----------|-------|
 | `--bg-body` | `#FFFBF8` | — | Page background (warm cream) |
 | `--bg-elevated` | `#FFF6F0` | — | Card backgrounds |
 | `--glass-bg` | `rgba(255, 255, 255, 0.70)` | — | Frosted card surfaces |
-| `--brand-text` | `#D35A1C` | 6.1:1 | Links, brand-colored text |
+| `--brand-text` | `#C25116` | 4.6:1 | Links, brand-colored text |
 | `--text-primary` | `#1A1512` | 15.2:1 | Headings, body text |
 | `--text-secondary` | `#5C4E42` | 7.2:1 | Secondary text |
 | `--text-tertiary` | `#665B51` | 5.8:1 | Captions, hints |
@@ -219,7 +219,7 @@ Instead of floating gradient orbs, Savor uses a layered paper aesthetic:
 | Token | Dark Mode | Light Mode | Usage |
 |-------|-----------|------------|-------|
 | `--macro-protein` | `#93C5FD` | `#2563EB` | Protein bars, tags |
-| `--macro-carbs` | `#FCD34D` | `#D97706` | Carb bars, tags |
+| `--macro-carbs` | `#FCD34D` | `#B45309` | Carb bars, tags |
 | `--macro-fat` | `#FCA5A5` | `#DC2626` | Fat bars, tags |
 | `--calorie-under` | `#22C55E` | `#16A34A` | Under calorie target |
 | `--calorie-over` | `#FCA5A5` | `#DC2626` | Over calorie target |

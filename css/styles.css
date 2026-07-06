@@ -91,10 +91,10 @@
     --brand-glow-strong: rgba(211, 90, 28, 0.25);
 
     /* Brand text — lighter shade for light backgrounds (WCAG AA 4.5:1+) */
-    --brand-text: #D35A1C;
+    --brand-text: #C25116;
 
-    /* Semantic colors — light mode: darker tones (WCAG AA 4.5:1+) */
-    --success: #16A34A;
+    /* Semantic colors — WCAG AA 4.5:1+ */
+    --success: #05823C;
     --success-bg: rgba(22, 163, 74, 0.10);
     --warning: #B45309;
     --warning-bg: rgba(180, 83, 9, 0.10);
@@ -105,7 +105,7 @@
 
     /* Protein / Carbs / Fat */
     --macro-protein: #2563EB;
-    --macro-carbs: #D97706;
+    --macro-carbs: #B45309;
     --macro-fat: #DC2626;
 
     /* Calorie colors */
