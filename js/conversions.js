@@ -168,3 +168,5 @@ function bindTemperatureConverter() {
   input.addEventListener('input', update);
   unitSelect.addEventListener('change', update);
 }
+
+export { ROUND, parseFraction };

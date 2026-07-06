@@ -141,7 +141,9 @@ Savor/
 ├── eslint.config.js            # ESLint flat config
 ├── tests/
 │   ├── recipe-parsers.test.js  # Tests for shared recipe parsers
-│   └── data.test.js            # Tests for data layer (localStorage CRUD)
+│   ├── data.test.js            # Tests for data layer (localStorage CRUD)
+│   ├── conversions.test.js     # Tests for fraction parsing and rounding
+│   └── utils.test.js           # Tests for formatting, time, and escaping
 ├── .gitignore
 ├── .env.example                # Environment variable template
 ├── LICENSE
