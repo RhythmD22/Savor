@@ -3,6 +3,7 @@ import { extractRecipeLocally, fetchRecipeFromUrl } from './api.js';
 import { showToast, escapeHTML, autoSizeTextarea } from './utils.js';
 
 let previewRecipe = null;
+let manualImageData = null;
 let manualIngredients = [{ text: '' }];
 let manualInstructions = [''];
 
@@ -58,12 +59,29 @@ function bindImportEvents() {
 
   const addIngredientBtn = document.getElementById('btn-add-ingredient');
   if (addIngredientBtn) {
-    addIngredientBtn.addEventListener('click', addIngredientRow);
+    addIngredientBtn.addEventListener('click', () => addIngredientRow());
   }
 
   const addInstructionBtn = document.getElementById('btn-add-instruction');
   if (addInstructionBtn) {
-    addInstructionBtn.addEventListener('click', addInstructionRow);
+    addInstructionBtn.addEventListener('click', () => addInstructionRow());
+  }
+
+  const manualAddIngredientBtn = document.getElementById('btn-manual-add-ingredient');
+  if (manualAddIngredientBtn) {
+    manualAddIngredientBtn.addEventListener('click', () => addIngredientRow('manual-'));
+  }
+
+  const manualAddInstructionBtn = document.getElementById('btn-manual-add-instruction');
+  if (manualAddInstructionBtn) {
+    manualAddInstructionBtn.addEventListener('click', () => addInstructionRow('manual-'));
+  }
+
+  const manualImageInput = document.getElementById('manual-image');
+  const manualImageArea = document.getElementById('manual-image-area');
+  if (manualImageInput && manualImageArea) {
+    manualImageArea.addEventListener('click', () => manualImageInput.click());
+    manualImageInput.addEventListener('change', handleManualImageFile);
   }
 
   const saveBtn = document.getElementById('btn-save-imported');
@@ -202,6 +220,25 @@ function hidePreview() {
   if (statusEl) statusEl.innerHTML = '';
 }
 
+function handleManualImageFile() {
+  const input = document.getElementById('manual-image');
+  const preview = document.getElementById('manual-image-preview');
+  const placeholder = document.getElementById('manual-image-placeholder');
+  if (!input || !preview || !placeholder) return;
+
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    manualImageData = reader.result;
+    placeholder.setAttribute('hidden', '');
+    preview.innerHTML = `<img class="import-preview-image" src="${escapeHTML(reader.result)}" alt="Recipe image preview">`;
+    preview.removeAttribute('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
 function showStatus(message, type) {
   const statusEl = document.getElementById('import-status');
   if (!statusEl) return;
@@ -216,18 +253,19 @@ function showStatus(message, type) {
   statusEl.innerHTML = `${icons[type] || ''} ${message}`;
 }
 
-function addIngredientRow() {
+function addIngredientRow(prefix = '') {
   manualIngredients.push({ text: '' });
-  renderIngredientsEditor();
+  renderIngredientsEditor(prefix);
 }
 
-function addInstructionRow() {
+function addInstructionRow(prefix = '') {
   manualInstructions.push('');
-  renderInstructionsEditor();
+  renderInstructionsEditor(prefix);
 }
 
-function renderIngredientsEditor() {
-  const container = document.getElementById('ingredients-editor');
+function renderIngredientsEditor(prefix = '') {
+  const containerId = prefix ? `${prefix}ingredients-editor` : 'ingredients-editor';
+  const container = document.getElementById(containerId);
   if (!container) return;
 
   container.innerHTML = manualIngredients
@@ -239,8 +277,8 @@ function renderIngredientsEditor() {
         return `
       <div class="import-ingredient-row">
         <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
-          data-ingredient-index="${i}" placeholder="e.g. 2 cups flour">
-        <button class="btn btn-icon-only btn-small" data-remove-ingredient="${i}" aria-label="Remove ingredient">
+          data-${prefix}ingredient-index="${i}" placeholder="e.g. 2 cups flour">
+        <button class="btn btn-icon-only btn-small" data-${prefix}remove-ingredient="${i}" aria-label="Remove ingredient">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -250,33 +288,34 @@ function renderIngredientsEditor() {
     )
     .join('');
 
-  container.querySelectorAll('[data-ingredient-index]').forEach((input) => {
+  container.querySelectorAll(`[data-${prefix}ingredient-index]`).forEach((input) => {
     input.addEventListener('input', (e) => {
-      const idx = parseInt(e.target.dataset.ingredientIndex);
+      const idx = parseInt(e.target.getAttribute(`data-${prefix}ingredient-index`));
       manualIngredients[idx] = { text: e.target.value };
     });
   });
 
-  container.querySelectorAll('[data-remove-ingredient]').forEach((btn) => {
+  container.querySelectorAll(`[data-${prefix}remove-ingredient]`).forEach((btn) => {
     btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.removeIngredient);
+      const idx = parseInt(btn.getAttribute(`data-${prefix}remove-ingredient`));
       manualIngredients.splice(idx, 1);
-      renderIngredientsEditor();
+      renderIngredientsEditor(prefix);
     });
   });
 }
 
-function renderInstructionsEditor() {
-  const container = document.getElementById('instructions-editor');
+function renderInstructionsEditor(prefix = '') {
+  const containerId = prefix ? `${prefix}instructions-editor` : 'instructions-editor';
+  const container = document.getElementById(containerId);
   if (!container) return;
 
   container.innerHTML = manualInstructions
     .map(
       (step, i) => `
       <div class="import-ingredient-row">
-        <textarea class="glass-textarea" data-instruction-index="${i}"
+        <textarea class="glass-textarea" data-${prefix}instruction-index="${i}"
           placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
-        <button class="btn btn-icon-only btn-small" data-remove-instruction="${i}" aria-label="Remove step">
+        <button class="btn btn-icon-only btn-small" data-${prefix}remove-instruction="${i}" aria-label="Remove step">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -285,20 +324,20 @@ function renderInstructionsEditor() {
     )
     .join('');
 
-  container.querySelectorAll('[data-instruction-index]').forEach((textarea) => {
+  container.querySelectorAll(`[data-${prefix}instruction-index]`).forEach((textarea) => {
     autoSizeTextarea(textarea);
     textarea.addEventListener('input', (e) => {
       autoSizeTextarea(e.target);
-      const idx = parseInt(e.target.dataset.instructionIndex);
+      const idx = parseInt(e.target.getAttribute(`data-${prefix}instruction-index`));
       manualInstructions[idx] = e.target.value;
     });
   });
 
-  container.querySelectorAll('[data-remove-instruction]').forEach((btn) => {
+  container.querySelectorAll(`[data-${prefix}remove-instruction]`).forEach((btn) => {
     btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.removeInstruction);
+      const idx = parseInt(btn.getAttribute(`data-${prefix}remove-instruction`));
       manualInstructions.splice(idx, 1);
-      renderInstructionsEditor();
+      renderInstructionsEditor(prefix);
     });
   });
 }
@@ -360,6 +399,7 @@ function handleManualSave() {
   const recipe = {
     title,
     description: document.getElementById('manual-description')?.value || '',
+    image: manualImageData || '',
     servings: parseInt(document.getElementById('manual-servings')?.value) || 4,
     prepTime: parseInt(document.getElementById('manual-prep-time')?.value) || 0,
     cookTime: parseInt(document.getElementById('manual-cook-time')?.value) || 0,
@@ -372,6 +412,9 @@ function handleManualSave() {
       protein: parseFloat(document.getElementById('manual-protein')?.value) || 0,
       carbs: parseFloat(document.getElementById('manual-carbs')?.value) || 0,
       fat: parseFloat(document.getElementById('manual-fat')?.value) || 0,
+      fiber: parseFloat(document.getElementById('manual-fiber')?.value) || 0,
+      sugar: parseFloat(document.getElementById('manual-sugar')?.value) || 0,
+      sodium: parseFloat(document.getElementById('manual-sodium')?.value) || 0,
     },
     tags: (document.getElementById('manual-tags')?.value || '').split(',').map((t) => t.trim()).filter(Boolean),
     cuisine: document.getElementById('manual-cuisine')?.value || '',
@@ -390,9 +433,23 @@ function resetForms() {
   const manualForm = document.getElementById('manual-recipe-form');
   if (manualForm) manualForm.reset();
 
+  const manualImageInput = document.getElementById('manual-image');
+  if (manualImageInput) manualImageInput.value = '';
+  manualImageData = null;
+
+  const manualImagePreview = document.getElementById('manual-image-preview');
+  const manualImagePlaceholder = document.getElementById('manual-image-placeholder');
+  if (manualImagePreview && manualImagePlaceholder) {
+    manualImagePreview.setAttribute('hidden', '');
+    manualImagePreview.innerHTML = '';
+    manualImagePlaceholder.removeAttribute('hidden');
+  }
+
   manualIngredients = [{ text: '' }];
   manualInstructions = [''];
   renderIngredientsEditor();
   renderInstructionsEditor();
+  renderIngredientsEditor('manual-');
+  renderInstructionsEditor('manual-');
   hidePreview();
 }

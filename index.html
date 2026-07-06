@@ -746,6 +746,18 @@
           <form class="import-form" id="manual-recipe-form">
             <p class="text-sm text-secondary">Create a recipe from scratch with custom ingredients and instructions.</p>
 
+            <button type="button" class="manual-image-area" id="manual-image-area" aria-label="Add a cover image">
+              <div class="import-preview-image-placeholder" id="manual-image-placeholder">
+                <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="1.5" stroke-linecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </div>
+              <div id="manual-image-preview" hidden></div>
+              <input type="file" id="manual-image" accept="image/*" hidden>
+            </button>
+
             <div class="import-form-field">
               <label class="import-form-label" for="manual-title">Title *</label>
               <input type="text" class="glass-input" id="manual-title" placeholder="Recipe name" required>
@@ -754,6 +766,7 @@
               <label class="import-form-label" for="manual-description">Description</label>
               <textarea class="glass-textarea" id="manual-description" placeholder="Brief description"></textarea>
             </div>
+
             <div class="grid-3col">
               <div class="import-form-field"><label class="import-form-label"
                   for="manual-servings">Servings</label><input type="number" class="glass-input" id="manual-servings"
@@ -775,6 +788,38 @@
                   type="number" class="glass-input" id="manual-carbs" min="0" step="0.1"></div>
               <div class="import-form-field"><label class="import-form-label" for="manual-fat">Fat (g)</label><input
                   type="number" class="glass-input" id="manual-fat" min="0" step="0.1"></div>
+              <div class="import-form-field"><label class="import-form-label" for="manual-fiber">Fiber (g)</label><input
+                  type="number" class="glass-input" id="manual-fiber" min="0" step="0.1"></div>
+              <div class="import-form-field"><label class="import-form-label" for="manual-sugar">Sugar (g)</label><input
+                  type="number" class="glass-input" id="manual-sugar" min="0" step="0.1"></div>
+              <div class="import-form-field"><label class="import-form-label" for="manual-sodium">Sodium
+                  (mg)</label><input type="number" class="glass-input" id="manual-sodium" min="0"></div>
+            </div>
+
+            <div class="import-form-field">
+              <label class="import-form-label">Ingredients</label>
+              <div class="import-ingredients-editor" id="manual-ingredients-editor"></div>
+              <button type="button" class="import-add-btn" id="btn-manual-add-ingredient">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add ingredient
+              </button>
+            </div>
+
+            <div class="import-form-field">
+              <label class="import-form-label">Instructions</label>
+              <div class="import-ingredients-editor" id="manual-instructions-editor"></div>
+              <button type="button" class="import-add-btn" id="btn-manual-add-instruction">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add step
+              </button>
             </div>
 
             <div class="grid-2col">
