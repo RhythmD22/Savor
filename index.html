@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Savor — Import recipes, track calories, and build healthier habits">
-  <meta name="theme-color" content="#1C1714">
+  <meta name="theme-color" content="#FFFBF8">
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,18 +37,6 @@
   <link rel="stylesheet" href="css/conversions.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" defer></script>
-
-  <script>
-    (function () {
-      var saved = localStorage.getItem('savor_theme');
-      if (!saved && window.matchMedia('(prefers-color-scheme: light)').matches) saved = 'light';
-      if (saved) {
-        document.documentElement.dataset.theme = saved;
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', saved === 'light' ? '#FFFBF8' : '#1C1714');
-      }
-    })();
-  </script>
 </head>
 
 <body>

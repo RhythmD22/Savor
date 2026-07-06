@@ -260,7 +260,7 @@
   animation: spin 0.6s linear infinite;
 }
 
-[data-theme="light"] .spinner {
+[data-theme="dark"] .spinner {
   border-color: rgba(0, 0, 0, 0.08);
 }
 

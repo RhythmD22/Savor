@@ -162,7 +162,7 @@ function renderWeightChart(log) {
   const chartContainer = document.getElementById('weight-chart');
   if (!chartContainer) return;
 
-  const isLight = document.documentElement.dataset.theme === 'light';
+  const isLight = document.documentElement.dataset.theme !== 'dark';
   const tickColor = isLight ? '#7A6C60' : '#9A8E82';
   const gridColor = isLight ? 'rgba(184, 69, 13, 0.10)' : 'rgba(184, 69, 13, 0.12)';
 
