@@ -162,9 +162,14 @@ function renderWeightChart(log) {
   const chartContainer = document.getElementById('weight-chart');
   if (!chartContainer) return;
 
-  const isLight = document.documentElement.dataset.theme !== 'dark';
-  const tickColor = isLight ? '#7A6C60' : '#9A8E82';
-  const gridColor = isLight ? 'rgba(184, 69, 13, 0.10)' : 'rgba(184, 69, 13, 0.12)';
+  const style = getComputedStyle(document.documentElement);
+  const tickColor = style.getPropertyValue('--text-secondary').trim() || '#5C4E42';
+  const gridColor = style.getPropertyValue('--glass-border').trim() || 'rgba(184,69,13,0.10)';
+  const brand = style.getPropertyValue('--brand-600').trim() || '#D35A1C';
+  const r = parseInt(brand.slice(1, 3), 16);
+  const g = parseInt(brand.slice(3, 5), 16);
+  const b = parseInt(brand.slice(5, 7), 16);
+  const brandAlpha = `rgba(${r},${g},${b},0.1)`;
 
   if (log.length < 2) {
     chartContainer.innerHTML = `
@@ -180,7 +185,7 @@ function renderWeightChart(log) {
     setTimeout(() => {
       const canvas = document.getElementById('weightCanvas');
       if (canvas) {
-        renderSimpleChart(canvas, log, tickColor);
+        renderSimpleChart(canvas, log, tickColor, brand, brandAlpha);
       }
     }, 500);
   } else {
@@ -202,12 +207,12 @@ function renderWeightChart(log) {
           {
             label: 'Weight (lbs)',
             data: weights,
-            borderColor: '#D35A1C',
-            backgroundColor: 'rgba(211, 90, 28, 0.1)',
+            borderColor: brand,
+            backgroundColor: brandAlpha,
             fill: true,
             tension: 0.3,
             pointRadius: 3,
-            pointBackgroundColor: '#D35A1C',
+            pointBackgroundColor: brand,
           },
         ],
       },
@@ -224,7 +229,7 @@ function renderWeightChart(log) {
   }
 }
 
-function renderSimpleChart(canvas, log, tickColor) {
+function renderSimpleChart(canvas, log, tickColor, brand, brandAlpha) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -269,7 +274,7 @@ function renderSimpleChart(canvas, log, tickColor) {
     y: padding.top + chartH - ((weight - minWeight) / (maxWeight - minWeight)) * chartH,
   }));
 
-  ctx.strokeStyle = '#D35A1C';
+  ctx.strokeStyle = brand;
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
@@ -281,14 +286,14 @@ function renderSimpleChart(canvas, log, tickColor) {
 
   ctx.stroke();
 
-  ctx.fillStyle = 'rgba(211, 90, 28, 0.08)';
+  ctx.fillStyle = brandAlpha;
   ctx.lineTo(points[points.length - 1].x, padding.top + chartH);
   ctx.lineTo(points[0].x, padding.top + chartH);
   ctx.closePath();
   ctx.fill();
 
   points.forEach((p) => {
-    ctx.fillStyle = '#D35A1C';
+    ctx.fillStyle = brand;
     ctx.beginPath();
     ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
     ctx.fill();

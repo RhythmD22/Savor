@@ -126,8 +126,6 @@ function renderRecipeDetail(recipe) {
   if (favBtn) {
     favBtn.classList.toggle('active', recipe.isFavorite);
     favBtn.setAttribute('aria-label', recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites');
-    const starIcon = favBtn.querySelector('svg');
-    if (starIcon) starIcon.setAttribute('fill', recipe.isFavorite ? '#fbbf24' : 'none');
   }
 }
 
@@ -140,8 +138,6 @@ function bindActions(recipe) {
       if (updated) {
         favBtn.classList.toggle('active', updated.isFavorite);
         favBtn.setAttribute('aria-label', updated.isFavorite ? 'Remove from favorites' : 'Add to favorites');
-        const starIcon = favBtn.querySelector('svg');
-        if (starIcon) starIcon.setAttribute('fill', updated.isFavorite ? '#fbbf24' : 'none');
         showToast(updated.isFavorite ? 'Added to favorites' : 'Removed from favorites');
       }
     });

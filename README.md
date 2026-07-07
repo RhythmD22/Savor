@@ -30,7 +30,7 @@
 | Feature | Description |
 |---------|------------|
 | Recipe Import | Paste any recipe URL — ingredients, instructions, and nutrition are extracted automatically via a Vercel serverless function |
-| Manual Creation | Build recipes from scratch with custom ingredients, step-by-step instructions, and full nutrition data |
+| Manual Creation | Build recipes from scratch with custom ingredients, step-by-step instructions, full nutrition data, and image attachments |
 | Recipe Library | Browse, search, favorite, and filter recipes by meal type (breakfast, lunch, dinner, snacks) |
 | Cooking Conversions | Built-in measurement converters — volume (cups, tbsp, tsp, ml, liters), weight (lbs, oz, g, kg), temperature (F ↔ C), and oven-to-air-fryer (temp/time adjustments) — with fraction input support ("1 1/2") and a quick-reference cheat sheet |
 | Calorie Ring | Animated SVG calorie tracker on the dashboard — fill the ring throughout the day with color-coded macro breakdown |
@@ -195,7 +195,7 @@ Savor uses a warm orange-tinted theme with frosted glass surfaces, notebook pape
 | `--bg-body` | `#FFFBF8` | — | Page background (warm cream) |
 | `--bg-elevated` | `#FFF6F0` | — | Card backgrounds |
 | `--glass-bg` | `rgba(255, 255, 255, 0.70)` | — | Frosted card surfaces |
-| `--brand-text` | `#C25116` | 4.6:1 | Links, brand-colored text |
+| `--brand-text` | `#B0440E` | 5.1:1 | Links, brand-colored text |
 | `--text-primary` | `#1A1512` | 15.2:1 | Headings, body text |
 | `--text-secondary` | `#5C4E42` | 7.2:1 | Secondary text |
 | `--text-tertiary` | `#665B51` | 5.8:1 | Captions, hints |
@@ -221,9 +221,21 @@ Instead of floating gradient orbs, Savor uses a layered paper aesthetic:
 | `--macro-protein` | `#93C5FD` | `#2563EB` | Protein bars, tags |
 | `--macro-carbs` | `#FCD34D` | `#B45309` | Carb bars, tags |
 | `--macro-fat` | `#FCA5A5` | `#DC2626` | Fat bars, tags |
-| `--calorie-under` | `#22C55E` | `#16A34A` | Under calorie target |
+| `--calorie-under` | `#22C55E` | `#0D7A36` | Under calorie target |
 | `--calorie-over` | `#FCA5A5` | `#DC2626` | Over calorie target |
-| `--calorie-target` | `#FCD34D` | `#D97706` | Near calorie target |
+| `--calorie-target` | `#FCD34D` | `#92400E` | Near calorie target |
+
+### UI Semantic Colors
+
+| Token | Dark Mode | Light Mode | Usage |
+|-------|-----------|------------|-------|
+| `--success` | `#22C55E` | `#05823C` | Success states, API badges |
+| `--warning` | `#F59E0B` | `#B45309` | Warnings, imported recipe alerts |
+| `--danger` | `#FCA5A5` | `#DC2626` | Delete actions, reset button |
+| `--info` | `#93C5FD` | `#2563EB` | Info accents |
+| `--favorite` | `#FBBF24` | `#D97706` | Favorite star, bookmarks |
+| `--brand-100` | `#3A2214` | `#FFE6D9` | Placeholder gradients |
+| `--brand-200` | `#4A2C1A` | `#FFC9A8` | Placeholder gradients |
 
 ### Typography
 
@@ -250,7 +262,7 @@ Glass cards also include a subtle paper grain texture via a `::after` pseudo-ele
 
 ### Theme Toggle
 
-A fixed floating button in the top-right corner switches between themes. Persists to `localStorage`. Falls back to `prefers-color-scheme` on first visit. Live-listens for OS theme changes. PWA `theme-color` meta tag updates dynamically.
+A fixed floating button in the top-right corner switches between themes. Persists to `localStorage`. Falls back to `prefers-color-scheme` on first visit. Live-listens for OS theme changes. An inline `<head>` script sets `data-theme` before the first paint to prevent a flash of wrong theme on page load. PWA `theme-color` meta tag updates dynamically.
 
 ---
 

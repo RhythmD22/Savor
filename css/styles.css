@@ -91,7 +91,7 @@
     --brand-glow-strong: rgba(211, 90, 28, 0.25);
 
     /* Brand text — lighter shade for light backgrounds (WCAG AA 4.5:1+) */
-    --brand-text: #C25116;
+    --brand-text: #B0440E;
 
     /* Semantic colors — WCAG AA 4.5:1+ */
     --success: #05823C;
@@ -102,6 +102,10 @@
     --danger-bg: rgba(220, 38, 38, 0.08);
     --info: #2563EB;
     --info-bg: rgba(37, 99, 235, 0.08);
+    --favorite: #D97706;
+    --favorite-bg: rgba(217, 119, 6, 0.12);
+    --favorite-border: rgba(217, 119, 6, 0.3);
+    --border: var(--glass-border);
 
     /* Protein / Carbs / Fat */
     --macro-protein: #2563EB;
@@ -109,9 +113,9 @@
     --macro-fat: #DC2626;
 
     /* Calorie colors */
-    --calorie-under: #16A34A;
+    --calorie-under: #0D7A36;
     --calorie-over: #DC2626;
-    --calorie-target: #D97706;
+    --calorie-target: #92400E;
 
     /* Text — light mode. Verified ≥4.5:1 against #FFFBF8 */
     --text-primary: #1A1512;
@@ -145,6 +149,11 @@
     --glass-border-hover: rgba(184, 69, 13, 0.28);
     --glass-border-focus: rgba(184, 69, 13, 0.48);
 
+    /* Brand tints */
+    --brand-100: #3A2214;
+    --brand-200: #4A2C1A;
+    --brand-700: #D35A1C;
+
     /* Brand glows */
     --brand-glow: rgba(211, 90, 28, 0.22);
     --brand-glow-strong: rgba(211, 90, 28, 0.40);
@@ -161,6 +170,10 @@
     --danger-bg: rgba(252, 165, 165, 0.12);
     --info: #93C5FD;
     --info-bg: rgba(147, 197, 253, 0.12);
+    --favorite: #FBBF24;
+    --favorite-bg: rgba(251, 191, 36, 0.12);
+    --favorite-border: rgba(251, 191, 36, 0.3);
+    --border: var(--glass-border);
 
     /* Protein / Carbs / Fat */
     --macro-protein: #93C5FD;
@@ -291,6 +304,11 @@
   ::selection {
     background: var(--brand-200);
     color: var(--brand-900);
+  }
+
+  [data-theme="dark"] ::selection {
+    background: var(--brand-700);
+    color: var(--text-on-brand, #FFF6F0);
   }
 
   .sr-only {

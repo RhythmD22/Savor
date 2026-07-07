@@ -161,9 +161,9 @@
 }
 
 #btn-favorite.active {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--favorite);
+  background: var(--favorite-bg);
+  border-color: var(--favorite-border);
 }
 
 .recipe-source-link {

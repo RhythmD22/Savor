@@ -28,6 +28,7 @@ export default [
         FileReader: 'readonly',
         self: 'readonly',
         caches: 'readonly',
+        getComputedStyle: 'readonly',
       },
     },
     rules: {
