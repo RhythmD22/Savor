@@ -20,7 +20,7 @@
 }
 
 .import-tab.active {
-  color: var(--brand-600);
+  color: var(--brand-700);
   border-bottom-color: var(--brand-600);
 }
 
@@ -243,7 +243,6 @@
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-lg);
-  cursor: pointer;
 }
 
 .import-api-option:hover {
@@ -270,7 +269,7 @@
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-full);
   background: var(--brand-glow);
-  color: var(--brand-600);
+  color: var(--brand-text);
   font-size: var(--text-xs);
   font-weight: 600;
 }

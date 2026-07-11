@@ -82,7 +82,7 @@
         </svg>
         <span class="sidebar-brand-name">Savor</span>
       </div>
-      <span class="sidebar-page-heading" id="sidebar-heading">Dashboard</span>
+      <h2 class="sidebar-page-heading" id="sidebar-heading">Dashboard</h2>
       <button class="nav-item active" data-route="home" aria-label="Home" aria-current="page">
         <svg aria-hidden="true" focusable="false" class="nav-icon" width="24" height="24" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,7 +134,7 @@
 
   <div id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <button class="theme-toggle-fixed" aria-label="Switch to light theme" id="btn-theme">
+  <button class="theme-toggle-fixed" aria-label="Switch to light theme" aria-pressed="false" id="btn-theme">
     <svg class="icon-sun" aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="5" />
@@ -209,6 +209,8 @@
   <template id="template-recipes">
     <div class="page page-recipes" data-page="recipes">
 
+      <h2 class="sr-only">Recipes</h2>
+
       <div class="recipe-search">
         <svg class="recipe-search-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -236,7 +238,7 @@
       </div>
 
       <div class="flex-between">
-        <span class="text-sm text-secondary" id="recipe-stats">0 recipes</span>
+        <span class="text-sm text-secondary" id="recipe-stats" aria-live="polite">0 recipes</span>
       </div>
 
       <details class="conversions-toggle">
@@ -271,8 +273,9 @@
               <span class="converter-card-title">Volume</span>
             </div>
             <div class="converter-input-group">
-              <input type="text" inputmode="decimal" class="glass-input" id="conv-vol-input" placeholder="e.g. 1 1/2">
-              <select class="glass-input" id="conv-vol-unit">
+              <input type="number" class="glass-input" id="conv-vol-input" placeholder="e.g. 1.5"
+                aria-label="Volume amount" step="0.25" min="0">
+              <select class="glass-input" id="conv-vol-unit" aria-label="Volume unit">
                 <option value="cup">Cups</option>
                 <option value="tbsp">Tbsp</option>
                 <option value="tsp">Tsp</option>
@@ -297,8 +300,9 @@
               <span class="converter-card-title">Weight</span>
             </div>
             <div class="converter-input-group">
-              <input type="text" inputmode="decimal" class="glass-input" id="conv-wt-input" placeholder="e.g. 1.5">
-              <select class="glass-input" id="conv-wt-unit">
+              <input type="number" class="glass-input" id="conv-wt-input" placeholder="e.g. 1.5"
+                aria-label="Weight amount" step="0.1" min="0">
+              <select class="glass-input" id="conv-wt-unit" aria-label="Weight unit">
                 <option value="lb">Pounds</option>
                 <option value="oz">Ounces</option>
                 <option value="g">Grams</option>
@@ -318,8 +322,9 @@
               <span class="converter-card-title">Temperature</span>
             </div>
             <div class="converter-input-group">
-              <input type="text" inputmode="decimal" class="glass-input" id="conv-temp-input" placeholder="350">
-              <select class="glass-input" id="conv-temp-unit">
+              <input type="number" class="glass-input" id="conv-temp-input" placeholder="350"
+                aria-label="Temperature value" min="0">
+              <select class="glass-input" id="conv-temp-unit" aria-label="Temperature unit">
                 <option value="F">&deg;F</option>
                 <option value="C">&deg;C</option>
               </select>
@@ -504,7 +509,7 @@
             <div class="instructions-list" id="instructions-list"></div>
           </div>
 
-          <a class="recipe-source-link" id="recipe-source-link" href="#" target="_blank" rel="noopener noreferrer">
+          <a class="recipe-source-link" id="recipe-source-link" target="_blank" rel="noopener noreferrer">
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -517,7 +522,7 @@
         </div>
 
         <div id="recipe-edit-form" hidden>
-          <form class="import-form" onsubmit="return false">
+          <form class="import-form" id="edit-recipe-form">
             <div class="import-form-field">
               <label class="import-form-label" for="edit-recipe-title">Title</label>
               <input type="text" class="glass-input" id="edit-recipe-title">
@@ -604,7 +609,7 @@
             </div>
             <div class="import-actions">
               <button class="btn btn-secondary" id="btn-cancel-edit">Cancel</button>
-              <button class="btn btn-primary" id="btn-save-edit">Save Changes</button>
+              <button class="btn btn-primary" id="btn-save-edit" type="submit">Save Changes</button>
             </div>
           </form>
         </div>
@@ -623,21 +628,24 @@
       <div class="page-content">
 
         <div class="import-tabs" role="tablist" aria-label="Import method">
-          <button class="import-tab active" id="tab-url" data-tab="url" role="tab" aria-selected="true">From
+          <button class="import-tab active" id="tab-url" data-tab="url" role="tab" aria-selected="true"
+            aria-controls="url-panel">From
             URL</button>
-          <button class="import-tab" id="tab-manual" data-tab="manual" role="tab" aria-selected="false">Create
+          <button class="import-tab" id="tab-manual" data-tab="manual" role="tab" aria-selected="false"
+            aria-controls="manual-panel">Create
             Manually</button>
-          <button class="import-tab" id="tab-api" data-tab="api" role="tab" aria-selected="false">API</button>
+          <button class="import-tab" id="tab-api" data-tab="api" role="tab" aria-selected="false"
+            aria-controls="api-panel">API</button>
         </div>
 
         <!-- URL Import -->
-        <div class="import-tab-content active" data-tab="url" role="tabpanel" aria-labelledby="tab-url">
+        <div class="import-tab-content active" data-tab="url" id="url-panel" role="tabpanel" aria-labelledby="tab-url">
           <div class="import-url-section">
             <p class="text-sm text-secondary">Paste a link from any recipe website or food blog to automatically extract
               ingredients, instructions, and nutrition info.</p>
             <div class="import-url-input-group">
               <input type="url" class="glass-input" id="import-url-input" placeholder="https://example.com/recipe"
-                autocomplete="off">
+                autocomplete="off" aria-label="Recipe URL">
               <button class="btn btn-primary" id="btn-extract-url">Extract</button>
             </div>
           </div>
@@ -653,7 +661,7 @@
               <div class="import-preview-meta" id="import-preview-meta"></div>
             </div>
 
-            <form class="import-form" onsubmit="return false">
+            <form class="import-form" id="import-edit-form">
               <div class="import-form-field">
                 <label class="import-form-label" for="edit-title">Title</label>
                 <input type="text" class="glass-input" id="edit-title">
@@ -746,13 +754,14 @@
 
             <div class="import-actions">
               <button class="btn btn-secondary" id="btn-cancel-preview">Cancel</button>
-              <button class="btn btn-primary" id="btn-save-imported">Save Recipe</button>
+              <button class="btn btn-primary" id="btn-save-imported" type="submit">Save Recipe</button>
             </div>
           </div>
         </div>
 
         <!-- Manual Create -->
-        <div class="import-tab-content" data-tab="manual" role="tabpanel" aria-labelledby="tab-manual">
+        <div class="import-tab-content" data-tab="manual" id="manual-panel" role="tabpanel"
+          aria-labelledby="tab-manual">
           <form class="import-form" id="manual-recipe-form">
             <p class="text-sm text-secondary">Create a recipe from scratch with custom ingredients and instructions.</p>
 
@@ -765,7 +774,7 @@
                 </svg>
               </div>
               <div id="manual-image-preview" hidden></div>
-              <input type="file" id="manual-image" accept="image/*" hidden>
+              <input type="file" id="manual-image" accept="image/*" hidden aria-label="Upload a cover image">
             </button>
 
             <div class="import-form-field">
@@ -858,7 +867,7 @@
         </div>
 
         <!-- API -->
-        <div class="import-tab-content" data-tab="api" role="tabpanel" aria-labelledby="tab-api">
+        <div class="import-tab-content" data-tab="api" id="api-panel" role="tabpanel" aria-labelledby="tab-api">
           <div class="import-api-select">
             <p class="text-sm text-secondary">Food search results come from Open Food Facts, USDA FoodData Central, and
               Spoonacular — all proxied through the server to keep API keys secure.</p>
@@ -903,6 +912,8 @@
   <!-- Template: Meal Log -->
   <template id="template-meal-log">
     <div class="page page-meal-log" data-page="meal-log">
+
+      <h2 class="sr-only">Meal Log</h2>
 
       <div class="date-selector">
         <button class="date-nav" id="btn-date-prev" aria-label="Previous day">

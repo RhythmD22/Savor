@@ -204,6 +204,13 @@
   flex-shrink: 0;
 }
 
+.food-search-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
 .food-search-results {
   display: flex;
   flex-direction: column;
@@ -292,8 +299,8 @@
 }
 
 .stepper-btn {
-  width: 32px;
-  height: 32px;
+  width: var(--touch-target);
+  height: var(--touch-target);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--glass-bg);

@@ -6,6 +6,9 @@ export function showToast(message, type = '') {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const duration = reducedMotion ? 5000 : TOAST_DURATION;
+
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`.trimEnd();
   toast.textContent = message;
@@ -16,7 +19,7 @@ export function showToast(message, type = '') {
 
   setTimeout(() => {
     if (toast.parentNode) toast.remove();
-  }, TOAST_DURATION);
+  }, duration);
 }
 
 export function showDialog({ title, content, actions } = {}) {
@@ -49,7 +52,7 @@ export function showDialog({ title, content, actions } = {}) {
     <div class="dialog-sheet">
       <div class="dialog-handle"></div>
       <button class="icon-btn dialog-close-btn" aria-label="Close dialog">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       ${title ? `<h2 class="dialog-title">${title}</h2>` : ''}
       ${content ? `<div class="dialog-content">${content}</div>` : ''}

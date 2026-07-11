@@ -22,9 +22,14 @@ export function initRecipes() {
 
   const filterChips = document.querySelectorAll('.filter-chip');
   filterChips.forEach((chip) => {
+    chip.setAttribute('aria-pressed', chip.classList.contains('active') ? 'true' : 'false');
     chip.addEventListener('click', () => {
-      filterChips.forEach((c) => c.classList.remove('active'));
+      filterChips.forEach((c) => {
+        c.classList.remove('active');
+        c.setAttribute('aria-pressed', 'false');
+      });
       chip.classList.add('active');
+      chip.setAttribute('aria-pressed', 'true');
       currentFilter = chip.dataset.filter || 'all';
       renderRecipes();
     });
@@ -62,7 +67,7 @@ function renderRecipes() {
   if (recipes.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="empty-state-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
           <line x1="16" y1="13" x2="8" y2="13" />
@@ -79,7 +84,7 @@ function renderRecipes() {
     .map(
       (r) => `
       <button class="recipe-card glass glass-card" data-route="recipe-detail" data-id="${r.id}" aria-label="View recipe: ${escapeHTML(r.title)}">
-        ${r.image ? `<img class="recipe-card-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
+        ${r.image ? `<img class="recipe-card-image" src="${escapeHTML(r.image)}" alt="" loading="lazy">` : `<div class="recipe-card-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
         <div class="recipe-card-content">
           <div class="recipe-card-title truncate">${escapeHTML(r.title)}</div>
           ${r.sourceName ? `<div class="recipe-card-source">${escapeHTML(r.sourceName)}</div>` : ''}

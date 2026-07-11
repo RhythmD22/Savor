@@ -46,7 +46,7 @@
 | Frosted Glass UI | `backdrop-filter: blur()` glassmorphism on cards, inputs, navigation, and the floating bottom bar |
 | Local Storage | All recipes, meal logs, weight entries, and profile data persisted in `localStorage` — no account, no server, no sign-up |
 | Responsive PWA | Mobile-first with a floating bottom nav bar; converts to a 240px sidebar on desktop (768px+) |
-| Accessibility | WCAG 2.1 AA: `for` attributes on all form labels, `aria-hidden` on decorative SVGs, `role="tabpanel"` with `aria-labelledby`, `role="progressbar"` with `aria-valuenow/min/max` on macro bars, `aria-live` announcements on navigation, converter results, and toasts, focus trapping in dialogs, keyboard-accessible food search with Escape/close, visible `:focus-visible` indicators on inputs, nav items, and interactive controls, chart canvas with `role="img"` + `aria-label`, programmatic label-input associations, skip-to-main-content link |
+| Accessibility | WCAG 2.1 AA: `for` attributes on all form labels, `aria-hidden` and `focusable="false"` on all decorative SVGs, `role="tabpanel"` + `role="tab"` with `aria-selected` and `aria-controls` plus arrow-key navigation on tablists, `role="progressbar"` with `aria-valuenow/min/max` on macro bars, `aria-live` announcements on navigation, converter results, food search, recipe stats, and toasts, focus trapping and restoration in all dialogs, keyboard-accessible food search with Escape/close, visible `:focus-visible` indicators on all interactive elements, Chart.js canvas with `role="img"` + `aria-label` + sr-only data table, `aria-pressed` on theme toggle and filter chips, `aria-current="page"` on active nav items, `prefers-reduced-motion` kills all animations/transitions plus removes active-state scale transforms, skip-to-main-content link, all text colors verified at WCAG AA 4.5:1+ in both themes, all UI graphics verified at 3:1+ |
 | No Framework | Vanilla HTML, CSS, and JavaScript; CSS `@layer` organization |
 
 ---
@@ -180,8 +180,8 @@ Savor uses a warm orange-tinted theme with frosted glass surfaces, notebook pape
 | `--bg-elevated` | `#241E1A` | Card backgrounds |
 | `--glass-bg` | `rgba(36, 30, 26, 0.55)` | Frosted card surfaces |
 | `--glass-blur` | `22px` | Backdrop blur radius |
-| `--brand-600` | `#D35A1C` | Primary UI elements, active nav, ring fill |
-| `--brand-700` | `#B8450D` | Primary buttons, FAB |
+| `--brand-600` | `#E0611E` | Primary UI elements, active nav, ring fill |
+| `--brand-700` | `#D35A1C` | Primary buttons, FAB |
 | `--brand-text` | `#FFA970` | Links, brand-colored text (WCAG AA 4.5:1+) |
 | `--text-primary` | `#F2EBE5` | Headings, body text |
 | `--text-secondary` | `#B1A598` | Secondary text |

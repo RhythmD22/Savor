@@ -24,12 +24,7 @@
   gap: var(--space-sm);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
   padding-bottom: var(--space-xs);
-}
-
-.recipe-filters::-webkit-scrollbar {
-  display: none;
 }
 
 .filter-chip {
@@ -130,7 +125,7 @@ button.recipe-card {
 
 .recipe-card-source {
   font-size: var(--text-xs);
-  color: var(--brand-600);
+  color: var(--brand-text);
   margin-top: 2px;
 }
 

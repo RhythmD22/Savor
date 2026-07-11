@@ -72,7 +72,7 @@
 }
 
 .ring-remaining.over {
-  color: var(--danger);
+  color: #B91C1C;
 }
 
 .macro-breakdown {

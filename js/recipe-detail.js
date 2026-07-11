@@ -240,11 +240,14 @@ function showEditForm(recipe) {
   rebindEditInstructionEvents();
 
   window.scrollTo({ top: 0, behavior: 'instant' });
+
+  setTimeout(() => document.getElementById('edit-recipe-title')?.focus(), 50);
 }
 
 function hideEditForm() {
   document.getElementById('recipe-edit-form').setAttribute('hidden', '');
   document.getElementById('recipe-view-content').removeAttribute('hidden');
+  document.getElementById('btn-edit-recipe')?.focus({ preventScroll: true });
 }
 
 function handleSaveEdit(recipe) {
@@ -295,14 +298,14 @@ function renderEditIngredients() {
   container.innerHTML = editIngredients
     .map((ing, i) => {
       if (ing.heading) {
-        return `<div class="ingredient-heading">${escapeHTML(ing.text)}</div>`;
+        return `<div class="ingredient-heading" role="heading" aria-level="4">${escapeHTML(ing.text)}</div>`;
       }
       return `
       <div class="import-ingredient-row">
         <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
-          data-edit-ingredient-index="${i}" placeholder="e.g. 2 cups flour">
+          data-edit-ingredient-index="${i}" placeholder="e.g. 2 cups flour" aria-label="Ingredient ${i + 1}">
         <button class="btn btn-icon-only btn-small" data-edit-remove-ingredient="${i}" aria-label="Remove ingredient">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
@@ -319,9 +322,9 @@ function renderEditInstructions() {
     .map((step, i) => `
       <div class="import-ingredient-row">
         <textarea class="glass-textarea" data-edit-instruction-index="${i}"
-          placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
+          placeholder="Step ${i + 1}" aria-label="Instruction step ${i + 1}">${escapeHTML(step)}</textarea>
         <button class="btn btn-icon-only btn-small" data-edit-remove-instruction="${i}" aria-label="Remove step">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>

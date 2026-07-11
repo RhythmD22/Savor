@@ -94,6 +94,16 @@
   color: var(--text-primary);
 }
 
+.weight-entry-delete {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
 .weight-entry-delete:hover {
   opacity: 1;
   color: var(--danger);

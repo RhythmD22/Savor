@@ -152,6 +152,7 @@
     /* Brand tints */
     --brand-100: #3A2214;
     --brand-200: #4A2C1A;
+    --brand-600: #E0611E;
     --brand-700: #D35A1C;
 
     /* Brand glows */
@@ -263,7 +264,8 @@
 
   a {
     color: var(--brand-text);
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   img,
@@ -276,8 +278,11 @@
   }
 
   input {
-    outline: none;
     caret-color: var(--brand-600);
+  }
+
+  input:focus:not(:focus-visible) {
+    outline: none;
   }
 
   input:focus-visible {
@@ -286,9 +291,12 @@
   }
 
   textarea {
-    outline: none;
     caret-color: var(--brand-600);
     resize: vertical;
+  }
+
+  textarea:focus:not(:focus-visible) {
+    outline: none;
   }
 
   textarea:focus-visible {
@@ -583,7 +591,7 @@
   }
 
   .nav-item.active {
-    color: var(--brand-600);
+    color: var(--brand-700);
     background: rgba(184, 69, 13, 0.12);
   }
 
@@ -634,7 +642,12 @@
     flex: 1;
     padding: var(--space-lg);
     padding-bottom: var(--space-3xl);
-    animation: page-enter 0.4s var(--ease-out-expo);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #app-root {
+      animation: page-enter 0.4s var(--ease-out-expo);
+    }
   }
 
   #app-root:focus-visible {
@@ -722,13 +735,17 @@
     opacity: 0.5;
   }
 
-  .glass-card:active {
+  button.glass-card:active,
+  a.glass-card:active,
+  [tabindex].glass-card:active {
     transform: scale(0.975);
     border-color: var(--glass-border-hover);
     box-shadow: var(--shadow-md), 0 0 0 1px var(--glass-border-hover);
   }
 
-  .glass-card:active::after {
+  button.glass-card:active::after,
+  a.glass-card:active::after,
+  [tabindex].glass-card:active::after {
     opacity: 0.35;
   }
 
@@ -1038,8 +1055,14 @@
     font-weight: 500;
     color: var(--text-primary);
     pointer-events: all;
-    animation: toast-in 0.35s var(--ease-out-expo), toast-out 0.3s var(--ease-out-expo) 2.5s forwards;
+    animation: toast-in 0.35s var(--ease-out-expo);
     max-width: 100%;
+    transition: opacity 0.3s var(--ease-out-expo);
+  }
+
+  .toast.out {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
   }
 
   .toast-success {
@@ -1150,7 +1173,6 @@
     border-radius: var(--radius-full);
     margin: 0 auto var(--space-lg);
     position: relative;
-    cursor: grab;
     touch-action: none;
   }
 
@@ -1164,6 +1186,23 @@
     position: absolute;
     top: var(--space-md);
     right: var(--space-md);
+  }
+
+  .icon-btn {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .icon-btn:active {
+    background: var(--glass-bg-active);
+    color: var(--text-primary);
   }
 
   .dialog-title {
@@ -1421,6 +1460,20 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  button:active,
+  .theme-toggle-fixed:active,
+  .nav-item.nav-fab:active,
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-danger:active,
+  .filter-chip:active,
+  .glass-card:active,
+  .nav-item:active,
+  .btn:active,
+  .icon-btn:active {
+    transform: none;
   }
 }
 

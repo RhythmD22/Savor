@@ -148,7 +148,7 @@ function renderMealLog() {
               </div>
               <span class="meal-log-entry-calories">${formatNumber(e.calories)} cal</span>
               <button class="meal-log-entry-actions btn-icon-only" data-remove-entry="${e.id}" aria-label="Remove entry">
-                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
               </button>
@@ -159,14 +159,14 @@ function renderMealLog() {
         return `
           <div class="meal-log-section">
             <div class="meal-log-section-header">
-              <span class="meal-log-section-title">${typeLabels[type]}</span>
+              <h3 class="meal-log-section-title">${typeLabels[type]}</h3>
               <span class="meal-log-section-calories">${typeCal > 0 ? formatNumber(typeCal) + ' cal' : ''}</span>
             </div>
             <div class="meal-log-entries">
               ${entriesHTML}
             </div>
-            <button class="add-food-btn" data-meal-type="${type}">
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="add-food-btn" data-meal-type="${type}" aria-label="Add food to ${typeLabels[type]}">
+              <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
               Add Food
@@ -201,16 +201,20 @@ function openFoodSearch(mealType) {
   overlay.className = 'dialog-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Search foods');
+  overlay.setAttribute('aria-labelledby', 'food-search-heading');
+
+  const previousFocus = document.activeElement;
 
   overlay.innerHTML = `
     <div class="dialog-sheet food-search-dialog">
       <div class="dialog-handle"></div>
+      <h2 id="food-search-heading" class="dialog-title">Search Foods</h2>
       <button class="icon-btn dialog-close-btn" aria-label="Close search">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
+      <label for="food-search-input" class="food-search-label">Find a food</label>
       <input type="text" class="glass-input search-input-fixed" id="food-search-input" placeholder="Search recipes or foods..." autocomplete="off">
-      <div class="food-search-results" id="food-search-results">
+      <div class="food-search-results" id="food-search-results" aria-live="polite">
         <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
       </div>
     </div>`;
@@ -221,6 +225,9 @@ function openFoodSearch(mealType) {
   const removeOverlay = () => {
     overlay.remove();
     document.body.style.overflow = '';
+    if (previousFocus) {
+      setTimeout(() => previousFocus.focus(), 50);
+    }
   };
 
   overlay.addEventListener('click', (e) => {
@@ -230,6 +237,20 @@ function openFoodSearch(mealType) {
   overlay.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       removeOverlay();
+      return;
+    }
+    if (e.key === 'Tab') {
+      const focusable = overlay.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 
@@ -294,13 +315,13 @@ function openFoodSearch(mealType) {
       debounce(async (e) => {
         const query = e.target.value.trim();
         const results = await searchFood(query);
-        renderFoodResults(results, overlay, mealType);
+        renderFoodResults(results, overlay, mealType, previousFocus);
       }, 250)
     );
   }
 }
 
-function renderFoodResults(results, overlay, mealType) {
+function renderFoodResults(results, overlay, mealType, previousFocus) {
   const container = document.getElementById('food-search-results');
   if (!container) return;
 
@@ -315,14 +336,14 @@ function renderFoodResults(results, overlay, mealType) {
       (r) => `
       <div class="food-search-item glass glass-card" data-food-id="${r.id}" data-food-name="${escapeHTML(r.name)}"
         data-calories="${r.calories}" data-protein="${r.protein}" data-carbs="${r.carbs}" data-fat="${r.fat}">
-        <div class="food-search-select" tabindex="0" role="button" aria-expanded="false">
+        <button class="food-search-select" aria-expanded="false" id="food-select-${r.id}" aria-controls="food-stepper-${r.id}">
           <div class="food-search-info">
             <div class="food-search-name">${escapeHTML(r.name)}</div>
             <div class="food-search-brand">${escapeHTML(r.source || '')} \u00B7 ${r.per100g ? 'per 100g' : 'per serving'}</div>
           </div>
           <span class="food-search-calories" data-cals="${r.calories}">${formatNumber(r.calories)} cal</span>
-        </div>
-        <div class="food-search-stepper">
+        </button>
+        <div class="food-search-stepper" id="food-stepper-${r.id}">
           <div class="stepper-controls">
             <button class="stepper-btn stepper-minus" aria-label="Decrease servings">-</button>
             <span class="stepper-value">1</span>
@@ -356,12 +377,6 @@ function renderFoodResults(results, overlay, mealType) {
     };
 
     select.addEventListener('click', handleSelect);
-    select.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handleSelect();
-      }
-    });
   });
 
   container.querySelectorAll('.stepper-minus').forEach((btn) => {
@@ -405,6 +420,9 @@ function renderFoodResults(results, overlay, mealType) {
       addMealEntry(currentDate, entry);
       overlay.remove();
       document.body.style.overflow = '';
+      if (previousFocus) {
+        setTimeout(() => previousFocus.focus(), 50);
+      }
       showToast(`Added to ${mealType}`);
       renderMealLog();
     });

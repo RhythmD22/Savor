@@ -179,7 +179,15 @@ function renderWeightChart(log) {
     return;
   }
 
-  chartContainer.innerHTML = '<canvas id="weightCanvas" role="img" aria-label="Weight trend chart"></canvas>';
+  chartContainer.innerHTML = '<canvas id="weightCanvas" role="img" aria-label="Weight trend chart" aria-describedby="weight-chart-summary"></canvas>';
+  const summary = document.createElement('div');
+  summary.id = 'weight-chart-summary';
+  summary.className = 'sr-only';
+  const weights = log.map(e => toLbs(e.weight));
+  const change = weights[weights.length - 1] - weights[0];
+  const dir = change > 0 ? 'gained' : change < 0 ? 'lost' : 'maintained';
+  summary.textContent = `Weight ${dir} ${Math.abs(change).toFixed(1)} lbs over ${log.length} entries. Starting at ${weights[0].toFixed(1)} lbs, current ${weights[weights.length - 1].toFixed(1)} lbs.`;
+  chartContainer.appendChild(summary);
 
   if (typeof Chart === 'undefined') {
     setTimeout(() => {

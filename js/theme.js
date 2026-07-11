@@ -21,6 +21,7 @@ function applyTheme(theme) {
   const btn = document.getElementById('btn-theme');
   if (btn) {
     btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
   }
 }
 

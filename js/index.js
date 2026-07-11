@@ -54,8 +54,8 @@ export function initHome() {
       recentRecipesContainer.innerHTML = recent
         .map(
           (r) => `
-          <button class="glass glass-card mini-recipe-card" data-route="recipe-detail" data-id="${r.id}">
-            ${r.image ? `<img class="mini-recipe-image" src="${escapeHTML(r.image)}" alt="${escapeHTML(r.title)}" loading="lazy">` : `<div class="mini-recipe-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
+          <button class="glass glass-card mini-recipe-card" data-route="recipe-detail" data-id="${r.id}" aria-label="View recipe: ${escapeHTML(r.title)}">
+            ${r.image ? `<img class="mini-recipe-image" src="${escapeHTML(r.image)}" alt="" loading="lazy">` : `<div class="mini-recipe-image-placeholder" aria-hidden="true">${r.title.charAt(0).toUpperCase()}</div>`}
             <span class="mini-recipe-name truncate">${escapeHTML(r.title)}</span>
             <span class="mini-recipe-meta">${r.nutrition?.calories ? formatNumber(r.nutrition.calories) + ' cal' : ''}</span>
           </button>`

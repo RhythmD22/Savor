@@ -20,7 +20,9 @@ export function initImport() {
 
 function switchTab(tabId) {
   document.querySelectorAll('.import-tab').forEach((tab) => {
-    tab.classList.toggle('active', tab.dataset.tab === tabId);
+    const isActive = tab.dataset.tab === tabId;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
   document.querySelectorAll('.import-tab-content').forEach((content) => {
     content.classList.toggle('active', content.dataset.tab === tabId);
@@ -28,6 +30,32 @@ function switchTab(tabId) {
 }
 
 function bindImportEvents() {
+  const tabList = document.querySelector('.import-tabs');
+  if (tabList) {
+    tabList.addEventListener('keydown', (e) => {
+      const tabs = Array.from(tabList.querySelectorAll('.import-tab'));
+      const currentIdx = tabs.indexOf(document.activeElement);
+      let targetIdx = currentIdx;
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        targetIdx = (currentIdx + 1) % tabs.length;
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        targetIdx = (currentIdx - 1 + tabs.length) % tabs.length;
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        targetIdx = 0;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        targetIdx = tabs.length - 1;
+      }
+      if (targetIdx !== currentIdx) {
+        tabs[targetIdx].focus();
+        tabs[targetIdx].click();
+      }
+    });
+  }
+
   document.querySelectorAll('.import-tab').forEach((tab) => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
@@ -233,7 +261,8 @@ function handleManualImageFile() {
   reader.onload = () => {
     manualImageData = reader.result;
     placeholder.setAttribute('hidden', '');
-    preview.innerHTML = `<img class="import-preview-image" src="${escapeHTML(reader.result)}" alt="Recipe image preview">`;
+    const recipeTitle = document.getElementById('manual-title')?.value?.trim() || 'Recipe';
+    preview.innerHTML = `<img class="import-preview-image" src="${escapeHTML(reader.result)}" alt="Photo for ${escapeHTML(recipeTitle)}">`;
     preview.removeAttribute('hidden');
   };
   reader.readAsDataURL(file);
@@ -242,11 +271,13 @@ function handleManualImageFile() {
 function showStatus(message, type) {
   const statusEl = document.getElementById('import-status');
   if (!statusEl) return;
+  statusEl.setAttribute('role', 'alert');
+  statusEl.setAttribute('aria-live', 'assertive');
 
   const icons = {
     loading: `<span class="spinner spinner-brand"></span>`,
-    success: `<svg class="import-status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-    error: `<svg class="import-status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+    success: `<svg class="import-status-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+    error: `<svg class="import-status-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
   };
 
   statusEl.className = `import-status ${type}`;
@@ -272,14 +303,14 @@ function renderIngredientsEditor(prefix = '') {
     .map(
       (ing, i) => {
         if (ing.heading) {
-          return `<div class="ingredient-heading">${escapeHTML(ing.text)}</div>`;
+          return `<div class="ingredient-heading" role="heading" aria-level="4">${escapeHTML(ing.text)}</div>`;
         }
         return `
       <div class="import-ingredient-row">
         <input type="text" class="glass-input" value="${escapeHTML(typeof ing === 'string' ? ing : ing.text || '')}"
-          data-${prefix}ingredient-index="${i}" placeholder="e.g. 2 cups flour">
+          data-${prefix}ingredient-index="${i}" placeholder="e.g. 2 cups flour" aria-label="Ingredient ${i + 1}">
         <button class="btn btn-icon-only btn-small" data-${prefix}remove-ingredient="${i}" aria-label="Remove ingredient">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
@@ -314,9 +345,9 @@ function renderInstructionsEditor(prefix = '') {
       (step, i) => `
       <div class="import-ingredient-row">
         <textarea class="glass-textarea" data-${prefix}instruction-index="${i}"
-          placeholder="Step ${i + 1}">${escapeHTML(step)}</textarea>
+          placeholder="Step ${i + 1}" aria-label="Instruction step ${i + 1}">${escapeHTML(step)}</textarea>
         <button class="btn btn-icon-only btn-small" data-${prefix}remove-instruction="${i}" aria-label="Remove step">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
