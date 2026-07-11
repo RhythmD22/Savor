@@ -1,4 +1,4 @@
-import { getMealLog, getMealTypeTotals, getDailyTotals, addMealEntry, removeMealEntry, getProfile, DEFAULT_CALORIE_GOAL } from './data.js';
+import { getMealLog, getMealTypeTotals, getDailyTotals, addMealEntry, removeMealEntry, getProfile, addRecipe, DEFAULT_CALORIE_GOAL } from './data.js';
 import { searchFood } from './api.js';
 import { formatNumber, formatDate, showToast, debounce, escapeHTML, MS_PER_DAY } from './utils.js';
 
@@ -217,6 +217,12 @@ function openFoodSearch(mealType) {
       <div class="food-search-results" id="food-search-results" aria-live="polite">
         <p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>
       </div>
+      <button class="custom-food-btn" id="btn-custom-food">
+        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Custom Food
+      </button>
     </div>`;
 
   document.body.appendChild(overlay);
@@ -318,6 +324,13 @@ function openFoodSearch(mealType) {
         renderFoodResults(results, overlay, mealType, previousFocus);
       }, 250)
     );
+  }
+
+  const customFoodBtn = document.getElementById('btn-custom-food');
+  if (customFoodBtn) {
+    customFoodBtn.addEventListener('click', () => {
+      renderCustomFoodForm(overlay, mealType, previousFocus);
+    });
   }
 }
 
@@ -438,5 +451,113 @@ function updateStepperCalories(item, count) {
   const label = item.querySelector('.stepper-label');
   if (label) {
     label.textContent = count === 1 ? 'serving' : 'servings';
+  }
+}
+
+function renderCustomFoodForm(overlay, mealType, previousFocus) {
+  const container = document.getElementById('food-search-results');
+  const customBtn = document.getElementById('btn-custom-food');
+  if (!container) return;
+
+  if (customBtn) customBtn.style.display = 'none';
+
+  container.innerHTML = `
+    <div class="custom-food-form">
+      <h3 class="meal-log-section-title">Custom Food</h3>
+      <div class="import-form-field">
+        <label class="import-form-label" for="custom-food-name">Food Name</label>
+        <input type="text" class="glass-input" id="custom-food-name" placeholder="e.g. Homemade smoothie" autocomplete="off">
+      </div>
+      <div class="form-row col-3">
+        <div class="import-form-field">
+          <label class="import-form-label" for="custom-food-calories">Calories</label>
+          <input type="number" class="glass-input" id="custom-food-calories" min="0" inputmode="decimal">
+        </div>
+        <div class="import-form-field">
+          <label class="import-form-label" for="custom-food-protein">Protein (g)</label>
+          <input type="number" class="glass-input" id="custom-food-protein" min="0" inputmode="decimal">
+        </div>
+        <div class="import-form-field">
+          <label class="import-form-label" for="custom-food-carbs">Carbs (g)</label>
+          <input type="number" class="glass-input" id="custom-food-carbs" min="0" inputmode="decimal">
+        </div>
+      </div>
+      <div class="import-form-field">
+        <label class="import-form-label" for="custom-food-fat">Fat (g)</label>
+        <input type="number" class="glass-input" id="custom-food-fat" min="0" inputmode="decimal">
+      </div>
+      <label class="save-recipe-toggle">
+        <input type="checkbox" id="custom-food-save-recipe">
+        <span>Save as recipe for future use</span>
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-secondary" id="btn-custom-cancel">Cancel</button>
+        <button class="btn btn-primary" id="btn-custom-add">Add Food</button>
+      </div>
+    </div>`;
+
+  const cancelBtn = document.getElementById('btn-custom-cancel');
+  const addBtn = document.getElementById('btn-custom-add');
+  const nameInput = document.getElementById('custom-food-name');
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      if (customBtn) customBtn.style.display = '';
+      container.innerHTML =
+        '<p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>';
+      container.scrollTop = 0;
+    });
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const name = (document.getElementById('custom-food-name')?.value || '').trim();
+      const calories = parseFloat(document.getElementById('custom-food-calories')?.value) || 0;
+      const protein = parseFloat(document.getElementById('custom-food-protein')?.value) || 0;
+      const carbs = parseFloat(document.getElementById('custom-food-carbs')?.value) || 0;
+      const fat = parseFloat(document.getElementById('custom-food-fat')?.value) || 0;
+      const saveAsRecipe = document.getElementById('custom-food-save-recipe')?.checked || false;
+
+      if (!name) {
+        showToast('Please enter a food name');
+        return;
+      }
+
+      if (saveAsRecipe) {
+        addRecipe({
+          title: name,
+          servings: 1,
+          nutrition: { calories, protein, carbs, fat },
+        });
+      }
+
+      addMealEntry(currentDate, {
+        foodName: name,
+        calories,
+        protein,
+        carbs,
+        fat,
+        mealType,
+        servingSize: 1,
+      });
+
+      overlay.remove();
+      document.body.style.overflow = '';
+      if (previousFocus) {
+        setTimeout(() => previousFocus.focus(), 50);
+      }
+      showToast(`Added to ${mealType}`);
+      renderMealLog();
+    });
+  }
+
+  if (nameInput) {
+    setTimeout(() => nameInput.focus(), 100);
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addBtn?.click();
+      }
+    });
   }
 }

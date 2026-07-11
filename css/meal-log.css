@@ -219,6 +219,8 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 0 2px;
+  background: transparent;
 }
 
 .food-search-item {
@@ -336,4 +338,88 @@
   padding: var(--space-xs) var(--space-md);
   font-size: var(--text-sm);
   flex-shrink: 0;
+}
+
+.custom-food-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 2px dashed var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--brand-text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  min-height: var(--touch-target);
+  background: transparent;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+}
+
+.custom-food-btn:hover {
+  border-color: var(--brand-600);
+  background: var(--brand-50);
+}
+
+.custom-food-btn:active {
+  background: var(--glass-bg-active);
+}
+
+.custom-food-btn:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+}
+
+.custom-food-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: 2px;
+}
+
+.custom-food-form .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.custom-food-form .form-row.col-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.custom-food-form .form-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.custom-food-form .form-actions .btn {
+  flex: 1;
+}
+
+.custom-food-form .save-recipe-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.custom-food-form .save-recipe-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand-600);
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+[data-theme="dark"] .custom-food-form .glass-input {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .food-search-results {
+  background: transparent;
 }

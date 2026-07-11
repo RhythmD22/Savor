@@ -196,6 +196,12 @@
   grid-column: 1 / -1;
 }
 
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
 @media (min-width: 768px) {
   .hero-calorie-ring {
     flex-direction: row;

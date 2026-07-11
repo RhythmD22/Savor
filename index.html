@@ -531,6 +531,22 @@
               <label class="import-form-label" for="edit-recipe-description">Description</label>
               <textarea class="glass-textarea" id="edit-recipe-description"></textarea>
             </div>
+            <div class="import-form-field">
+              <label class="import-form-label">Cover Image</label>
+              <button type="button" class="manual-image-area" id="edit-recipe-image-area"
+                aria-label="Add or change cover image">
+                <div class="import-preview-image-placeholder" id="edit-recipe-image-placeholder">
+                  <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </div>
+                <div id="edit-recipe-image-preview" hidden></div>
+                <input type="file" id="edit-recipe-image-file" accept="image/*" hidden
+                  aria-label="Upload a cover image">
+              </button>
+            </div>
             <div class="grid-3col">
               <div class="import-form-field">
                 <label class="import-form-label" for="edit-recipe-servings">Servings</label>

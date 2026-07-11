@@ -4,6 +4,7 @@ import { formatNumber, formatTime, formatDecimal, showToast, showConfirm, escape
 let currentRecipeId = null;
 let editIngredients = [];
 let editInstructions = [];
+let editImageData = null;
 
 export function initRecipeDetail(data) {
   if (!data?.id) {
@@ -193,6 +194,13 @@ function bindActions(recipe) {
     descTa.addEventListener('input', (e) => autoSizeTextarea(e.target));
   }
 
+  const imageArea = document.getElementById('edit-recipe-image-area');
+  const imageFile = document.getElementById('edit-recipe-image-file');
+  if (imageArea && imageFile) {
+    imageArea.addEventListener('click', () => imageFile.click());
+    imageFile.addEventListener('change', handleEditImageFile);
+  }
+
   const deleteBtn = document.getElementById('btn-delete-recipe');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', () => {
@@ -227,6 +235,9 @@ function showEditForm(recipe) {
   document.getElementById('edit-recipe-cuisine').value = recipe.cuisine || '';
   document.getElementById('edit-recipe-meal-type').value = recipe.mealType || '';
 
+  editImageData = recipe.image || null;
+  updateEditImagePreview(recipe.title);
+
   editIngredients = (recipe.ingredients || []).length > 0
     ? recipe.ingredients.slice()
     : [{ text: '' }];
@@ -247,7 +258,37 @@ function showEditForm(recipe) {
 function hideEditForm() {
   document.getElementById('recipe-edit-form').setAttribute('hidden', '');
   document.getElementById('recipe-view-content').removeAttribute('hidden');
+  editImageData = null;
   document.getElementById('btn-edit-recipe')?.focus({ preventScroll: true });
+}
+
+function updateEditImagePreview(recipeTitle) {
+  const preview = document.getElementById('edit-recipe-image-preview');
+  const placeholder = document.getElementById('edit-recipe-image-placeholder');
+  if (!preview || !placeholder) return;
+
+  if (editImageData) {
+    placeholder.setAttribute('hidden', '');
+    preview.innerHTML = `<img class="import-preview-image" src="${escapeHTML(editImageData)}" alt="Photo for ${escapeHTML(recipeTitle || 'recipe')}">`;
+    preview.removeAttribute('hidden');
+  } else {
+    preview.setAttribute('hidden', '');
+    placeholder.removeAttribute('hidden');
+  }
+}
+
+function handleEditImageFile() {
+  const input = document.getElementById('edit-recipe-image-file');
+  if (!input || !input.files[0]) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    editImageData = reader.result;
+    const title = document.getElementById('edit-recipe-title')?.value?.trim() || 'recipe';
+    updateEditImagePreview(title);
+  };
+  reader.readAsDataURL(input.files[0]);
+  input.value = '';
 }
 
 function handleSaveEdit(recipe) {
@@ -279,6 +320,7 @@ function handleSaveEdit(recipe) {
     tags: (document.getElementById('edit-recipe-tags')?.value || '').split(',').map((t) => t.trim()).filter(Boolean),
     cuisine: document.getElementById('edit-recipe-cuisine')?.value || '',
     mealType: document.getElementById('edit-recipe-meal-type')?.value || '',
+    image: editImageData || undefined,
   };
 
   const updated = updateRecipe(recipe.id, updates);
