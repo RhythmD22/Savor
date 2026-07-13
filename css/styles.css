@@ -150,6 +150,7 @@
     --glass-border-focus: rgba(184, 69, 13, 0.48);
 
     /* Brand tints */
+    --brand-50: #2E1A0E;
     --brand-100: #3A2214;
     --brand-200: #4A2C1A;
     --brand-600: #E0611E;
