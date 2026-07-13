@@ -501,11 +501,14 @@ function renderCustomFoodForm(overlay, mealType, previousFocus) {
   const nameInput = document.getElementById('custom-food-name');
 
   if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-      if (customBtn) customBtn.style.display = '';
+    cancelBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       container.innerHTML =
         '<p class="text-tertiary text-sm text-center">Start typing to search your recipes</p>';
       container.scrollTop = 0;
+      requestAnimationFrame(() => {
+        if (customBtn) customBtn.style.display = '';
+      });
     });
   }
 
