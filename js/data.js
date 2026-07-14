@@ -128,9 +128,24 @@ export function formatDate(date) {
   return d.toISOString().split('T')[0];
 }
 
+function resolveEntry(entry) {
+  if (!entry.recipeId) return entry;
+  const recipe = _data.recipes.find((r) => r.id === entry.recipeId);
+  if (!recipe) return entry;
+  return {
+    ...entry,
+    foodName: recipe.title,
+    calories: (recipe.nutrition?.calories || 0) * (entry.servingSize || 1),
+    protein: (recipe.nutrition?.protein || 0) * (entry.servingSize || 1),
+    carbs: (recipe.nutrition?.carbs || 0) * (entry.servingSize || 1),
+    fat: (recipe.nutrition?.fat || 0) * (entry.servingSize || 1),
+  };
+}
+
 export function getMealLog(date) {
   const key = formatDate(date);
-  return _data.mealLog[key] || [];
+  const entries = _data.mealLog[key] || [];
+  return entries.map(resolveEntry);
 }
 
 export function addMealEntry(date, entry) {

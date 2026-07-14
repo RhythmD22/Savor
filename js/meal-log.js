@@ -428,6 +428,7 @@ function renderFoodResults(results, overlay, mealType, previousFocus) {
         fat: (parseFloat(item.dataset.fat) || 0) * servingSize,
         mealType,
         servingSize,
+        recipeId: item.dataset.foodId || null,
       };
 
       addMealEntry(currentDate, entry);
@@ -523,12 +524,14 @@ function renderCustomFoodForm(overlay, mealType, previousFocus) {
         return;
       }
 
+      let recipeId = null;
       if (saveAsRecipe) {
-        addRecipe({
+        const newRecipe = addRecipe({
           title: name,
           servings: 1,
           nutrition: { calories, protein, carbs, fat },
         });
+        recipeId = newRecipe.id;
       }
 
       addMealEntry(currentDate, {
@@ -539,6 +542,7 @@ function renderCustomFoodForm(overlay, mealType, previousFocus) {
         fat,
         mealType,
         servingSize: 1,
+        recipeId,
       });
 
       overlay.remove();
