@@ -31,7 +31,7 @@
 |---------|------------|
 | Recipe Import | Paste any recipe URL — ingredients, instructions, and nutrition are extracted automatically via a Vercel serverless function |
 | Manual Creation | Build recipes from scratch with custom ingredients, step-by-step instructions, full nutrition data, and image attachments — edit any recipe later to add or change its cover image |
-| Recipe Library | Browse, search, favorite, and filter recipes by meal type (breakfast, lunch, dinner, snacks) |
+| Recipe Library | Browse, search, favorite, and filter recipes by meal type (breakfast, lunch, dinner, snacks); drag-to-reorder recipe steps with keyboard and touch support |
 | Cooking Conversions | Built-in measurement converters — volume (cups, tbsp, tsp, ml, liters), weight (lbs, oz, g, kg), temperature (F ↔ C), and oven-to-air-fryer (temp/time adjustments) — with fraction input support ("1 1/2") and a quick-reference cheat sheet |
 | Calorie Ring | Animated SVG calorie tracker on the dashboard — fill the ring throughout the day with color-coded macro breakdown |
 | Meal Logging | Log recipes or individual foods to your daily diary with per-meal grouping and visual macro bars — includes a custom food creator for quick one-off entries you can optionally save as reusable recipes |

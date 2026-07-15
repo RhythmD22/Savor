@@ -12,6 +12,8 @@ export function initRecipeDetail(data) {
     return;
   }
 
+  _viewDragBound = false;
+  _editDragBound = false;
   currentRecipeId = data.id;
   const recipe = getRecipe(data.id);
 
@@ -105,12 +107,20 @@ function renderRecipeDetail(recipe) {
       instructionsList.innerHTML = recipe.instructions
         .map(
           (step, i) => `
-          <div class="instruction-step">
+          <div class="instruction-step" data-step-index="${i}">
+            <div class="step-drag-handle" draggable="true" tabindex="0" role="button"
+              aria-label="Drag to reorder step ${i + 1}" title="Drag to reorder (Arrow keys to move)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/>
+              </svg>
+            </div>
             <div class="step-number">${i + 1}</div>
             <p class="step-text">${escapeHTML(step)}</p>
           </div>`
         )
         .join('');
+
+      bindInstructionsDrag();
     }
   }
 
@@ -210,6 +220,382 @@ function bindActions(recipe) {
         window.navigateTo('recipes');
       });
     });
+  }
+}
+
+let _viewDragBound = false;
+let _viewDragSrc = null;
+let _viewDropIdx = null;
+let _editDragBound = false;
+let _editDragSrc = null;
+let _editDropIdx = null;
+
+function bindInstructionsDrag() {
+  const list = document.getElementById('instructions-list');
+  if (!list) return;
+
+  function getInsertIndex(clientY) {
+    const steps = [...list.querySelectorAll('.instruction-step')];
+    if (steps.length === 0) return 0;
+    for (let i = 0; i < steps.length; i++) {
+      const rect = steps[i].getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (clientY < midY) return i;
+    }
+    return steps.length;
+  }
+
+  function showIndicator(insertIdx) {
+    const steps = list.querySelectorAll('.instruction-step');
+    steps.forEach((s) => {
+      s.classList.remove('step-drag-over', 'step-drag-over-end');
+    });
+    if (insertIdx < steps.length) {
+      steps[insertIdx].classList.add('step-drag-over');
+    } else if (steps.length > 0) {
+      steps[steps.length - 1].classList.add('step-drag-over-end');
+    }
+  }
+
+  function clearIndicators() {
+    list.querySelectorAll('.instruction-step').forEach((s) => {
+      s.classList.remove('step-drag-over', 'step-drag-over-end');
+    });
+  }
+
+  function cleanupView() {
+    clearIndicators();
+    const step = list.querySelector('.instruction-step.step-dragging');
+    if (step) step.classList.remove('step-dragging');
+    _viewDragSrc = null;
+    _viewDropIdx = null;
+  }
+
+  // ── Container listeners (bind once) ──
+
+  if (!_viewDragBound) {
+    _viewDragBound = true;
+
+    list.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (_viewDragSrc === null) return;
+      _viewDropIdx = getInsertIndex(e.clientY);
+      showIndicator(_viewDropIdx);
+    });
+
+    list.addEventListener('dragleave', (e) => {
+      if (!list.contains(e.relatedTarget)) {
+        clearIndicators();
+      }
+    });
+
+    list.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (_viewDragSrc === null || _viewDropIdx === null) { cleanupView(); return; }
+      const adjusted = _viewDragSrc < _viewDropIdx ? _viewDropIdx - 1 : _viewDropIdx;
+      if (_viewDragSrc !== adjusted) {
+        performViewReorder(list, _viewDragSrc, adjusted);
+      }
+      cleanupView();
+    });
+  }
+
+  // ── Handle listeners (rebound each render) ──
+
+  list.querySelectorAll('.step-drag-handle').forEach((handle) => {
+    const step = handle.closest('.instruction-step');
+
+    handle.addEventListener('dragstart', (e) => {
+      _viewDragSrc = parseInt(step.dataset.stepIndex);
+      step.classList.add('step-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+    });
+
+    handle.addEventListener('dragend', () => {
+      cleanupView();
+    });
+
+    handle.addEventListener('keydown', (e) => {
+      const idx = parseInt(step.dataset.stepIndex);
+      if (e.key === 'ArrowUp' && idx > 0) {
+        e.preventDefault();
+        moveInstructionStep(list, idx, idx - 1);
+      } else if (e.key === 'ArrowDown' && idx < list.querySelectorAll('.instruction-step').length - 1) {
+        e.preventDefault();
+        moveInstructionStep(list, idx, idx + 1);
+      }
+    });
+
+    // ── Touch support ──
+    let touchClone = null;
+    let touchOffsetY = 0;
+
+    handle.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      _viewDragSrc = parseInt(step.dataset.stepIndex);
+      step.classList.add('step-dragging');
+      touchOffsetY = touch.clientY - step.getBoundingClientRect().top;
+
+      touchClone = step.cloneNode(true);
+      touchClone.style.position = 'fixed';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.width = step.offsetWidth + 'px';
+      touchClone.style.opacity = '0.9';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+      touchClone.style.background = 'var(--glass-bg-solid, #fff)';
+      touchClone.style.borderRadius = 'var(--radius-sm, 8px)';
+      touchClone.style.left = step.getBoundingClientRect().left + 'px';
+      touchClone.style.top = touch.clientY - touchOffsetY + 'px';
+      document.body.appendChild(touchClone);
+
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchmove', (e) => {
+      if (!touchClone || _viewDragSrc === null) return;
+      const touch = e.touches[0];
+      touchClone.style.top = touch.clientY - touchOffsetY + 'px';
+      _viewDropIdx = getInsertIndex(touch.clientY);
+      showIndicator(_viewDropIdx);
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchend', () => {
+      if (touchClone) {
+        document.body.removeChild(touchClone);
+        touchClone = null;
+      }
+      if (_viewDragSrc !== null && _viewDropIdx !== null) {
+        const adjusted = _viewDragSrc < _viewDropIdx ? _viewDropIdx - 1 : _viewDropIdx;
+        if (_viewDragSrc !== adjusted) {
+          performViewReorder(list, _viewDragSrc, adjusted);
+        }
+      }
+      cleanupView();
+    });
+
+    handle.addEventListener('touchcancel', () => {
+      if (touchClone) {
+        document.body.removeChild(touchClone);
+        touchClone = null;
+      }
+      cleanupView();
+    });
+  });
+}
+
+function performViewReorder(list, fromIndex, toIndex) {
+  const currentRecipe = getRecipe(currentRecipeId);
+  if (!currentRecipe) return;
+
+  const instructions = [...currentRecipe.instructions];
+  const [moved] = instructions.splice(fromIndex, 1);
+  instructions.splice(toIndex, 0, moved);
+
+  const updated = updateRecipe(currentRecipe.id, { instructions });
+  if (updated) {
+    const steps = [...list.querySelectorAll('.instruction-step')];
+    const movedStep = steps[fromIndex];
+    if (fromIndex < toIndex) {
+      const ref = toIndex + 1 < steps.length ? steps[toIndex + 1] : null;
+      list.insertBefore(movedStep, ref);
+    } else {
+      list.insertBefore(movedStep, steps[toIndex]);
+    }
+    renumberSteps(list);
+    list.querySelectorAll('.instruction-step').forEach((s, i) => {
+      s.dataset.stepIndex = i;
+    });
+    updateDragLabels(list);
+  }
+}
+
+function moveInstructionStep(list, fromIndex, toIndex) {
+  performViewReorder(list, fromIndex, toIndex);
+  const handles = list.querySelectorAll('.step-drag-handle');
+  const movedHandle = handles[toIndex];
+  if (movedHandle) movedHandle.focus();
+}
+
+function updateDragLabels(list) {
+  list.querySelectorAll('.step-drag-handle').forEach((handle, i) => {
+    handle.setAttribute('aria-label', `Drag to reorder step ${i + 1}`);
+  });
+}
+
+function renumberSteps(list) {
+  list.querySelectorAll('.step-number').forEach((num, i) => {
+    num.textContent = i + 1;
+  });
+}
+
+function bindEditInstructionsDrag() {
+  const container = document.getElementById('edit-instructions-editor');
+  if (!container) return;
+
+  function getInsertIndex(clientY) {
+    const rows = [...container.querySelectorAll('.edit-instruction-row')];
+    if (rows.length === 0) return 0;
+    for (let i = 0; i < rows.length; i++) {
+      const rect = rows[i].getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (clientY < midY) return i;
+    }
+    return rows.length;
+  }
+
+  function showIndicator(insertIdx) {
+    const rows = container.querySelectorAll('.edit-instruction-row');
+    rows.forEach((r) => r.classList.remove('step-drag-over', 'step-drag-over-end'));
+    if (insertIdx < rows.length) {
+      rows[insertIdx].classList.add('step-drag-over');
+    } else if (rows.length > 0) {
+      rows[rows.length - 1].classList.add('step-drag-over-end');
+    }
+  }
+
+  function cleanupEdit() {
+    container.querySelectorAll('.edit-instruction-row').forEach((r) => {
+      r.classList.remove('step-dragging', 'step-drag-over', 'step-drag-over-end');
+    });
+    _editDragSrc = null;
+    _editDropIdx = null;
+  }
+
+  // ── Container listeners (bind once) ──
+
+  if (!_editDragBound) {
+    _editDragBound = true;
+
+    container.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (_editDragSrc === null) return;
+      _editDropIdx = getInsertIndex(e.clientY);
+      showIndicator(_editDropIdx);
+    });
+
+    container.addEventListener('dragleave', (e) => {
+      if (!container.contains(e.relatedTarget)) {
+        container.querySelectorAll('.edit-instruction-row').forEach((r) => {
+          r.classList.remove('step-drag-over', 'step-drag-over-end');
+        });
+      }
+    });
+
+    container.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (_editDragSrc === null || _editDropIdx === null) { cleanupEdit(); return; }
+      const adjusted = _editDragSrc < _editDropIdx ? _editDropIdx - 1 : _editDropIdx;
+      if (_editDragSrc !== adjusted) {
+        moveEditInstructionStep(_editDragSrc, adjusted);
+      }
+      cleanupEdit();
+    });
+  }
+
+  // ── Handle listeners (rebound each render) ──
+
+  container.querySelectorAll('.step-drag-handle').forEach((handle) => {
+    const row = handle.closest('.edit-instruction-row');
+
+    handle.addEventListener('dragstart', (e) => {
+      _editDragSrc = parseInt(row.dataset.editInstructionDrag);
+      row.classList.add('step-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+    });
+
+    handle.addEventListener('dragend', () => {
+      cleanupEdit();
+    });
+
+    handle.addEventListener('keydown', (e) => {
+      const idx = parseInt(row.dataset.editInstructionDrag);
+      if (e.key === 'ArrowUp' && idx > 0) {
+        e.preventDefault();
+        moveEditInstructionStep(idx, idx - 1);
+      } else if (e.key === 'ArrowDown' && idx < editInstructions.length - 1) {
+        e.preventDefault();
+        moveEditInstructionStep(idx, idx + 1);
+      }
+    });
+
+    // ── Touch support ──
+    let touchClone = null;
+    let touchOffsetY = 0;
+
+    handle.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      _editDragSrc = parseInt(row.dataset.editInstructionDrag);
+      row.classList.add('step-dragging');
+      touchOffsetY = touch.clientY - row.getBoundingClientRect().top;
+
+      touchClone = row.cloneNode(true);
+      touchClone.style.position = 'fixed';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.width = row.offsetWidth + 'px';
+      touchClone.style.opacity = '0.9';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+      touchClone.style.background = 'var(--glass-bg-solid, #fff)';
+      touchClone.style.borderRadius = 'var(--radius-sm, 8px)';
+      touchClone.style.left = row.getBoundingClientRect().left + 'px';
+      touchClone.style.top = touch.clientY - touchOffsetY + 'px';
+      document.body.appendChild(touchClone);
+
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchmove', (e) => {
+      if (!touchClone || _editDragSrc === null) return;
+      const touch = e.touches[0];
+      touchClone.style.top = touch.clientY - touchOffsetY + 'px';
+      _editDropIdx = getInsertIndex(touch.clientY);
+      showIndicator(_editDropIdx);
+      e.preventDefault();
+    }, { passive: false });
+
+    handle.addEventListener('touchend', () => {
+      if (touchClone) {
+        document.body.removeChild(touchClone);
+        touchClone = null;
+      }
+      if (_editDragSrc !== null && _editDropIdx !== null) {
+        const adjusted = _editDragSrc < _editDropIdx ? _editDropIdx - 1 : _editDropIdx;
+        if (_editDragSrc !== adjusted) {
+          moveEditInstructionStep(_editDragSrc, adjusted);
+        }
+      }
+      cleanupEdit();
+    });
+
+    handle.addEventListener('touchcancel', () => {
+      if (touchClone) {
+        document.body.removeChild(touchClone);
+        touchClone = null;
+      }
+      cleanupEdit();
+    });
+  });
+}
+
+function moveEditInstructionStep(fromIndex, toIndex) {
+  const [moved] = editInstructions.splice(fromIndex, 1);
+  editInstructions.splice(toIndex, 0, moved);
+  renderEditInstructions();
+  rebindEditInstructionEvents();
+
+  const container = document.getElementById('edit-instructions-editor');
+  if (container) {
+    const handles = container.querySelectorAll('.step-drag-handle');
+    const movedHandle = handles[toIndex];
+    if (movedHandle) movedHandle.focus();
   }
 }
 
@@ -362,7 +748,13 @@ function renderEditInstructions() {
 
   container.innerHTML = editInstructions
     .map((step, i) => `
-      <div class="import-ingredient-row">
+      <div class="import-ingredient-row edit-instruction-row" data-edit-instruction-drag="${i}">
+        <div class="step-drag-handle" draggable="true" tabindex="0" role="button"
+          aria-label="Drag to reorder step ${i + 1}" title="Drag to reorder (Arrow keys to move)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="18" x2="16" y2="18"/>
+          </svg>
+        </div>
         <textarea class="glass-textarea" data-edit-instruction-index="${i}"
           placeholder="Step ${i + 1}" aria-label="Instruction step ${i + 1}">${escapeHTML(step)}</textarea>
         <button class="btn btn-icon-only btn-small" data-edit-remove-instruction="${i}" aria-label="Remove step">
@@ -374,6 +766,8 @@ function renderEditInstructions() {
     .join('');
 
   container.querySelectorAll('textarea').forEach(autoSizeTextarea);
+
+  bindEditInstructionsDrag();
 }
 
 function bindEditEditorEvents() {
@@ -440,6 +834,9 @@ function rebindEditInstructionEvents() {
       if (editInstructions.length === 0) editInstructions = [''];
       renderEditInstructions();
       rebindEditInstructionEvents();
+      bindEditInstructionsDrag();
     });
   });
+
+  bindEditInstructionsDrag();
 }

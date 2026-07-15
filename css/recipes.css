@@ -5,7 +5,7 @@
 }
 
 .recipe-search .glass-input {
-  padding-left: var(--space-3xl);
+  padding-left: calc(var(--space-3xl) + var(--space-sm));
 }
 
 .recipe-search-icon {
@@ -15,8 +15,9 @@
   transform: translateY(-50%);
   color: var(--text-tertiary);
   pointer-events: none;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  z-index: 1;
 }
 
 .recipe-filters {

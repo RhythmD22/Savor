@@ -7,6 +7,11 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-highlight);
+  margin-bottom: var(--space-lg);
+}
+
+#recipe-view-content .page-section {
+  margin-top: var(--space-xl);
 }
 
 .recipe-hero-image {
@@ -133,6 +138,7 @@
 .instruction-step {
   display: flex;
   gap: var(--space-md);
+  align-items: flex-start;
 }
 
 .step-number {
@@ -160,6 +166,65 @@
   line-height: 1.6;
   padding-top: var(--space-xs);
   overflow-wrap: break-word;
+}
+
+.step-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  cursor: grab;
+  color: var(--text-tertiary);
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.step-drag-handle:hover {
+  color: var(--text-secondary);
+  background: var(--glass-bg);
+}
+
+.step-drag-handle:active {
+  cursor: grabbing;
+}
+
+.step-drag-handle:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(184, 69, 13, 0.2);
+}
+
+.instruction-step.step-dragging {
+  opacity: 0.4;
+}
+
+.instruction-step.step-drag-over,
+.edit-instruction-row.step-drag-over {
+  box-shadow: inset 0 3px 0 0 var(--brand-600);
+}
+
+.instruction-step.step-drag-over-end,
+.edit-instruction-row.step-drag-over-end {
+  box-shadow: inset 0 -3px 0 0 var(--brand-600);
+}
+
+.edit-instruction-row.step-dragging {
+  opacity: 0.4;
+}
+
+.edit-instruction-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.import-ingredient-row.edit-instruction-row {
+  align-items: flex-start;
+}
+
+.edit-instruction-row .glass-textarea {
+  flex: 1;
 }
 
 .recipe-actions {

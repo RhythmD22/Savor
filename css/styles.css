@@ -913,6 +913,7 @@
     letter-spacing: 0.01em;
     white-space: normal;
     max-width: 100%;
+    text-transform: capitalize;
   }
 
   .tag-brand {
