@@ -110,13 +110,39 @@
 }
 
 .ingredient-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
   width: 24px;
   height: 24px;
-  border: 2px solid var(--glass-border);
+  border: 2px solid var(--brand-600);
   border-radius: 4px;
   flex-shrink: 0;
-  accent-color: var(--brand-600);
   cursor: pointer;
+  position: relative;
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.ingredient-checkbox:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+.ingredient-checkbox:checked {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+}
+
+.ingredient-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--text-on-brand);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .ingredient-checkbox:checked+.ingredient-name {
