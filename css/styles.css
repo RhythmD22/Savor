@@ -1605,3 +1605,27 @@
     gap: var(--space-md);
   }
 }
+
+/* ── iOS 27 home-screen web app top blur workaround ────── */
+
+html[data-ios27="true"] {
+  --ios27-blur-gap: 0px;
+}
+
+@media (orientation: portrait) {
+  html[data-ios27="true"] {
+    --ios27-blur-gap: 20px;
+  }
+
+  html[data-ios27="true"] .app-header {
+    padding-top: calc(var(--space-sm) + env(safe-area-inset-top, 0px) + var(--ios27-blur-gap));
+    height: calc(var(--header-height) + env(safe-area-inset-top, 0px) + var(--ios27-blur-gap));
+    background: var(--bg-body);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  html[data-ios27="true"] .theme-toggle-fixed {
+    top: calc(var(--space-sm) + env(safe-area-inset-top, 0px) + var(--ios27-blur-gap));
+  }
+}
