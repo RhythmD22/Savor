@@ -132,6 +132,8 @@ Savor/
 ├── apple-touch-icon-152x152.png            # iOS home screen 152x152
 ├── apple-touch-icon-167x167.png            # iOS home screen 167x167
 ├── favicon.ico                             # Multi-resolution favicon (16+32+48)
+├── favicon-16x16.png                       # Favicon 16x16 PNG
+├── favicon-32x32.png                       # Favicon 32x32 PNG
 ├── manifest.json               # PWA Web App Manifest
 ├── service-worker.js           # Offline caching and install flow
 ├── vercel.json                 # Vercel deployment config (SPA rewrites + serverless function)
